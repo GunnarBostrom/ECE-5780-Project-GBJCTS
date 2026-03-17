@@ -2,3 +2,4 @@
 Project repo for the ECE Class Group project for Gunnar Bostrom, Josh Canada, and Trenton Stratton
 
 Gunnar Bostrom
+Trenton Stratton
