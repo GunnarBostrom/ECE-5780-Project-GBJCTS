@@ -3,3 +3,4 @@ Project repo for the ECE Class Group project for Gunnar Bostrom, Josh Canada, an
 
 Gunnar Bostrom
 Trenton Stratton
+Josh Canada
