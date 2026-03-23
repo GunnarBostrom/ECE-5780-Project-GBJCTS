@@ -29,7 +29,7 @@ Weekly Milestones:
 
 ### Planned
 - radio controlled thrust input (altitude control)
-- stable flight
+- stable flight (pitch and roll axes)
 - fixed altitude hover
 
 
