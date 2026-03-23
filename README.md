@@ -1,4 +1,4 @@
-# ECE-5780-Project-GBJCTS: Simple Quadcopter Development for Embedded Systems
+# ECE-5780-Project-GBJCTS: Simple Quadcopter
 This is the final project for an embedded systems design course.
 
 This project involves developing a simple quadcopter to demonstrate proficiency in communication protocols, interrupts, system control, and sensor integration.
@@ -14,13 +14,13 @@ Weekly Milestones:
 
 
 ## Hardware Components (tentative)
-**Flight Controller:** STM32F072 Discovery Board
-**IMU:** LSM6DS3 on a NOYITO breakout board
-**Altitude sensor:** TBD
-**Radio:** TBD
-**ESCs:** TBD
-**Motors:** TBD
-**Power:** 4S LiPo battery
+**Flight Controller:** STM32F072 Discovery Board  
+**IMU:** LSM6DS3 on a NOYITO breakout board  
+**Altitude sensor:** TBD  
+**Radio:** TBD  
+**ESCs:** TBD  
+**Motors:** TBD  
+**Power:** 4S LiPo battery  
 
 
 ## Features
