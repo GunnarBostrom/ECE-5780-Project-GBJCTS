@@ -53,3 +53,9 @@ dkms.conf
 
 # debug information files
 *.dwo
+
+# IDE
+.vscode/
+
+# OS generated files
+.DS_Store
