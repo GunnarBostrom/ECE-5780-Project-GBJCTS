@@ -34,7 +34,6 @@ Weekly Milestones:
 
 
 ## Toolchain Setup
-
 This project uses a bare-metal embedded toolchain based on GCC, Make, and OpenOCD.
 
 ### Required Tools
@@ -66,7 +65,7 @@ sudo apt-get install gcc-arm-none-eabi binutils-arm-none-eabi make openocd stlin
 ```
 
 ### Windows
-Recommended to use WSL. Install Windows Subsystem for Linux and use the Linux instructions above.
+Recommended to use WSL. Install Windows Subsystem for Linux and use the Linux instructions above.  
 Setup guide: https://learn.microsoft.com/en-us/windows/wsl/install
 
 
