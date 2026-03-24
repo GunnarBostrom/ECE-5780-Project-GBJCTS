@@ -33,10 +33,47 @@ Weekly Milestones:
 - fixed altitude hover
 
 
+## Toolchain Setup
+
+This project uses a bare-metal embedded toolchain based on GCC, Make, and OpenOCD.
+
+### Required Tools
+- **GNU ARM Embedded Toolchain** (compiler)  
+- **Make** (build system)  
+- **OpenOCD** (flashing/debugging)  
+- **ST-Link** (hardware debug probe)
+<!-- - **STM32CubeMX**: [Download here](https://www.st.com/en/development-tools/stm32cubeide.html)   -->   
+
+<!-- ### Recommended
+- **Visual Studio Code:** [Download here](https://code.visualstudio.com/)  
+- **VSCode Extensions:**  
+   - [C/C++ Extension Pack](https://marketplace.visualstudio.com/items?itemName=ms-vscode.cpptools-extension-pack)  -->
+
+---
+
+### macOS (Homebrew)
+Install Homebrew if needed: https://brew.sh/
+
+```bash
+brew install --cask gcc-arm-embedded
+brew install openocd stlink make
+```
+
+### Linux (Ubuntu/Debian)
+```bash
+sudo apt-get update
+sudo apt-get install gcc-arm-none-eabi binutils-arm-none-eabi make openocd stlink-tools
+```
+
+### Windows
+Recommended to use WSL. Install Windows Subsystem for Linux and use the Linux instructions above.
+Setup guide: https://learn.microsoft.com/en-us/windows/wsl/install
+
+
 ## Project Info
-**Status:** In progress  
-**Semester:** Spring 2026  
-**Authors:** [G. Bostram](https://github.com/GunnarBostrom), [J. Canada](https://github.com/JC919), [T. Stratton](https://github.com/POACH3)  
-**Start Date:** 17-MAR-2026  
+**Status:** In Progress  
+**Language:** C  
 **License:** MIT License – see [LICENSE](./LICENSE)  
-**Language:** C
+**Authors:** [G. Bostram](https://github.com/GunnarBostrom), [J. Canada](https://github.com/JC919), [T. Stratton](https://github.com/POACH3)  
+**Semester:** Spring 2026  
+**Start Date:** 17-MAR-2026
