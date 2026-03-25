@@ -7,6 +7,15 @@
 #include <sys/_intsup.h>
 #include <sys/types.h>
 
+#include "config.h"
+
+// parallel logic for lidar and other peripherals
+#if USE_IMU
+    #include "imu.h"
+#else
+    #include "imu_fake.h"
+#endif
+
 void Error_Handler(void);
 void SystemClock_Config(void);
 
@@ -15,8 +24,33 @@ void SystemClock_Config(void);
   * @retval int
   */
 
-  int main(void)
-{
+int main(void){
+
+  imu_init();
+
+
+
+  while(1){
+    
+    imu_read();
+
+
+
+  }
+
+  // END DRONE CODE
+
+
+
+
+
+
+
+
+
+
+  // BEGIN BLINKY CODE
+
   /* Reset of all peripherals, Initializes the Flash interface and the Systick. */
   HAL_Init();
   /* Configure the system clock */
@@ -34,8 +68,7 @@ void SystemClock_Config(void);
   HAL_GPIO_WritePin(GPIOC, GPIO_PIN_6 | GPIO_PIN_7 | GPIO_PIN_8 | GPIO_PIN_9, GPIO_PIN_SET);
 
 
-  while (1)
-  {
+  while (1){
     HAL_GPIO_TogglePin(GPIOC, GPIO_PIN_8);
     HAL_Delay(500);
   }
