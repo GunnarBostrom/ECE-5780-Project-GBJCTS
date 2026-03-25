@@ -5,7 +5,7 @@ This project involves developing a simple quadcopter to demonstrate proficiency 
 
 Weekly Milestones:
 1. Development Environment & Hardware Setup
-2. IMU Sensor Interface (MPU-6050)
+2. IMU Sensor Interface
 3. Altitude Sensor Interface
 4. Radio Receiver Interface
 5. ESC Control and Motor PWM Output
@@ -16,11 +16,16 @@ Weekly Milestones:
 ## Hardware Components (tentative)
 **Flight Controller:** STM32F072 Discovery Board  
 **IMU:** LSM6DS3 on a NOYITO breakout board  
-**Altitude sensor:** TBD  
-**Radio:** TBD  
-**ESCs:** TBD  
-**Motors:** TBD  
+**Altitude Sensor:** VL53L1X on an Adafruit breakout board  
+**Radio:** Team BlackSheep Crossfire Nano  
+<!-- **SBUS Inverter:** 74HC14   -->
+**ESCs:** XILO 40A BLHeli_S ESC  
+**Motors:** EMAX ECO II 2207 2400KV  
 **Power:** 4S LiPo battery  
+**BEC:** MatekSys Micro BEC  
+
+**Quadcopter Frame:** GEPRC GEP-Mark4 5"  
+**Propellers:** HQProp Ethix S3  
 
 
 ## Features
@@ -50,7 +55,7 @@ This project uses a bare-metal embedded toolchain based on GCC, Make, and OpenOC
 
 ---
 
-### macOS (Homebrew)
+### macOS
 Install Homebrew if needed: https://brew.sh/
 
 ```bash
@@ -58,7 +63,7 @@ brew install --cask gcc-arm-embedded
 brew install openocd stlink make
 ```
 
-### Linux (Ubuntu/Debian)
+### Linux
 ```bash
 sudo apt-get update
 sudo apt-get install gcc-arm-none-eabi binutils-arm-none-eabi make openocd stlink-tools
