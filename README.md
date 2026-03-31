@@ -1,3 +1,11 @@
+To build this project in CMake:
+use:
+cmake --build build
+To flash to the the board:
+cmake --build build --target flash_project
+
+
+
 # ECE-5780-Project-GBJCTS: Simple Quadcopter
 This is the final project for an embedded systems design course.
 
