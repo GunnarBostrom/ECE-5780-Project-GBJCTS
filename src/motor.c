@@ -104,7 +104,7 @@ void motor_set_all(uint16_t pulse_us)
     TIM2->CCR3 = pulse_us;
     TIM2->CCR4 = pulse_us;
 }
-//Note motor minimum value for all 4 motors at min throttle is 1200
+
 void motor_set_individual(uint16_t m1, uint16_t m2, uint16_t m3, uint16_t m4)
 {
     TIM2->CCR1 = clamp_us(m1);
