@@ -8,13 +8,9 @@
 #include <sys/types.h>
 
 #include "config.h"
-
-// parallel logic for lidar and other peripherals
-#if USE_IMU
-    #include "imu.h"
-#else
-    #include "imu_fake.h"
-#endif
+#include "imu.h"
+#include "lidar.h"
+#include "radio.h"
 
 void Error_Handler(void);
 void SystemClock_Config(void);
@@ -26,14 +22,21 @@ void SystemClock_Config(void);
 
 int main(void){
 
-  imu_init();
+  /* Reset of all peripherals, Initializes the Flash interface and the Systick. */
+  HAL_Init();
+  /* Configure the system clock */
+  SystemClock_Config();
 
+  imu_init();
+  radio_init();
+  lidar_init();
 
 
   while(1){
     
     imu_read();
-
+    radio_read();
+    lidar_read();
 
 
   }
@@ -51,10 +54,6 @@ int main(void){
 
   // BEGIN BLINKY CODE
 
-  /* Reset of all peripherals, Initializes the Flash interface and the Systick. */
-  HAL_Init();
-  /* Configure the system clock */
-  SystemClock_Config();
 
   RCC->AHBENR |= RCC_AHBENR_GPIOCEN;
   (void)RCC->AHBENR;

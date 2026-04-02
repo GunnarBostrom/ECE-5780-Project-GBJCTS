@@ -2,6 +2,8 @@
 IMU
 
 */
+#ifndef IMU_H
+#define IMU_H
 
 #pragma once
 
@@ -10,3 +12,5 @@ void imu_init(void);
 
 // Read IMU data
 void imu_read(void);
+
+#endif // IMU_H
