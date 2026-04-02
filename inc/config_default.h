@@ -1,7 +1,14 @@
-// This config file sets a default configuration, but is overridden if a config_local.h exists.
+// This config file assumes that all peripherals are used unless overridden
 
-#pragma once
-
-// assumed that all peripherals are used unless overridden
-#define USE_IMU 1
-#define USE_LIDAR 1
+#ifndef USE_RADIO
+    #define USE_RADIO 1
+#endif
+#ifndef USE_IMU
+    #define USE_IMU 1
+#endif
+#ifndef USE_LIDAR
+    #define USE_LIDAR 1
+#endif
+#ifndef USE_MOTOR
+    #define USE_MOTOR 1
+#endif
