@@ -1,23 +1,49 @@
 /****************************************************************************************
  * File: pid_sim_main.c
  *
+ * Josh Canada
+ * Embedded Systems Final Project
+ *
  * Description:
- * This file runs a 1-axis PID control simulation for the quadrotor attitude system.
- * The simulation models the plant dynamics and applies a PID controller to track
- * a desired angle (setpoint). Results are printed to stdout and can be saved to a CSV
- * file for plotting in MATLAB.
+ * This file runs a simplified quadrotor hover simulation using:
+ *
+ * // Roll rotational dynamics
+ * // Pitch rotational dynamics
+ * // Yaw rotational dynamics
+ * // Altitude dynamics
+ * // Four first-order motor lag states
+ *
+ * The current active closed-loop controllers are:
+ *
+ * // Roll PID
+ * // Altitude PID
+ *
+ * Pitch and yaw are presently held at zero command so that controller development can
+ * proceed in stages.
+ *
+ * --------------------------------------------------------------------------------------
+ * MODEL OVERVIEW
+ * --------------------------------------------------------------------------------------
+ * The plant is not a full nonlinear 6-DOF quadrotor model. It is a reduced-order hover
+ * model intended for control framework development and initial PID tuning.
+ *
+ * The simulation flow is:
+ *
+ *   setpoint -> PID -> motor mixer -> plant update -> logged response
+ *
+ * Logged results are written to a CSV file that can be opened in MATLAB.
  *
  * --------------------------------------------------------------------------------------
  * BUILD INSTRUCTIONS (Linux / WSL / macOS)
  * --------------------------------------------------------------------------------------
- * From the root project directory, compile using gcc:
+ * From the root project directory, compile using:
  *
  *     gcc -Iinc src/pid_sim_main.c src/pid.c src/plant.c -lm -o sim
  *
  * Notes:
- * - -Iinc         : Includes header files from the /inc directory
- * - -lm           : Links the math library (required for sin, cos, etc.)
- * - -o sim        : Outputs executable named "sim"
+ * // -Iinc includes the header files in /inc
+ * // -lm links the math library for sqrtf()
+ * // -o sim creates an executable named sim
  *
  * --------------------------------------------------------------------------------------
  * RUN INSTRUCTIONS
@@ -26,26 +52,19 @@
  *
  *     ./sim
  *
- * To save output to a CSV file for analysis:
+ * The program will automatically save output to the next available file:
  *
- *     ./sim > results.csv
+ *     /mnt/c/Users/joshc/Documents/MATLAB/Embedded_Final_Project_Tuning/PID_Sim_N.csv
+ *
+ * where N is the first unused simulation number.
  *
  * --------------------------------------------------------------------------------------
- * VIEWING RESULTS
+ * IMPORTANT NOTES
  * --------------------------------------------------------------------------------------
- * MATLAB:
- *     data = readmatrix('results.csv');
- *     t = data(:,1);
- *     setpoint = data(:,2);
- *     angle = data(:,3);
- *     plot(t, setpoint, '--', t, angle);
- *     legend('Setpoint','Measured Angle');
- * --------------------------------------------------------------------------------------
- * NOTES
- * --------------------------------------------------------------------------------------
- * - The simulation timestep (dt) should match the intended embedded control loop rate
- *   (e.g., dt = 0.002 for 500 Hz).
- * - This is a single-axis model used for controller tuning before hardware deployment.
+ * // Controller outputs in this simulation are not true physical torque commands.
+ * // The motor commands are speed-like simulation values used to exercise the mixer
+ * // and hover plant.
+ * // This model is intended for framework development, not final gain selection.
  *
  ****************************************************************************************/
 
@@ -69,38 +88,34 @@ static float rad_to_deg(float rad)
     return rad * (180.0f / PI);
 }
 
+// Clamp helper for actuator commands.
+static float clampf(float value, float min_val, float max_val)
+{
+    if (value < min_val)
+    {
+        return min_val;
+    }
+
+    if (value > max_val)
+    {
+        return max_val;
+    }
+
+    return value;
+}
+
 // Opens the next available CSV file in the MATLAB tuning folder.
-//
-// The function checks for files named:
-//   PID_Sim_1.csv
-//   PID_Sim_2.csv
-//   PID_Sim_3.csv
-//   ...
-//
-// It returns a writable FILE pointer for the first filename that does
-// not already exist, which prevents old simulation results from being
-// overwritten.
 static FILE *open_next_sim_file(void)
 {
-    // Buffer used to build the full output path.
     char filename[256];
 
-    // Try file numbers in ascending order until an unused name is found.
     for (int sim_num = 1; sim_num <= 10000; sim_num++)
     {
-        // Build the full WSL path to the output CSV file.
-        //
-        // This corresponds to the Windows folder:
-        // C:\Users\joshc\Documents\MATLAB\Embedded_Final_Project_Tuning
         snprintf(filename,
                  sizeof(filename),
                  "/mnt/c/Users/joshc/Documents/MATLAB/Embedded_Final_Project_Tuning/PID_Sim_%d.csv",
                  sim_num);
 
-        // Attempt to open the file in read mode.
-        //
-        // If this succeeds, the file already exists, so we close it and
-        // continue searching for the next available number.
         FILE *test_fp = fopen(filename, "r");
 
         if (test_fp != NULL)
@@ -109,24 +124,19 @@ static FILE *open_next_sim_file(void)
             continue;
         }
 
-        // If fopen in read mode failed, we assume the file does not exist,
-        // so now we open it in write mode and return the handle.
         FILE *write_fp = fopen(filename, "w");
 
         if (write_fp == NULL)
         {
             printf("Error: could not create output file:\n%s\n", filename);
+            printf("Make sure the MATLAB output folder already exists.\n");
             return NULL;
         }
 
-        // Print the chosen filename to the terminal so you know which run
-        // was just created.
         printf("Saving simulation results to:\n%s\n", filename);
-
         return write_fp;
     }
 
-    // If we somehow run out of filenames, return NULL.
     printf("Error: no available simulation filenames were found.\n");
     return NULL;
 }
@@ -135,122 +145,248 @@ int main(void)
 {
     // Simulation settings
     //
-    // dt should match desired embedded system control rate
-    //
-    // dt = 1 / 500 = 0.002 seconds
+    // dt = 0.002 s corresponds to a 500 Hz control loop.
     const float dt = 0.002f;
     const float sim_time = 8.0f;
     const int total_steps = (int)(sim_time / dt);
 
-    // Controller and plant declarations
-    PIDController pid;
-    AxisPlant plant;
+    // Controllers
+    PIDController roll_pid;
+    PIDController pitch_pid;
+    PIDController yaw_pid;
+    PIDController altitude_pid;
 
-    // Open the next available CSV file so previous simulation runs are
-    // preserved automatically.
+    // Plant
+    QuadPlant plant;
+
+    // Open output file
     FILE *fp = open_next_sim_file();
 
-    // Stop immediately if the output file could not be created.
     if (fp == NULL)
     {
         return 1;
     }
 
+    // ----------------------------------------
     // PID initialization
+    // ----------------------------------------
     //
-    // These are only starting values. You will tune them by observing
-    // the angle response and controller output.
-    //
-    // Suggested starting logic:
-    // 1. Start with Ki = 0
-    // 2. Tune Kp until it responds strongly
-    // 3. Add Kd to reduce overshoot and oscillation
-    // 4. Add a small Ki only after the other two look good
-    PID_Init(&pid,
-             40.0f,     // kp
-             3.0f,     // ki
-             0.03f,     // kd
+    // These are moderate starting values for this simplified simulation.
+    // They will almost certainly need tuning as the plant evolves.
+
+    // Roll controller
+    PID_Init(&roll_pid,
+             140.0f,     // kp
+             1.0f,     // ki
+             0.1f,     // kd
              dt,
-             -1.5f,    // output minimum
-             1.5f,     // output maximum
-             -0.5f,    // integrator minimum
-             0.5f,     // integrator maximum
+             -30.0f,  // output minimum
+             30.0f,   // output maximum
+             -5.0f,   // integrator minimum
+             5.0f,    // integrator maximum
              0.02f);   // derivative filter time constant
 
+    // Altitude controller
+    PID_Init(&altitude_pid,
+             400.0f,    // kp
+             0.0f,    // ki
+             0.4f,    // kd
+             dt,
+             -300.0f,  // output minimum
+             300.0f,   // output maximum
+             -80.0f,   // integrator minimum
+             80.0f,    // integrator maximum
+             0.03f);   // derivative filter time constant
+    
+    // Pitch controller
+    PID_Init(&pitch_pid,
+         120.0f,   // kp (start similar to roll)
+         0.0f,     // ki
+         0.11f,     // kd
+         dt,
+         -30.0f,
+         30.0f,
+         -5.0f,
+         5.0f,
+         0.02f);
+
+    // Yaw controller (smaller gains!)
+    PID_Init(&yaw_pid,
+         55.0f,        // kp
+         2.0f,         // ki
+         0.06f,        // kd
+         dt,
+         -20.0f,
+         20.0f,
+         -5.0f,
+         5.0f,
+         0.02f);
+    // ----------------------------------------
     // Plant initialization
-    //
-    // These parameters define how "hard" the simulated axis is to control.
-    //
-    // J: larger J means more inertia, so the system is slower to accelerate
-    // b: larger b means more damping, so oscillations die out faster
-    // k: larger k means stronger restoring behavior
-    //
-    // Reasonable theoretical simulation values for controller development.
+    // ----------------------------------------
     Plant_Init(&plant,
-               0.03f,   // J
-               0.10f,   // b
-               2.5f);   // k
+               0.020f,      // J_roll
+               0.020f,      // J_pitch
+               0.040f,      // J_yaw
+               0.020f,      // b_roll
+               0.020f,      // b_pitch
+               0.030f,      // b_yaw
+               1.00f,       // mass
+               0.30f,       // b_altitude
+               0.050f,      // motor_tau
+               0.00002f,    // k_thrust
+               0.000002f,   // k_yaw
+               0.10f);      // arm_length
 
-    // Initial condition
-    //
-    // Start the plant with a nonzero disturbance so the controller has
-    // something meaningful to correct.
-    //
-    // Example: initial pitch error of +12 degrees.
-    plant.theta = deg_to_rad(12.0f);
-    plant.omega = 0.0f;
+    // Initial conditions
+    plant.roll.angle = deg_to_rad(10.0f);
+    plant.roll.rate = 0.0f;
 
-    // Desired angle is level, which means zero degrees.
-    float setpoint_deg = 0.0f;
+    plant.pitch.angle = 0.0f;
+    plant.pitch.rate = 0.0f;
 
-    // Write optional metadata at the top of the file.
-    //
-    // MATLAB readtable will not like these lines unless you skip them, so
-    // leave them commented out for now unless you want metadata in the file.
-    //
-    // fprintf(fp, "# Kp=%.3f, Ki=%.3f, Kd=%.3f\n", pid.kp, pid.ki, pid.kd);
-    // fprintf(fp, "# dt=%.6f, sim_time=%.3f\n", dt, sim_time);
+    plant.yaw.angle = 0.0f;
+    plant.yaw.rate = 0.0f;
 
-    // Write CSV header to the output file.
-    fprintf(fp, "time_s,setpoint_deg,theta_deg,omega_dps,control_output\n");
+    plant.altitude.z = 0.0f;
+    plant.altitude.vz = 0.0f;
+
+    // Setpoints
+    float roll_setpoint_deg = 0.0f;
+    float pitch_setpoint_deg = 0.0f;
+    float yaw_setpoint_deg = 0.0f;
+    float altitude_setpoint_m = 1.0f;
+
+    // Compute nominal hover motor command
+    //
+    // 4 * k_thrust * omega_hover^2 = m * g
+    //
+    // omega_hover = sqrt((m * g) / (4 * k_thrust))
+    float omega_hover =
+        sqrtf((plant.altitude.mass * plant.g) / (4.0f * plant.k_thrust));
+
+    printf("Computed hover command: %.3f\n", omega_hover);
+
+    // CSV header
+    fprintf(fp,"time,roll_sp,roll,pitch_sp,pitch,yaw_sp,yaw,alt_sp,alt,m0,m1,m2,m3\n");
 
     // Main simulation loop
     for (int step = 0; step < total_steps; step++)
     {
-        // Current simulation time.
         float time_s = step * dt;
 
-        // Convert plant states to human-friendly controller units.
-        //
-        // For tuning, it is often easier to think in degrees and deg/s
-        // instead of radians and rad/s.
-        float theta_deg = rad_to_deg(plant.theta);
-        float omega_dps = rad_to_deg(plant.omega);
+        // Read plant states
+        float roll_deg = rad_to_deg(plant.roll.angle);
+        float roll_rate_dps = rad_to_deg(plant.roll.rate);
 
-        // Update the PID controller.
-        //
-        // Input:
-        //   setpoint = desired angle in degrees
-        //   measurement = current angle in degrees
-        //
-        // Output:
-        //   torque-like command to the plant
-        float control_output = PID_Update(&pid, setpoint_deg, theta_deg);
+        float pitch_deg = rad_to_deg(plant.pitch.angle);
+        float pitch_rate_dps = rad_to_deg(plant.pitch.rate);
 
-        // Update the simulated plant using the controller output.
-        Plant_Update(&plant, control_output, dt);
+        float yaw_deg = rad_to_deg(plant.yaw.angle);
+        float yaw_rate_dps = rad_to_deg(plant.yaw.rate);
 
-        // Write every simulation step to the CSV file.
-        fprintf(fp, "%.6f,%.6f,%.6f,%.6f,%.6f\n",
-                time_s,
-                setpoint_deg,
-                theta_deg,
-                omega_dps,
-                control_output);
+        float altitude_m = plant.altitude.z;
+        float vertical_velocity_mps = plant.altitude.vz;
+
+        if (time_s > 1.0f && time_s < 3.0f)
+        {
+            roll_setpoint_deg = 10.0f;
+        }
+        else
+        {
+        roll_setpoint_deg = 0.0f;
+        }
+
+        if (time_s > 3.0f && time_s < 5.0f)
+        {
+            pitch_setpoint_deg = 10.0f;
+        }
+        else
+        {
+            pitch_setpoint_deg = 0.0f;
+        }
+
+        if (time_s > 5.0f && time_s < 7.0f)
+        {
+            yaw_setpoint_deg = 20.0f;
+        }
+        else
+        {
+            yaw_setpoint_deg = 0.0f;
+        }
+
+        // Controllers
+        float roll_cmd = PID_Update(&roll_pid, roll_setpoint_deg, roll_deg);
+        float pitch_cmd = PID_Update(&pitch_pid, pitch_setpoint_deg, pitch_deg);
+        float yaw_cmd = PID_Update(&yaw_pid, yaw_setpoint_deg, yaw_deg);
+        float altitude_cmd = PID_Update(&altitude_pid, altitude_setpoint_m, altitude_m);
+
+        // Base collective command around hover
+        float collective = omega_hover + altitude_cmd;
+
+        // ----------------------------------------
+        // Attitude command scaling before motor mixing
+        // ----------------------------------------
+        //
+        // Keep roll behavior mostly intact.
+        // Reduce pitch and yaw authority so they do not drive the motors into
+        // aggressive switching behavior.
+        //
+        // These scale factors are mixer gains, not PID gains.
+        const float roll_mix_scale = 1.00f;
+        const float pitch_mix_scale = 0.35f;
+        const float yaw_mix_scale = 0.20f;
+
+        float roll_mix = roll_mix_scale * roll_cmd;
+        float pitch_mix = pitch_mix_scale * pitch_cmd;
+        float yaw_mix = yaw_mix_scale * yaw_cmd;
+
+// ----------------------------------------
+// Motor mixing
+// ----------------------------------------
+//
+// Layout assumption:
+//
+//   Front
+//    0   1
+//    3   2
+//
+float motor_cmd[4];
+
+motor_cmd[0] = collective - roll_mix - pitch_mix + yaw_mix;
+motor_cmd[1] = collective + roll_mix - pitch_mix - yaw_mix;
+motor_cmd[2] = collective + roll_mix + pitch_mix + yaw_mix;
+motor_cmd[3] = collective - roll_mix + pitch_mix - yaw_mix;
+
+    // Clamp commands to a reasonable nonnegative simulation range
+for (int i = 0; i < 4; i++)
+{
+    motor_cmd[i] = clampf(motor_cmd[i], 0.0f, 2000.0f);
+}
+
+        // Update plant
+        Plant_Update(&plant, motor_cmd, dt);
+
+        // Logging
+        fprintf(fp,
+        "%.6f,%.6f,%.6f,%.6f,%.6f,%.6f,%.6f,%.6f,%.6f,%.6f,%.6f,%.6f,%.6f\n",
+        time_s,
+        roll_setpoint_deg,
+        roll_deg,
+        pitch_setpoint_deg,
+        pitch_deg,
+        yaw_setpoint_deg,
+        yaw_deg,
+        altitude_setpoint_m,
+        altitude_m,
+        motor_cmd[0],
+        motor_cmd[1],
+        motor_cmd[2],
+        motor_cmd[3]);
     }
 
-    // Close the output file so all buffered data is saved correctly.
     fclose(fp);
 
+    printf("Simulation complete.\n");
     return 0;
 }
