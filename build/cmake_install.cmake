@@ -1,4 +1,4 @@
-# Install script for directory: /home/gunnar/CS6780/Project/ECE-5780-Project-GBJCTS
+# Install script for directory: /mnt/c/Users/joshc/ECE-5780-Project-GBJCTS
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)
@@ -45,5 +45,5 @@ endif()
 
 string(REPLACE ";" "\n" CMAKE_INSTALL_MANIFEST_CONTENT
        "${CMAKE_INSTALL_MANIFEST_FILES}")
-file(WRITE "/home/gunnar/CS6780/Project/ECE-5780-Project-GBJCTS/build/${CMAKE_INSTALL_MANIFEST}"
+file(WRITE "/mnt/c/Users/joshc/ECE-5780-Project-GBJCTS/build/${CMAKE_INSTALL_MANIFEST}"
      "${CMAKE_INSTALL_MANIFEST_CONTENT}")

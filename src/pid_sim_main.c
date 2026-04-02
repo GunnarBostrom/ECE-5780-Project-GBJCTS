@@ -288,32 +288,32 @@ int main(void)
         float altitude_m = plant.altitude.z;
         float vertical_velocity_mps = plant.altitude.vz;
 
-        if (time_s > 1.0f && time_s < 3.0f)
-        {
-            roll_setpoint_deg = 10.0f;
-        }
-        else
-        {
-        roll_setpoint_deg = 0.0f;
-        }
+        // if (time_s > 1.0f && time_s < 3.0f)
+        // {
+        //     roll_setpoint_deg = 10.0f;
+        // }
+        // else
+        // {
+        // roll_setpoint_deg = 0.0f;
+        // }
 
-        if (time_s > 3.0f && time_s < 5.0f)
-        {
-            pitch_setpoint_deg = 10.0f;
-        }
-        else
-        {
-            pitch_setpoint_deg = 0.0f;
-        }
+        // if (time_s > 3.0f && time_s < 5.0f)
+        // {
+        //     pitch_setpoint_deg = 10.0f;
+        // }
+        // else
+        // {
+        //     pitch_setpoint_deg = 0.0f;
+        // }
 
-        if (time_s > 5.0f && time_s < 7.0f)
-        {
-            yaw_setpoint_deg = 20.0f;
-        }
-        else
-        {
-            yaw_setpoint_deg = 0.0f;
-        }
+        // if (time_s > 5.0f && time_s < 7.0f)
+        // {
+        //     yaw_setpoint_deg = 20.0f;
+        // }
+        // else
+        // {
+        //     yaw_setpoint_deg = 0.0f;
+        // }
 
         // Controllers
         float roll_cmd = PID_Update(&roll_pid, roll_setpoint_deg, roll_deg);

@@ -53,10 +53,10 @@ RM = /usr/bin/cmake -E rm -f
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /home/gunnar/CS6780/Project/ECE-5780-Project-GBJCTS
+CMAKE_SOURCE_DIR = /mnt/c/Users/joshc/ECE-5780-Project-GBJCTS
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /home/gunnar/CS6780/Project/ECE-5780-Project-GBJCTS/build
+CMAKE_BINARY_DIR = /mnt/c/Users/joshc/ECE-5780-Project-GBJCTS/build
 
 # Include any dependencies generated for this target.
 include CMakeFiles/project.dir/depend.make
@@ -70,367 +70,367 @@ include CMakeFiles/project.dir/progress.make
 include CMakeFiles/project.dir/flags.make
 
 CMakeFiles/project.dir/Core/Src/system_stm32f0xx.c.obj: CMakeFiles/project.dir/flags.make
-CMakeFiles/project.dir/Core/Src/system_stm32f0xx.c.obj: /home/gunnar/CS6780/Project/ECE-5780-Project-GBJCTS/Core/Src/system_stm32f0xx.c
+CMakeFiles/project.dir/Core/Src/system_stm32f0xx.c.obj: /mnt/c/Users/joshc/ECE-5780-Project-GBJCTS/Core/Src/system_stm32f0xx.c
 CMakeFiles/project.dir/Core/Src/system_stm32f0xx.c.obj: CMakeFiles/project.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/gunnar/CS6780/Project/ECE-5780-Project-GBJCTS/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building C object CMakeFiles/project.dir/Core/Src/system_stm32f0xx.c.obj"
-	/usr/bin/arm-none-eabi-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -MD -MT CMakeFiles/project.dir/Core/Src/system_stm32f0xx.c.obj -MF CMakeFiles/project.dir/Core/Src/system_stm32f0xx.c.obj.d -o CMakeFiles/project.dir/Core/Src/system_stm32f0xx.c.obj -c /home/gunnar/CS6780/Project/ECE-5780-Project-GBJCTS/Core/Src/system_stm32f0xx.c
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/mnt/c/Users/joshc/ECE-5780-Project-GBJCTS/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building C object CMakeFiles/project.dir/Core/Src/system_stm32f0xx.c.obj"
+	/usr/bin/arm-none-eabi-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -MD -MT CMakeFiles/project.dir/Core/Src/system_stm32f0xx.c.obj -MF CMakeFiles/project.dir/Core/Src/system_stm32f0xx.c.obj.d -o CMakeFiles/project.dir/Core/Src/system_stm32f0xx.c.obj -c /mnt/c/Users/joshc/ECE-5780-Project-GBJCTS/Core/Src/system_stm32f0xx.c
 
 CMakeFiles/project.dir/Core/Src/system_stm32f0xx.c.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing C source to CMakeFiles/project.dir/Core/Src/system_stm32f0xx.c.i"
-	/usr/bin/arm-none-eabi-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /home/gunnar/CS6780/Project/ECE-5780-Project-GBJCTS/Core/Src/system_stm32f0xx.c > CMakeFiles/project.dir/Core/Src/system_stm32f0xx.c.i
+	/usr/bin/arm-none-eabi-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /mnt/c/Users/joshc/ECE-5780-Project-GBJCTS/Core/Src/system_stm32f0xx.c > CMakeFiles/project.dir/Core/Src/system_stm32f0xx.c.i
 
 CMakeFiles/project.dir/Core/Src/system_stm32f0xx.c.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling C source to assembly CMakeFiles/project.dir/Core/Src/system_stm32f0xx.c.s"
-	/usr/bin/arm-none-eabi-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /home/gunnar/CS6780/Project/ECE-5780-Project-GBJCTS/Core/Src/system_stm32f0xx.c -o CMakeFiles/project.dir/Core/Src/system_stm32f0xx.c.s
+	/usr/bin/arm-none-eabi-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /mnt/c/Users/joshc/ECE-5780-Project-GBJCTS/Core/Src/system_stm32f0xx.c -o CMakeFiles/project.dir/Core/Src/system_stm32f0xx.c.s
 
 CMakeFiles/project.dir/Core/Src/syscalls.c.obj: CMakeFiles/project.dir/flags.make
-CMakeFiles/project.dir/Core/Src/syscalls.c.obj: /home/gunnar/CS6780/Project/ECE-5780-Project-GBJCTS/Core/Src/syscalls.c
+CMakeFiles/project.dir/Core/Src/syscalls.c.obj: /mnt/c/Users/joshc/ECE-5780-Project-GBJCTS/Core/Src/syscalls.c
 CMakeFiles/project.dir/Core/Src/syscalls.c.obj: CMakeFiles/project.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/gunnar/CS6780/Project/ECE-5780-Project-GBJCTS/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Building C object CMakeFiles/project.dir/Core/Src/syscalls.c.obj"
-	/usr/bin/arm-none-eabi-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -MD -MT CMakeFiles/project.dir/Core/Src/syscalls.c.obj -MF CMakeFiles/project.dir/Core/Src/syscalls.c.obj.d -o CMakeFiles/project.dir/Core/Src/syscalls.c.obj -c /home/gunnar/CS6780/Project/ECE-5780-Project-GBJCTS/Core/Src/syscalls.c
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/mnt/c/Users/joshc/ECE-5780-Project-GBJCTS/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Building C object CMakeFiles/project.dir/Core/Src/syscalls.c.obj"
+	/usr/bin/arm-none-eabi-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -MD -MT CMakeFiles/project.dir/Core/Src/syscalls.c.obj -MF CMakeFiles/project.dir/Core/Src/syscalls.c.obj.d -o CMakeFiles/project.dir/Core/Src/syscalls.c.obj -c /mnt/c/Users/joshc/ECE-5780-Project-GBJCTS/Core/Src/syscalls.c
 
 CMakeFiles/project.dir/Core/Src/syscalls.c.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing C source to CMakeFiles/project.dir/Core/Src/syscalls.c.i"
-	/usr/bin/arm-none-eabi-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /home/gunnar/CS6780/Project/ECE-5780-Project-GBJCTS/Core/Src/syscalls.c > CMakeFiles/project.dir/Core/Src/syscalls.c.i
+	/usr/bin/arm-none-eabi-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /mnt/c/Users/joshc/ECE-5780-Project-GBJCTS/Core/Src/syscalls.c > CMakeFiles/project.dir/Core/Src/syscalls.c.i
 
 CMakeFiles/project.dir/Core/Src/syscalls.c.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling C source to assembly CMakeFiles/project.dir/Core/Src/syscalls.c.s"
-	/usr/bin/arm-none-eabi-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /home/gunnar/CS6780/Project/ECE-5780-Project-GBJCTS/Core/Src/syscalls.c -o CMakeFiles/project.dir/Core/Src/syscalls.c.s
+	/usr/bin/arm-none-eabi-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /mnt/c/Users/joshc/ECE-5780-Project-GBJCTS/Core/Src/syscalls.c -o CMakeFiles/project.dir/Core/Src/syscalls.c.s
 
 CMakeFiles/project.dir/Core/Src/sysmem.c.obj: CMakeFiles/project.dir/flags.make
-CMakeFiles/project.dir/Core/Src/sysmem.c.obj: /home/gunnar/CS6780/Project/ECE-5780-Project-GBJCTS/Core/Src/sysmem.c
+CMakeFiles/project.dir/Core/Src/sysmem.c.obj: /mnt/c/Users/joshc/ECE-5780-Project-GBJCTS/Core/Src/sysmem.c
 CMakeFiles/project.dir/Core/Src/sysmem.c.obj: CMakeFiles/project.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/gunnar/CS6780/Project/ECE-5780-Project-GBJCTS/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Building C object CMakeFiles/project.dir/Core/Src/sysmem.c.obj"
-	/usr/bin/arm-none-eabi-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -MD -MT CMakeFiles/project.dir/Core/Src/sysmem.c.obj -MF CMakeFiles/project.dir/Core/Src/sysmem.c.obj.d -o CMakeFiles/project.dir/Core/Src/sysmem.c.obj -c /home/gunnar/CS6780/Project/ECE-5780-Project-GBJCTS/Core/Src/sysmem.c
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/mnt/c/Users/joshc/ECE-5780-Project-GBJCTS/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Building C object CMakeFiles/project.dir/Core/Src/sysmem.c.obj"
+	/usr/bin/arm-none-eabi-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -MD -MT CMakeFiles/project.dir/Core/Src/sysmem.c.obj -MF CMakeFiles/project.dir/Core/Src/sysmem.c.obj.d -o CMakeFiles/project.dir/Core/Src/sysmem.c.obj -c /mnt/c/Users/joshc/ECE-5780-Project-GBJCTS/Core/Src/sysmem.c
 
 CMakeFiles/project.dir/Core/Src/sysmem.c.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing C source to CMakeFiles/project.dir/Core/Src/sysmem.c.i"
-	/usr/bin/arm-none-eabi-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /home/gunnar/CS6780/Project/ECE-5780-Project-GBJCTS/Core/Src/sysmem.c > CMakeFiles/project.dir/Core/Src/sysmem.c.i
+	/usr/bin/arm-none-eabi-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /mnt/c/Users/joshc/ECE-5780-Project-GBJCTS/Core/Src/sysmem.c > CMakeFiles/project.dir/Core/Src/sysmem.c.i
 
 CMakeFiles/project.dir/Core/Src/sysmem.c.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling C source to assembly CMakeFiles/project.dir/Core/Src/sysmem.c.s"
-	/usr/bin/arm-none-eabi-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /home/gunnar/CS6780/Project/ECE-5780-Project-GBJCTS/Core/Src/sysmem.c -o CMakeFiles/project.dir/Core/Src/sysmem.c.s
+	/usr/bin/arm-none-eabi-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /mnt/c/Users/joshc/ECE-5780-Project-GBJCTS/Core/Src/sysmem.c -o CMakeFiles/project.dir/Core/Src/sysmem.c.s
 
 CMakeFiles/project.dir/src/control.c.obj: CMakeFiles/project.dir/flags.make
-CMakeFiles/project.dir/src/control.c.obj: /home/gunnar/CS6780/Project/ECE-5780-Project-GBJCTS/src/control.c
+CMakeFiles/project.dir/src/control.c.obj: /mnt/c/Users/joshc/ECE-5780-Project-GBJCTS/src/control.c
 CMakeFiles/project.dir/src/control.c.obj: CMakeFiles/project.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/gunnar/CS6780/Project/ECE-5780-Project-GBJCTS/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_4) "Building C object CMakeFiles/project.dir/src/control.c.obj"
-	/usr/bin/arm-none-eabi-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -MD -MT CMakeFiles/project.dir/src/control.c.obj -MF CMakeFiles/project.dir/src/control.c.obj.d -o CMakeFiles/project.dir/src/control.c.obj -c /home/gunnar/CS6780/Project/ECE-5780-Project-GBJCTS/src/control.c
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/mnt/c/Users/joshc/ECE-5780-Project-GBJCTS/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_4) "Building C object CMakeFiles/project.dir/src/control.c.obj"
+	/usr/bin/arm-none-eabi-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -MD -MT CMakeFiles/project.dir/src/control.c.obj -MF CMakeFiles/project.dir/src/control.c.obj.d -o CMakeFiles/project.dir/src/control.c.obj -c /mnt/c/Users/joshc/ECE-5780-Project-GBJCTS/src/control.c
 
 CMakeFiles/project.dir/src/control.c.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing C source to CMakeFiles/project.dir/src/control.c.i"
-	/usr/bin/arm-none-eabi-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /home/gunnar/CS6780/Project/ECE-5780-Project-GBJCTS/src/control.c > CMakeFiles/project.dir/src/control.c.i
+	/usr/bin/arm-none-eabi-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /mnt/c/Users/joshc/ECE-5780-Project-GBJCTS/src/control.c > CMakeFiles/project.dir/src/control.c.i
 
 CMakeFiles/project.dir/src/control.c.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling C source to assembly CMakeFiles/project.dir/src/control.c.s"
-	/usr/bin/arm-none-eabi-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /home/gunnar/CS6780/Project/ECE-5780-Project-GBJCTS/src/control.c -o CMakeFiles/project.dir/src/control.c.s
+	/usr/bin/arm-none-eabi-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /mnt/c/Users/joshc/ECE-5780-Project-GBJCTS/src/control.c -o CMakeFiles/project.dir/src/control.c.s
 
 CMakeFiles/project.dir/src/filter.c.obj: CMakeFiles/project.dir/flags.make
-CMakeFiles/project.dir/src/filter.c.obj: /home/gunnar/CS6780/Project/ECE-5780-Project-GBJCTS/src/filter.c
+CMakeFiles/project.dir/src/filter.c.obj: /mnt/c/Users/joshc/ECE-5780-Project-GBJCTS/src/filter.c
 CMakeFiles/project.dir/src/filter.c.obj: CMakeFiles/project.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/gunnar/CS6780/Project/ECE-5780-Project-GBJCTS/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_5) "Building C object CMakeFiles/project.dir/src/filter.c.obj"
-	/usr/bin/arm-none-eabi-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -MD -MT CMakeFiles/project.dir/src/filter.c.obj -MF CMakeFiles/project.dir/src/filter.c.obj.d -o CMakeFiles/project.dir/src/filter.c.obj -c /home/gunnar/CS6780/Project/ECE-5780-Project-GBJCTS/src/filter.c
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/mnt/c/Users/joshc/ECE-5780-Project-GBJCTS/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_5) "Building C object CMakeFiles/project.dir/src/filter.c.obj"
+	/usr/bin/arm-none-eabi-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -MD -MT CMakeFiles/project.dir/src/filter.c.obj -MF CMakeFiles/project.dir/src/filter.c.obj.d -o CMakeFiles/project.dir/src/filter.c.obj -c /mnt/c/Users/joshc/ECE-5780-Project-GBJCTS/src/filter.c
 
 CMakeFiles/project.dir/src/filter.c.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing C source to CMakeFiles/project.dir/src/filter.c.i"
-	/usr/bin/arm-none-eabi-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /home/gunnar/CS6780/Project/ECE-5780-Project-GBJCTS/src/filter.c > CMakeFiles/project.dir/src/filter.c.i
+	/usr/bin/arm-none-eabi-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /mnt/c/Users/joshc/ECE-5780-Project-GBJCTS/src/filter.c > CMakeFiles/project.dir/src/filter.c.i
 
 CMakeFiles/project.dir/src/filter.c.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling C source to assembly CMakeFiles/project.dir/src/filter.c.s"
-	/usr/bin/arm-none-eabi-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /home/gunnar/CS6780/Project/ECE-5780-Project-GBJCTS/src/filter.c -o CMakeFiles/project.dir/src/filter.c.s
+	/usr/bin/arm-none-eabi-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /mnt/c/Users/joshc/ECE-5780-Project-GBJCTS/src/filter.c -o CMakeFiles/project.dir/src/filter.c.s
 
 CMakeFiles/project.dir/src/i2c.c.obj: CMakeFiles/project.dir/flags.make
-CMakeFiles/project.dir/src/i2c.c.obj: /home/gunnar/CS6780/Project/ECE-5780-Project-GBJCTS/src/i2c.c
+CMakeFiles/project.dir/src/i2c.c.obj: /mnt/c/Users/joshc/ECE-5780-Project-GBJCTS/src/i2c.c
 CMakeFiles/project.dir/src/i2c.c.obj: CMakeFiles/project.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/gunnar/CS6780/Project/ECE-5780-Project-GBJCTS/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_6) "Building C object CMakeFiles/project.dir/src/i2c.c.obj"
-	/usr/bin/arm-none-eabi-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -MD -MT CMakeFiles/project.dir/src/i2c.c.obj -MF CMakeFiles/project.dir/src/i2c.c.obj.d -o CMakeFiles/project.dir/src/i2c.c.obj -c /home/gunnar/CS6780/Project/ECE-5780-Project-GBJCTS/src/i2c.c
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/mnt/c/Users/joshc/ECE-5780-Project-GBJCTS/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_6) "Building C object CMakeFiles/project.dir/src/i2c.c.obj"
+	/usr/bin/arm-none-eabi-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -MD -MT CMakeFiles/project.dir/src/i2c.c.obj -MF CMakeFiles/project.dir/src/i2c.c.obj.d -o CMakeFiles/project.dir/src/i2c.c.obj -c /mnt/c/Users/joshc/ECE-5780-Project-GBJCTS/src/i2c.c
 
 CMakeFiles/project.dir/src/i2c.c.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing C source to CMakeFiles/project.dir/src/i2c.c.i"
-	/usr/bin/arm-none-eabi-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /home/gunnar/CS6780/Project/ECE-5780-Project-GBJCTS/src/i2c.c > CMakeFiles/project.dir/src/i2c.c.i
+	/usr/bin/arm-none-eabi-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /mnt/c/Users/joshc/ECE-5780-Project-GBJCTS/src/i2c.c > CMakeFiles/project.dir/src/i2c.c.i
 
 CMakeFiles/project.dir/src/i2c.c.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling C source to assembly CMakeFiles/project.dir/src/i2c.c.s"
-	/usr/bin/arm-none-eabi-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /home/gunnar/CS6780/Project/ECE-5780-Project-GBJCTS/src/i2c.c -o CMakeFiles/project.dir/src/i2c.c.s
+	/usr/bin/arm-none-eabi-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /mnt/c/Users/joshc/ECE-5780-Project-GBJCTS/src/i2c.c -o CMakeFiles/project.dir/src/i2c.c.s
 
 CMakeFiles/project.dir/src/imu.c.obj: CMakeFiles/project.dir/flags.make
-CMakeFiles/project.dir/src/imu.c.obj: /home/gunnar/CS6780/Project/ECE-5780-Project-GBJCTS/src/imu.c
+CMakeFiles/project.dir/src/imu.c.obj: /mnt/c/Users/joshc/ECE-5780-Project-GBJCTS/src/imu.c
 CMakeFiles/project.dir/src/imu.c.obj: CMakeFiles/project.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/gunnar/CS6780/Project/ECE-5780-Project-GBJCTS/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_7) "Building C object CMakeFiles/project.dir/src/imu.c.obj"
-	/usr/bin/arm-none-eabi-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -MD -MT CMakeFiles/project.dir/src/imu.c.obj -MF CMakeFiles/project.dir/src/imu.c.obj.d -o CMakeFiles/project.dir/src/imu.c.obj -c /home/gunnar/CS6780/Project/ECE-5780-Project-GBJCTS/src/imu.c
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/mnt/c/Users/joshc/ECE-5780-Project-GBJCTS/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_7) "Building C object CMakeFiles/project.dir/src/imu.c.obj"
+	/usr/bin/arm-none-eabi-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -MD -MT CMakeFiles/project.dir/src/imu.c.obj -MF CMakeFiles/project.dir/src/imu.c.obj.d -o CMakeFiles/project.dir/src/imu.c.obj -c /mnt/c/Users/joshc/ECE-5780-Project-GBJCTS/src/imu.c
 
 CMakeFiles/project.dir/src/imu.c.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing C source to CMakeFiles/project.dir/src/imu.c.i"
-	/usr/bin/arm-none-eabi-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /home/gunnar/CS6780/Project/ECE-5780-Project-GBJCTS/src/imu.c > CMakeFiles/project.dir/src/imu.c.i
+	/usr/bin/arm-none-eabi-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /mnt/c/Users/joshc/ECE-5780-Project-GBJCTS/src/imu.c > CMakeFiles/project.dir/src/imu.c.i
 
 CMakeFiles/project.dir/src/imu.c.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling C source to assembly CMakeFiles/project.dir/src/imu.c.s"
-	/usr/bin/arm-none-eabi-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /home/gunnar/CS6780/Project/ECE-5780-Project-GBJCTS/src/imu.c -o CMakeFiles/project.dir/src/imu.c.s
+	/usr/bin/arm-none-eabi-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /mnt/c/Users/joshc/ECE-5780-Project-GBJCTS/src/imu.c -o CMakeFiles/project.dir/src/imu.c.s
 
 CMakeFiles/project.dir/src/lidar.c.obj: CMakeFiles/project.dir/flags.make
-CMakeFiles/project.dir/src/lidar.c.obj: /home/gunnar/CS6780/Project/ECE-5780-Project-GBJCTS/src/lidar.c
+CMakeFiles/project.dir/src/lidar.c.obj: /mnt/c/Users/joshc/ECE-5780-Project-GBJCTS/src/lidar.c
 CMakeFiles/project.dir/src/lidar.c.obj: CMakeFiles/project.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/gunnar/CS6780/Project/ECE-5780-Project-GBJCTS/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_8) "Building C object CMakeFiles/project.dir/src/lidar.c.obj"
-	/usr/bin/arm-none-eabi-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -MD -MT CMakeFiles/project.dir/src/lidar.c.obj -MF CMakeFiles/project.dir/src/lidar.c.obj.d -o CMakeFiles/project.dir/src/lidar.c.obj -c /home/gunnar/CS6780/Project/ECE-5780-Project-GBJCTS/src/lidar.c
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/mnt/c/Users/joshc/ECE-5780-Project-GBJCTS/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_8) "Building C object CMakeFiles/project.dir/src/lidar.c.obj"
+	/usr/bin/arm-none-eabi-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -MD -MT CMakeFiles/project.dir/src/lidar.c.obj -MF CMakeFiles/project.dir/src/lidar.c.obj.d -o CMakeFiles/project.dir/src/lidar.c.obj -c /mnt/c/Users/joshc/ECE-5780-Project-GBJCTS/src/lidar.c
 
 CMakeFiles/project.dir/src/lidar.c.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing C source to CMakeFiles/project.dir/src/lidar.c.i"
-	/usr/bin/arm-none-eabi-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /home/gunnar/CS6780/Project/ECE-5780-Project-GBJCTS/src/lidar.c > CMakeFiles/project.dir/src/lidar.c.i
+	/usr/bin/arm-none-eabi-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /mnt/c/Users/joshc/ECE-5780-Project-GBJCTS/src/lidar.c > CMakeFiles/project.dir/src/lidar.c.i
 
 CMakeFiles/project.dir/src/lidar.c.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling C source to assembly CMakeFiles/project.dir/src/lidar.c.s"
-	/usr/bin/arm-none-eabi-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /home/gunnar/CS6780/Project/ECE-5780-Project-GBJCTS/src/lidar.c -o CMakeFiles/project.dir/src/lidar.c.s
+	/usr/bin/arm-none-eabi-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /mnt/c/Users/joshc/ECE-5780-Project-GBJCTS/src/lidar.c -o CMakeFiles/project.dir/src/lidar.c.s
 
 CMakeFiles/project.dir/src/main.c.obj: CMakeFiles/project.dir/flags.make
-CMakeFiles/project.dir/src/main.c.obj: /home/gunnar/CS6780/Project/ECE-5780-Project-GBJCTS/src/main.c
+CMakeFiles/project.dir/src/main.c.obj: /mnt/c/Users/joshc/ECE-5780-Project-GBJCTS/src/main.c
 CMakeFiles/project.dir/src/main.c.obj: CMakeFiles/project.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/gunnar/CS6780/Project/ECE-5780-Project-GBJCTS/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_9) "Building C object CMakeFiles/project.dir/src/main.c.obj"
-	/usr/bin/arm-none-eabi-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -MD -MT CMakeFiles/project.dir/src/main.c.obj -MF CMakeFiles/project.dir/src/main.c.obj.d -o CMakeFiles/project.dir/src/main.c.obj -c /home/gunnar/CS6780/Project/ECE-5780-Project-GBJCTS/src/main.c
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/mnt/c/Users/joshc/ECE-5780-Project-GBJCTS/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_9) "Building C object CMakeFiles/project.dir/src/main.c.obj"
+	/usr/bin/arm-none-eabi-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -MD -MT CMakeFiles/project.dir/src/main.c.obj -MF CMakeFiles/project.dir/src/main.c.obj.d -o CMakeFiles/project.dir/src/main.c.obj -c /mnt/c/Users/joshc/ECE-5780-Project-GBJCTS/src/main.c
 
 CMakeFiles/project.dir/src/main.c.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing C source to CMakeFiles/project.dir/src/main.c.i"
-	/usr/bin/arm-none-eabi-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /home/gunnar/CS6780/Project/ECE-5780-Project-GBJCTS/src/main.c > CMakeFiles/project.dir/src/main.c.i
+	/usr/bin/arm-none-eabi-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /mnt/c/Users/joshc/ECE-5780-Project-GBJCTS/src/main.c > CMakeFiles/project.dir/src/main.c.i
 
 CMakeFiles/project.dir/src/main.c.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling C source to assembly CMakeFiles/project.dir/src/main.c.s"
-	/usr/bin/arm-none-eabi-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /home/gunnar/CS6780/Project/ECE-5780-Project-GBJCTS/src/main.c -o CMakeFiles/project.dir/src/main.c.s
+	/usr/bin/arm-none-eabi-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /mnt/c/Users/joshc/ECE-5780-Project-GBJCTS/src/main.c -o CMakeFiles/project.dir/src/main.c.s
 
 CMakeFiles/project.dir/src/motor.c.obj: CMakeFiles/project.dir/flags.make
-CMakeFiles/project.dir/src/motor.c.obj: /home/gunnar/CS6780/Project/ECE-5780-Project-GBJCTS/src/motor.c
+CMakeFiles/project.dir/src/motor.c.obj: /mnt/c/Users/joshc/ECE-5780-Project-GBJCTS/src/motor.c
 CMakeFiles/project.dir/src/motor.c.obj: CMakeFiles/project.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/gunnar/CS6780/Project/ECE-5780-Project-GBJCTS/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_10) "Building C object CMakeFiles/project.dir/src/motor.c.obj"
-	/usr/bin/arm-none-eabi-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -MD -MT CMakeFiles/project.dir/src/motor.c.obj -MF CMakeFiles/project.dir/src/motor.c.obj.d -o CMakeFiles/project.dir/src/motor.c.obj -c /home/gunnar/CS6780/Project/ECE-5780-Project-GBJCTS/src/motor.c
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/mnt/c/Users/joshc/ECE-5780-Project-GBJCTS/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_10) "Building C object CMakeFiles/project.dir/src/motor.c.obj"
+	/usr/bin/arm-none-eabi-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -MD -MT CMakeFiles/project.dir/src/motor.c.obj -MF CMakeFiles/project.dir/src/motor.c.obj.d -o CMakeFiles/project.dir/src/motor.c.obj -c /mnt/c/Users/joshc/ECE-5780-Project-GBJCTS/src/motor.c
 
 CMakeFiles/project.dir/src/motor.c.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing C source to CMakeFiles/project.dir/src/motor.c.i"
-	/usr/bin/arm-none-eabi-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /home/gunnar/CS6780/Project/ECE-5780-Project-GBJCTS/src/motor.c > CMakeFiles/project.dir/src/motor.c.i
+	/usr/bin/arm-none-eabi-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /mnt/c/Users/joshc/ECE-5780-Project-GBJCTS/src/motor.c > CMakeFiles/project.dir/src/motor.c.i
 
 CMakeFiles/project.dir/src/motor.c.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling C source to assembly CMakeFiles/project.dir/src/motor.c.s"
-	/usr/bin/arm-none-eabi-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /home/gunnar/CS6780/Project/ECE-5780-Project-GBJCTS/src/motor.c -o CMakeFiles/project.dir/src/motor.c.s
+	/usr/bin/arm-none-eabi-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /mnt/c/Users/joshc/ECE-5780-Project-GBJCTS/src/motor.c -o CMakeFiles/project.dir/src/motor.c.s
 
 CMakeFiles/project.dir/src/pwm.c.obj: CMakeFiles/project.dir/flags.make
-CMakeFiles/project.dir/src/pwm.c.obj: /home/gunnar/CS6780/Project/ECE-5780-Project-GBJCTS/src/pwm.c
+CMakeFiles/project.dir/src/pwm.c.obj: /mnt/c/Users/joshc/ECE-5780-Project-GBJCTS/src/pwm.c
 CMakeFiles/project.dir/src/pwm.c.obj: CMakeFiles/project.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/gunnar/CS6780/Project/ECE-5780-Project-GBJCTS/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_11) "Building C object CMakeFiles/project.dir/src/pwm.c.obj"
-	/usr/bin/arm-none-eabi-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -MD -MT CMakeFiles/project.dir/src/pwm.c.obj -MF CMakeFiles/project.dir/src/pwm.c.obj.d -o CMakeFiles/project.dir/src/pwm.c.obj -c /home/gunnar/CS6780/Project/ECE-5780-Project-GBJCTS/src/pwm.c
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/mnt/c/Users/joshc/ECE-5780-Project-GBJCTS/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_11) "Building C object CMakeFiles/project.dir/src/pwm.c.obj"
+	/usr/bin/arm-none-eabi-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -MD -MT CMakeFiles/project.dir/src/pwm.c.obj -MF CMakeFiles/project.dir/src/pwm.c.obj.d -o CMakeFiles/project.dir/src/pwm.c.obj -c /mnt/c/Users/joshc/ECE-5780-Project-GBJCTS/src/pwm.c
 
 CMakeFiles/project.dir/src/pwm.c.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing C source to CMakeFiles/project.dir/src/pwm.c.i"
-	/usr/bin/arm-none-eabi-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /home/gunnar/CS6780/Project/ECE-5780-Project-GBJCTS/src/pwm.c > CMakeFiles/project.dir/src/pwm.c.i
+	/usr/bin/arm-none-eabi-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /mnt/c/Users/joshc/ECE-5780-Project-GBJCTS/src/pwm.c > CMakeFiles/project.dir/src/pwm.c.i
 
 CMakeFiles/project.dir/src/pwm.c.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling C source to assembly CMakeFiles/project.dir/src/pwm.c.s"
-	/usr/bin/arm-none-eabi-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /home/gunnar/CS6780/Project/ECE-5780-Project-GBJCTS/src/pwm.c -o CMakeFiles/project.dir/src/pwm.c.s
+	/usr/bin/arm-none-eabi-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /mnt/c/Users/joshc/ECE-5780-Project-GBJCTS/src/pwm.c -o CMakeFiles/project.dir/src/pwm.c.s
 
 CMakeFiles/project.dir/src/radio.c.obj: CMakeFiles/project.dir/flags.make
-CMakeFiles/project.dir/src/radio.c.obj: /home/gunnar/CS6780/Project/ECE-5780-Project-GBJCTS/src/radio.c
+CMakeFiles/project.dir/src/radio.c.obj: /mnt/c/Users/joshc/ECE-5780-Project-GBJCTS/src/radio.c
 CMakeFiles/project.dir/src/radio.c.obj: CMakeFiles/project.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/gunnar/CS6780/Project/ECE-5780-Project-GBJCTS/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_12) "Building C object CMakeFiles/project.dir/src/radio.c.obj"
-	/usr/bin/arm-none-eabi-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -MD -MT CMakeFiles/project.dir/src/radio.c.obj -MF CMakeFiles/project.dir/src/radio.c.obj.d -o CMakeFiles/project.dir/src/radio.c.obj -c /home/gunnar/CS6780/Project/ECE-5780-Project-GBJCTS/src/radio.c
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/mnt/c/Users/joshc/ECE-5780-Project-GBJCTS/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_12) "Building C object CMakeFiles/project.dir/src/radio.c.obj"
+	/usr/bin/arm-none-eabi-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -MD -MT CMakeFiles/project.dir/src/radio.c.obj -MF CMakeFiles/project.dir/src/radio.c.obj.d -o CMakeFiles/project.dir/src/radio.c.obj -c /mnt/c/Users/joshc/ECE-5780-Project-GBJCTS/src/radio.c
 
 CMakeFiles/project.dir/src/radio.c.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing C source to CMakeFiles/project.dir/src/radio.c.i"
-	/usr/bin/arm-none-eabi-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /home/gunnar/CS6780/Project/ECE-5780-Project-GBJCTS/src/radio.c > CMakeFiles/project.dir/src/radio.c.i
+	/usr/bin/arm-none-eabi-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /mnt/c/Users/joshc/ECE-5780-Project-GBJCTS/src/radio.c > CMakeFiles/project.dir/src/radio.c.i
 
 CMakeFiles/project.dir/src/radio.c.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling C source to assembly CMakeFiles/project.dir/src/radio.c.s"
-	/usr/bin/arm-none-eabi-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /home/gunnar/CS6780/Project/ECE-5780-Project-GBJCTS/src/radio.c -o CMakeFiles/project.dir/src/radio.c.s
+	/usr/bin/arm-none-eabi-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /mnt/c/Users/joshc/ECE-5780-Project-GBJCTS/src/radio.c -o CMakeFiles/project.dir/src/radio.c.s
 
 CMakeFiles/project.dir/src/uart.c.obj: CMakeFiles/project.dir/flags.make
-CMakeFiles/project.dir/src/uart.c.obj: /home/gunnar/CS6780/Project/ECE-5780-Project-GBJCTS/src/uart.c
+CMakeFiles/project.dir/src/uart.c.obj: /mnt/c/Users/joshc/ECE-5780-Project-GBJCTS/src/uart.c
 CMakeFiles/project.dir/src/uart.c.obj: CMakeFiles/project.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/gunnar/CS6780/Project/ECE-5780-Project-GBJCTS/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_13) "Building C object CMakeFiles/project.dir/src/uart.c.obj"
-	/usr/bin/arm-none-eabi-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -MD -MT CMakeFiles/project.dir/src/uart.c.obj -MF CMakeFiles/project.dir/src/uart.c.obj.d -o CMakeFiles/project.dir/src/uart.c.obj -c /home/gunnar/CS6780/Project/ECE-5780-Project-GBJCTS/src/uart.c
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/mnt/c/Users/joshc/ECE-5780-Project-GBJCTS/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_13) "Building C object CMakeFiles/project.dir/src/uart.c.obj"
+	/usr/bin/arm-none-eabi-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -MD -MT CMakeFiles/project.dir/src/uart.c.obj -MF CMakeFiles/project.dir/src/uart.c.obj.d -o CMakeFiles/project.dir/src/uart.c.obj -c /mnt/c/Users/joshc/ECE-5780-Project-GBJCTS/src/uart.c
 
 CMakeFiles/project.dir/src/uart.c.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing C source to CMakeFiles/project.dir/src/uart.c.i"
-	/usr/bin/arm-none-eabi-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /home/gunnar/CS6780/Project/ECE-5780-Project-GBJCTS/src/uart.c > CMakeFiles/project.dir/src/uart.c.i
+	/usr/bin/arm-none-eabi-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /mnt/c/Users/joshc/ECE-5780-Project-GBJCTS/src/uart.c > CMakeFiles/project.dir/src/uart.c.i
 
 CMakeFiles/project.dir/src/uart.c.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling C source to assembly CMakeFiles/project.dir/src/uart.c.s"
-	/usr/bin/arm-none-eabi-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /home/gunnar/CS6780/Project/ECE-5780-Project-GBJCTS/src/uart.c -o CMakeFiles/project.dir/src/uart.c.s
+	/usr/bin/arm-none-eabi-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /mnt/c/Users/joshc/ECE-5780-Project-GBJCTS/src/uart.c -o CMakeFiles/project.dir/src/uart.c.s
 
 CMakeFiles/project.dir/src/stm32f0xx_it.c.obj: CMakeFiles/project.dir/flags.make
-CMakeFiles/project.dir/src/stm32f0xx_it.c.obj: /home/gunnar/CS6780/Project/ECE-5780-Project-GBJCTS/src/stm32f0xx_it.c
+CMakeFiles/project.dir/src/stm32f0xx_it.c.obj: /mnt/c/Users/joshc/ECE-5780-Project-GBJCTS/src/stm32f0xx_it.c
 CMakeFiles/project.dir/src/stm32f0xx_it.c.obj: CMakeFiles/project.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/gunnar/CS6780/Project/ECE-5780-Project-GBJCTS/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_14) "Building C object CMakeFiles/project.dir/src/stm32f0xx_it.c.obj"
-	/usr/bin/arm-none-eabi-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -MD -MT CMakeFiles/project.dir/src/stm32f0xx_it.c.obj -MF CMakeFiles/project.dir/src/stm32f0xx_it.c.obj.d -o CMakeFiles/project.dir/src/stm32f0xx_it.c.obj -c /home/gunnar/CS6780/Project/ECE-5780-Project-GBJCTS/src/stm32f0xx_it.c
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/mnt/c/Users/joshc/ECE-5780-Project-GBJCTS/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_14) "Building C object CMakeFiles/project.dir/src/stm32f0xx_it.c.obj"
+	/usr/bin/arm-none-eabi-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -MD -MT CMakeFiles/project.dir/src/stm32f0xx_it.c.obj -MF CMakeFiles/project.dir/src/stm32f0xx_it.c.obj.d -o CMakeFiles/project.dir/src/stm32f0xx_it.c.obj -c /mnt/c/Users/joshc/ECE-5780-Project-GBJCTS/src/stm32f0xx_it.c
 
 CMakeFiles/project.dir/src/stm32f0xx_it.c.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing C source to CMakeFiles/project.dir/src/stm32f0xx_it.c.i"
-	/usr/bin/arm-none-eabi-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /home/gunnar/CS6780/Project/ECE-5780-Project-GBJCTS/src/stm32f0xx_it.c > CMakeFiles/project.dir/src/stm32f0xx_it.c.i
+	/usr/bin/arm-none-eabi-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /mnt/c/Users/joshc/ECE-5780-Project-GBJCTS/src/stm32f0xx_it.c > CMakeFiles/project.dir/src/stm32f0xx_it.c.i
 
 CMakeFiles/project.dir/src/stm32f0xx_it.c.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling C source to assembly CMakeFiles/project.dir/src/stm32f0xx_it.c.s"
-	/usr/bin/arm-none-eabi-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /home/gunnar/CS6780/Project/ECE-5780-Project-GBJCTS/src/stm32f0xx_it.c -o CMakeFiles/project.dir/src/stm32f0xx_it.c.s
+	/usr/bin/arm-none-eabi-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /mnt/c/Users/joshc/ECE-5780-Project-GBJCTS/src/stm32f0xx_it.c -o CMakeFiles/project.dir/src/stm32f0xx_it.c.s
 
 CMakeFiles/project.dir/src/stm32f0xx_hal_msp.c.obj: CMakeFiles/project.dir/flags.make
-CMakeFiles/project.dir/src/stm32f0xx_hal_msp.c.obj: /home/gunnar/CS6780/Project/ECE-5780-Project-GBJCTS/src/stm32f0xx_hal_msp.c
+CMakeFiles/project.dir/src/stm32f0xx_hal_msp.c.obj: /mnt/c/Users/joshc/ECE-5780-Project-GBJCTS/src/stm32f0xx_hal_msp.c
 CMakeFiles/project.dir/src/stm32f0xx_hal_msp.c.obj: CMakeFiles/project.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/gunnar/CS6780/Project/ECE-5780-Project-GBJCTS/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_15) "Building C object CMakeFiles/project.dir/src/stm32f0xx_hal_msp.c.obj"
-	/usr/bin/arm-none-eabi-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -MD -MT CMakeFiles/project.dir/src/stm32f0xx_hal_msp.c.obj -MF CMakeFiles/project.dir/src/stm32f0xx_hal_msp.c.obj.d -o CMakeFiles/project.dir/src/stm32f0xx_hal_msp.c.obj -c /home/gunnar/CS6780/Project/ECE-5780-Project-GBJCTS/src/stm32f0xx_hal_msp.c
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/mnt/c/Users/joshc/ECE-5780-Project-GBJCTS/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_15) "Building C object CMakeFiles/project.dir/src/stm32f0xx_hal_msp.c.obj"
+	/usr/bin/arm-none-eabi-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -MD -MT CMakeFiles/project.dir/src/stm32f0xx_hal_msp.c.obj -MF CMakeFiles/project.dir/src/stm32f0xx_hal_msp.c.obj.d -o CMakeFiles/project.dir/src/stm32f0xx_hal_msp.c.obj -c /mnt/c/Users/joshc/ECE-5780-Project-GBJCTS/src/stm32f0xx_hal_msp.c
 
 CMakeFiles/project.dir/src/stm32f0xx_hal_msp.c.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing C source to CMakeFiles/project.dir/src/stm32f0xx_hal_msp.c.i"
-	/usr/bin/arm-none-eabi-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /home/gunnar/CS6780/Project/ECE-5780-Project-GBJCTS/src/stm32f0xx_hal_msp.c > CMakeFiles/project.dir/src/stm32f0xx_hal_msp.c.i
+	/usr/bin/arm-none-eabi-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /mnt/c/Users/joshc/ECE-5780-Project-GBJCTS/src/stm32f0xx_hal_msp.c > CMakeFiles/project.dir/src/stm32f0xx_hal_msp.c.i
 
 CMakeFiles/project.dir/src/stm32f0xx_hal_msp.c.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling C source to assembly CMakeFiles/project.dir/src/stm32f0xx_hal_msp.c.s"
-	/usr/bin/arm-none-eabi-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /home/gunnar/CS6780/Project/ECE-5780-Project-GBJCTS/src/stm32f0xx_hal_msp.c -o CMakeFiles/project.dir/src/stm32f0xx_hal_msp.c.s
+	/usr/bin/arm-none-eabi-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /mnt/c/Users/joshc/ECE-5780-Project-GBJCTS/src/stm32f0xx_hal_msp.c -o CMakeFiles/project.dir/src/stm32f0xx_hal_msp.c.s
 
 CMakeFiles/project.dir/startup_stm32f072xb.s.obj: CMakeFiles/project.dir/flags.make
-CMakeFiles/project.dir/startup_stm32f072xb.s.obj: /home/gunnar/CS6780/Project/ECE-5780-Project-GBJCTS/startup_stm32f072xb.s
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/gunnar/CS6780/Project/ECE-5780-Project-GBJCTS/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_16) "Building ASM object CMakeFiles/project.dir/startup_stm32f072xb.s.obj"
-	/usr/bin/arm-none-eabi-gcc $(ASM_DEFINES) $(ASM_INCLUDES) $(ASM_FLAGS) -o CMakeFiles/project.dir/startup_stm32f072xb.s.obj -c /home/gunnar/CS6780/Project/ECE-5780-Project-GBJCTS/startup_stm32f072xb.s
+CMakeFiles/project.dir/startup_stm32f072xb.s.obj: /mnt/c/Users/joshc/ECE-5780-Project-GBJCTS/startup_stm32f072xb.s
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/mnt/c/Users/joshc/ECE-5780-Project-GBJCTS/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_16) "Building ASM object CMakeFiles/project.dir/startup_stm32f072xb.s.obj"
+	/usr/bin/arm-none-eabi-gcc $(ASM_DEFINES) $(ASM_INCLUDES) $(ASM_FLAGS) -o CMakeFiles/project.dir/startup_stm32f072xb.s.obj -c /mnt/c/Users/joshc/ECE-5780-Project-GBJCTS/startup_stm32f072xb.s
 
 CMakeFiles/project.dir/startup_stm32f072xb.s.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing ASM source to CMakeFiles/project.dir/startup_stm32f072xb.s.i"
-	/usr/bin/arm-none-eabi-gcc $(ASM_DEFINES) $(ASM_INCLUDES) $(ASM_FLAGS) -E /home/gunnar/CS6780/Project/ECE-5780-Project-GBJCTS/startup_stm32f072xb.s > CMakeFiles/project.dir/startup_stm32f072xb.s.i
+	/usr/bin/arm-none-eabi-gcc $(ASM_DEFINES) $(ASM_INCLUDES) $(ASM_FLAGS) -E /mnt/c/Users/joshc/ECE-5780-Project-GBJCTS/startup_stm32f072xb.s > CMakeFiles/project.dir/startup_stm32f072xb.s.i
 
 CMakeFiles/project.dir/startup_stm32f072xb.s.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling ASM source to assembly CMakeFiles/project.dir/startup_stm32f072xb.s.s"
-	/usr/bin/arm-none-eabi-gcc $(ASM_DEFINES) $(ASM_INCLUDES) $(ASM_FLAGS) -S /home/gunnar/CS6780/Project/ECE-5780-Project-GBJCTS/startup_stm32f072xb.s -o CMakeFiles/project.dir/startup_stm32f072xb.s.s
+	/usr/bin/arm-none-eabi-gcc $(ASM_DEFINES) $(ASM_INCLUDES) $(ASM_FLAGS) -S /mnt/c/Users/joshc/ECE-5780-Project-GBJCTS/startup_stm32f072xb.s -o CMakeFiles/project.dir/startup_stm32f072xb.s.s
 
 CMakeFiles/project.dir/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal.c.obj: CMakeFiles/project.dir/flags.make
-CMakeFiles/project.dir/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal.c.obj: /home/gunnar/CS6780/Project/ECE-5780-Project-GBJCTS/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal.c
+CMakeFiles/project.dir/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal.c.obj: /mnt/c/Users/joshc/ECE-5780-Project-GBJCTS/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal.c
 CMakeFiles/project.dir/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal.c.obj: CMakeFiles/project.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/gunnar/CS6780/Project/ECE-5780-Project-GBJCTS/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_17) "Building C object CMakeFiles/project.dir/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal.c.obj"
-	/usr/bin/arm-none-eabi-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -MD -MT CMakeFiles/project.dir/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal.c.obj -MF CMakeFiles/project.dir/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal.c.obj.d -o CMakeFiles/project.dir/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal.c.obj -c /home/gunnar/CS6780/Project/ECE-5780-Project-GBJCTS/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal.c
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/mnt/c/Users/joshc/ECE-5780-Project-GBJCTS/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_17) "Building C object CMakeFiles/project.dir/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal.c.obj"
+	/usr/bin/arm-none-eabi-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -MD -MT CMakeFiles/project.dir/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal.c.obj -MF CMakeFiles/project.dir/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal.c.obj.d -o CMakeFiles/project.dir/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal.c.obj -c /mnt/c/Users/joshc/ECE-5780-Project-GBJCTS/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal.c
 
 CMakeFiles/project.dir/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal.c.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing C source to CMakeFiles/project.dir/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal.c.i"
-	/usr/bin/arm-none-eabi-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /home/gunnar/CS6780/Project/ECE-5780-Project-GBJCTS/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal.c > CMakeFiles/project.dir/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal.c.i
+	/usr/bin/arm-none-eabi-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /mnt/c/Users/joshc/ECE-5780-Project-GBJCTS/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal.c > CMakeFiles/project.dir/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal.c.i
 
 CMakeFiles/project.dir/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal.c.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling C source to assembly CMakeFiles/project.dir/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal.c.s"
-	/usr/bin/arm-none-eabi-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /home/gunnar/CS6780/Project/ECE-5780-Project-GBJCTS/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal.c -o CMakeFiles/project.dir/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal.c.s
+	/usr/bin/arm-none-eabi-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /mnt/c/Users/joshc/ECE-5780-Project-GBJCTS/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal.c -o CMakeFiles/project.dir/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal.c.s
 
 CMakeFiles/project.dir/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_rcc.c.obj: CMakeFiles/project.dir/flags.make
-CMakeFiles/project.dir/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_rcc.c.obj: /home/gunnar/CS6780/Project/ECE-5780-Project-GBJCTS/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_rcc.c
+CMakeFiles/project.dir/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_rcc.c.obj: /mnt/c/Users/joshc/ECE-5780-Project-GBJCTS/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_rcc.c
 CMakeFiles/project.dir/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_rcc.c.obj: CMakeFiles/project.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/gunnar/CS6780/Project/ECE-5780-Project-GBJCTS/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_18) "Building C object CMakeFiles/project.dir/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_rcc.c.obj"
-	/usr/bin/arm-none-eabi-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -MD -MT CMakeFiles/project.dir/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_rcc.c.obj -MF CMakeFiles/project.dir/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_rcc.c.obj.d -o CMakeFiles/project.dir/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_rcc.c.obj -c /home/gunnar/CS6780/Project/ECE-5780-Project-GBJCTS/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_rcc.c
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/mnt/c/Users/joshc/ECE-5780-Project-GBJCTS/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_18) "Building C object CMakeFiles/project.dir/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_rcc.c.obj"
+	/usr/bin/arm-none-eabi-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -MD -MT CMakeFiles/project.dir/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_rcc.c.obj -MF CMakeFiles/project.dir/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_rcc.c.obj.d -o CMakeFiles/project.dir/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_rcc.c.obj -c /mnt/c/Users/joshc/ECE-5780-Project-GBJCTS/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_rcc.c
 
 CMakeFiles/project.dir/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_rcc.c.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing C source to CMakeFiles/project.dir/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_rcc.c.i"
-	/usr/bin/arm-none-eabi-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /home/gunnar/CS6780/Project/ECE-5780-Project-GBJCTS/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_rcc.c > CMakeFiles/project.dir/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_rcc.c.i
+	/usr/bin/arm-none-eabi-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /mnt/c/Users/joshc/ECE-5780-Project-GBJCTS/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_rcc.c > CMakeFiles/project.dir/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_rcc.c.i
 
 CMakeFiles/project.dir/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_rcc.c.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling C source to assembly CMakeFiles/project.dir/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_rcc.c.s"
-	/usr/bin/arm-none-eabi-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /home/gunnar/CS6780/Project/ECE-5780-Project-GBJCTS/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_rcc.c -o CMakeFiles/project.dir/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_rcc.c.s
+	/usr/bin/arm-none-eabi-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /mnt/c/Users/joshc/ECE-5780-Project-GBJCTS/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_rcc.c -o CMakeFiles/project.dir/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_rcc.c.s
 
 CMakeFiles/project.dir/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_gpio.c.obj: CMakeFiles/project.dir/flags.make
-CMakeFiles/project.dir/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_gpio.c.obj: /home/gunnar/CS6780/Project/ECE-5780-Project-GBJCTS/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_gpio.c
+CMakeFiles/project.dir/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_gpio.c.obj: /mnt/c/Users/joshc/ECE-5780-Project-GBJCTS/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_gpio.c
 CMakeFiles/project.dir/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_gpio.c.obj: CMakeFiles/project.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/gunnar/CS6780/Project/ECE-5780-Project-GBJCTS/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_19) "Building C object CMakeFiles/project.dir/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_gpio.c.obj"
-	/usr/bin/arm-none-eabi-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -MD -MT CMakeFiles/project.dir/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_gpio.c.obj -MF CMakeFiles/project.dir/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_gpio.c.obj.d -o CMakeFiles/project.dir/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_gpio.c.obj -c /home/gunnar/CS6780/Project/ECE-5780-Project-GBJCTS/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_gpio.c
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/mnt/c/Users/joshc/ECE-5780-Project-GBJCTS/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_19) "Building C object CMakeFiles/project.dir/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_gpio.c.obj"
+	/usr/bin/arm-none-eabi-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -MD -MT CMakeFiles/project.dir/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_gpio.c.obj -MF CMakeFiles/project.dir/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_gpio.c.obj.d -o CMakeFiles/project.dir/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_gpio.c.obj -c /mnt/c/Users/joshc/ECE-5780-Project-GBJCTS/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_gpio.c
 
 CMakeFiles/project.dir/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_gpio.c.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing C source to CMakeFiles/project.dir/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_gpio.c.i"
-	/usr/bin/arm-none-eabi-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /home/gunnar/CS6780/Project/ECE-5780-Project-GBJCTS/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_gpio.c > CMakeFiles/project.dir/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_gpio.c.i
+	/usr/bin/arm-none-eabi-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /mnt/c/Users/joshc/ECE-5780-Project-GBJCTS/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_gpio.c > CMakeFiles/project.dir/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_gpio.c.i
 
 CMakeFiles/project.dir/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_gpio.c.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling C source to assembly CMakeFiles/project.dir/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_gpio.c.s"
-	/usr/bin/arm-none-eabi-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /home/gunnar/CS6780/Project/ECE-5780-Project-GBJCTS/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_gpio.c -o CMakeFiles/project.dir/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_gpio.c.s
+	/usr/bin/arm-none-eabi-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /mnt/c/Users/joshc/ECE-5780-Project-GBJCTS/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_gpio.c -o CMakeFiles/project.dir/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_gpio.c.s
 
 CMakeFiles/project.dir/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_cortex.c.obj: CMakeFiles/project.dir/flags.make
-CMakeFiles/project.dir/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_cortex.c.obj: /home/gunnar/CS6780/Project/ECE-5780-Project-GBJCTS/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_cortex.c
+CMakeFiles/project.dir/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_cortex.c.obj: /mnt/c/Users/joshc/ECE-5780-Project-GBJCTS/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_cortex.c
 CMakeFiles/project.dir/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_cortex.c.obj: CMakeFiles/project.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/gunnar/CS6780/Project/ECE-5780-Project-GBJCTS/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_20) "Building C object CMakeFiles/project.dir/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_cortex.c.obj"
-	/usr/bin/arm-none-eabi-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -MD -MT CMakeFiles/project.dir/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_cortex.c.obj -MF CMakeFiles/project.dir/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_cortex.c.obj.d -o CMakeFiles/project.dir/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_cortex.c.obj -c /home/gunnar/CS6780/Project/ECE-5780-Project-GBJCTS/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_cortex.c
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/mnt/c/Users/joshc/ECE-5780-Project-GBJCTS/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_20) "Building C object CMakeFiles/project.dir/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_cortex.c.obj"
+	/usr/bin/arm-none-eabi-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -MD -MT CMakeFiles/project.dir/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_cortex.c.obj -MF CMakeFiles/project.dir/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_cortex.c.obj.d -o CMakeFiles/project.dir/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_cortex.c.obj -c /mnt/c/Users/joshc/ECE-5780-Project-GBJCTS/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_cortex.c
 
 CMakeFiles/project.dir/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_cortex.c.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing C source to CMakeFiles/project.dir/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_cortex.c.i"
-	/usr/bin/arm-none-eabi-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /home/gunnar/CS6780/Project/ECE-5780-Project-GBJCTS/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_cortex.c > CMakeFiles/project.dir/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_cortex.c.i
+	/usr/bin/arm-none-eabi-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /mnt/c/Users/joshc/ECE-5780-Project-GBJCTS/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_cortex.c > CMakeFiles/project.dir/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_cortex.c.i
 
 CMakeFiles/project.dir/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_cortex.c.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling C source to assembly CMakeFiles/project.dir/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_cortex.c.s"
-	/usr/bin/arm-none-eabi-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /home/gunnar/CS6780/Project/ECE-5780-Project-GBJCTS/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_cortex.c -o CMakeFiles/project.dir/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_cortex.c.s
+	/usr/bin/arm-none-eabi-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /mnt/c/Users/joshc/ECE-5780-Project-GBJCTS/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_cortex.c -o CMakeFiles/project.dir/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_cortex.c.s
 
 CMakeFiles/project.dir/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_pwr.c.obj: CMakeFiles/project.dir/flags.make
-CMakeFiles/project.dir/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_pwr.c.obj: /home/gunnar/CS6780/Project/ECE-5780-Project-GBJCTS/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_pwr.c
+CMakeFiles/project.dir/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_pwr.c.obj: /mnt/c/Users/joshc/ECE-5780-Project-GBJCTS/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_pwr.c
 CMakeFiles/project.dir/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_pwr.c.obj: CMakeFiles/project.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/gunnar/CS6780/Project/ECE-5780-Project-GBJCTS/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_21) "Building C object CMakeFiles/project.dir/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_pwr.c.obj"
-	/usr/bin/arm-none-eabi-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -MD -MT CMakeFiles/project.dir/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_pwr.c.obj -MF CMakeFiles/project.dir/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_pwr.c.obj.d -o CMakeFiles/project.dir/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_pwr.c.obj -c /home/gunnar/CS6780/Project/ECE-5780-Project-GBJCTS/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_pwr.c
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/mnt/c/Users/joshc/ECE-5780-Project-GBJCTS/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_21) "Building C object CMakeFiles/project.dir/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_pwr.c.obj"
+	/usr/bin/arm-none-eabi-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -MD -MT CMakeFiles/project.dir/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_pwr.c.obj -MF CMakeFiles/project.dir/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_pwr.c.obj.d -o CMakeFiles/project.dir/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_pwr.c.obj -c /mnt/c/Users/joshc/ECE-5780-Project-GBJCTS/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_pwr.c
 
 CMakeFiles/project.dir/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_pwr.c.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing C source to CMakeFiles/project.dir/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_pwr.c.i"
-	/usr/bin/arm-none-eabi-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /home/gunnar/CS6780/Project/ECE-5780-Project-GBJCTS/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_pwr.c > CMakeFiles/project.dir/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_pwr.c.i
+	/usr/bin/arm-none-eabi-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /mnt/c/Users/joshc/ECE-5780-Project-GBJCTS/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_pwr.c > CMakeFiles/project.dir/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_pwr.c.i
 
 CMakeFiles/project.dir/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_pwr.c.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling C source to assembly CMakeFiles/project.dir/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_pwr.c.s"
-	/usr/bin/arm-none-eabi-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /home/gunnar/CS6780/Project/ECE-5780-Project-GBJCTS/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_pwr.c -o CMakeFiles/project.dir/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_pwr.c.s
+	/usr/bin/arm-none-eabi-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /mnt/c/Users/joshc/ECE-5780-Project-GBJCTS/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_pwr.c -o CMakeFiles/project.dir/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_pwr.c.s
 
 CMakeFiles/project.dir/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_pwr_ex.c.obj: CMakeFiles/project.dir/flags.make
-CMakeFiles/project.dir/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_pwr_ex.c.obj: /home/gunnar/CS6780/Project/ECE-5780-Project-GBJCTS/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_pwr_ex.c
+CMakeFiles/project.dir/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_pwr_ex.c.obj: /mnt/c/Users/joshc/ECE-5780-Project-GBJCTS/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_pwr_ex.c
 CMakeFiles/project.dir/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_pwr_ex.c.obj: CMakeFiles/project.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/gunnar/CS6780/Project/ECE-5780-Project-GBJCTS/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_22) "Building C object CMakeFiles/project.dir/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_pwr_ex.c.obj"
-	/usr/bin/arm-none-eabi-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -MD -MT CMakeFiles/project.dir/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_pwr_ex.c.obj -MF CMakeFiles/project.dir/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_pwr_ex.c.obj.d -o CMakeFiles/project.dir/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_pwr_ex.c.obj -c /home/gunnar/CS6780/Project/ECE-5780-Project-GBJCTS/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_pwr_ex.c
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/mnt/c/Users/joshc/ECE-5780-Project-GBJCTS/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_22) "Building C object CMakeFiles/project.dir/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_pwr_ex.c.obj"
+	/usr/bin/arm-none-eabi-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -MD -MT CMakeFiles/project.dir/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_pwr_ex.c.obj -MF CMakeFiles/project.dir/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_pwr_ex.c.obj.d -o CMakeFiles/project.dir/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_pwr_ex.c.obj -c /mnt/c/Users/joshc/ECE-5780-Project-GBJCTS/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_pwr_ex.c
 
 CMakeFiles/project.dir/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_pwr_ex.c.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing C source to CMakeFiles/project.dir/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_pwr_ex.c.i"
-	/usr/bin/arm-none-eabi-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /home/gunnar/CS6780/Project/ECE-5780-Project-GBJCTS/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_pwr_ex.c > CMakeFiles/project.dir/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_pwr_ex.c.i
+	/usr/bin/arm-none-eabi-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /mnt/c/Users/joshc/ECE-5780-Project-GBJCTS/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_pwr_ex.c > CMakeFiles/project.dir/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_pwr_ex.c.i
 
 CMakeFiles/project.dir/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_pwr_ex.c.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling C source to assembly CMakeFiles/project.dir/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_pwr_ex.c.s"
-	/usr/bin/arm-none-eabi-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /home/gunnar/CS6780/Project/ECE-5780-Project-GBJCTS/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_pwr_ex.c -o CMakeFiles/project.dir/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_pwr_ex.c.s
+	/usr/bin/arm-none-eabi-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /mnt/c/Users/joshc/ECE-5780-Project-GBJCTS/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_pwr_ex.c -o CMakeFiles/project.dir/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_pwr_ex.c.s
 
 CMakeFiles/project.dir/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_tim.c.obj: CMakeFiles/project.dir/flags.make
-CMakeFiles/project.dir/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_tim.c.obj: /home/gunnar/CS6780/Project/ECE-5780-Project-GBJCTS/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_tim.c
+CMakeFiles/project.dir/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_tim.c.obj: /mnt/c/Users/joshc/ECE-5780-Project-GBJCTS/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_tim.c
 CMakeFiles/project.dir/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_tim.c.obj: CMakeFiles/project.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/gunnar/CS6780/Project/ECE-5780-Project-GBJCTS/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_23) "Building C object CMakeFiles/project.dir/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_tim.c.obj"
-	/usr/bin/arm-none-eabi-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -MD -MT CMakeFiles/project.dir/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_tim.c.obj -MF CMakeFiles/project.dir/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_tim.c.obj.d -o CMakeFiles/project.dir/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_tim.c.obj -c /home/gunnar/CS6780/Project/ECE-5780-Project-GBJCTS/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_tim.c
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/mnt/c/Users/joshc/ECE-5780-Project-GBJCTS/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_23) "Building C object CMakeFiles/project.dir/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_tim.c.obj"
+	/usr/bin/arm-none-eabi-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -MD -MT CMakeFiles/project.dir/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_tim.c.obj -MF CMakeFiles/project.dir/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_tim.c.obj.d -o CMakeFiles/project.dir/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_tim.c.obj -c /mnt/c/Users/joshc/ECE-5780-Project-GBJCTS/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_tim.c
 
 CMakeFiles/project.dir/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_tim.c.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing C source to CMakeFiles/project.dir/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_tim.c.i"
-	/usr/bin/arm-none-eabi-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /home/gunnar/CS6780/Project/ECE-5780-Project-GBJCTS/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_tim.c > CMakeFiles/project.dir/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_tim.c.i
+	/usr/bin/arm-none-eabi-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /mnt/c/Users/joshc/ECE-5780-Project-GBJCTS/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_tim.c > CMakeFiles/project.dir/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_tim.c.i
 
 CMakeFiles/project.dir/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_tim.c.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling C source to assembly CMakeFiles/project.dir/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_tim.c.s"
-	/usr/bin/arm-none-eabi-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /home/gunnar/CS6780/Project/ECE-5780-Project-GBJCTS/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_tim.c -o CMakeFiles/project.dir/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_tim.c.s
+	/usr/bin/arm-none-eabi-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /mnt/c/Users/joshc/ECE-5780-Project-GBJCTS/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_tim.c -o CMakeFiles/project.dir/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_tim.c.s
 
 CMakeFiles/project.dir/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_tim_ex.c.obj: CMakeFiles/project.dir/flags.make
-CMakeFiles/project.dir/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_tim_ex.c.obj: /home/gunnar/CS6780/Project/ECE-5780-Project-GBJCTS/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_tim_ex.c
+CMakeFiles/project.dir/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_tim_ex.c.obj: /mnt/c/Users/joshc/ECE-5780-Project-GBJCTS/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_tim_ex.c
 CMakeFiles/project.dir/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_tim_ex.c.obj: CMakeFiles/project.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/gunnar/CS6780/Project/ECE-5780-Project-GBJCTS/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_24) "Building C object CMakeFiles/project.dir/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_tim_ex.c.obj"
-	/usr/bin/arm-none-eabi-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -MD -MT CMakeFiles/project.dir/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_tim_ex.c.obj -MF CMakeFiles/project.dir/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_tim_ex.c.obj.d -o CMakeFiles/project.dir/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_tim_ex.c.obj -c /home/gunnar/CS6780/Project/ECE-5780-Project-GBJCTS/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_tim_ex.c
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/mnt/c/Users/joshc/ECE-5780-Project-GBJCTS/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_24) "Building C object CMakeFiles/project.dir/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_tim_ex.c.obj"
+	/usr/bin/arm-none-eabi-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -MD -MT CMakeFiles/project.dir/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_tim_ex.c.obj -MF CMakeFiles/project.dir/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_tim_ex.c.obj.d -o CMakeFiles/project.dir/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_tim_ex.c.obj -c /mnt/c/Users/joshc/ECE-5780-Project-GBJCTS/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_tim_ex.c
 
 CMakeFiles/project.dir/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_tim_ex.c.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing C source to CMakeFiles/project.dir/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_tim_ex.c.i"
-	/usr/bin/arm-none-eabi-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /home/gunnar/CS6780/Project/ECE-5780-Project-GBJCTS/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_tim_ex.c > CMakeFiles/project.dir/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_tim_ex.c.i
+	/usr/bin/arm-none-eabi-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /mnt/c/Users/joshc/ECE-5780-Project-GBJCTS/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_tim_ex.c > CMakeFiles/project.dir/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_tim_ex.c.i
 
 CMakeFiles/project.dir/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_tim_ex.c.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling C source to assembly CMakeFiles/project.dir/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_tim_ex.c.s"
-	/usr/bin/arm-none-eabi-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /home/gunnar/CS6780/Project/ECE-5780-Project-GBJCTS/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_tim_ex.c -o CMakeFiles/project.dir/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_tim_ex.c.s
+	/usr/bin/arm-none-eabi-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /mnt/c/Users/joshc/ECE-5780-Project-GBJCTS/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_tim_ex.c -o CMakeFiles/project.dir/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_tim_ex.c.s
 
 CMakeFiles/project.dir/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_i2c.c.obj: CMakeFiles/project.dir/flags.make
-CMakeFiles/project.dir/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_i2c.c.obj: /home/gunnar/CS6780/Project/ECE-5780-Project-GBJCTS/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_i2c.c
+CMakeFiles/project.dir/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_i2c.c.obj: /mnt/c/Users/joshc/ECE-5780-Project-GBJCTS/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_i2c.c
 CMakeFiles/project.dir/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_i2c.c.obj: CMakeFiles/project.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/gunnar/CS6780/Project/ECE-5780-Project-GBJCTS/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_25) "Building C object CMakeFiles/project.dir/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_i2c.c.obj"
-	/usr/bin/arm-none-eabi-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -MD -MT CMakeFiles/project.dir/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_i2c.c.obj -MF CMakeFiles/project.dir/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_i2c.c.obj.d -o CMakeFiles/project.dir/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_i2c.c.obj -c /home/gunnar/CS6780/Project/ECE-5780-Project-GBJCTS/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_i2c.c
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/mnt/c/Users/joshc/ECE-5780-Project-GBJCTS/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_25) "Building C object CMakeFiles/project.dir/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_i2c.c.obj"
+	/usr/bin/arm-none-eabi-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -MD -MT CMakeFiles/project.dir/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_i2c.c.obj -MF CMakeFiles/project.dir/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_i2c.c.obj.d -o CMakeFiles/project.dir/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_i2c.c.obj -c /mnt/c/Users/joshc/ECE-5780-Project-GBJCTS/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_i2c.c
 
 CMakeFiles/project.dir/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_i2c.c.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing C source to CMakeFiles/project.dir/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_i2c.c.i"
-	/usr/bin/arm-none-eabi-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /home/gunnar/CS6780/Project/ECE-5780-Project-GBJCTS/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_i2c.c > CMakeFiles/project.dir/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_i2c.c.i
+	/usr/bin/arm-none-eabi-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /mnt/c/Users/joshc/ECE-5780-Project-GBJCTS/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_i2c.c > CMakeFiles/project.dir/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_i2c.c.i
 
 CMakeFiles/project.dir/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_i2c.c.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling C source to assembly CMakeFiles/project.dir/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_i2c.c.s"
-	/usr/bin/arm-none-eabi-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /home/gunnar/CS6780/Project/ECE-5780-Project-GBJCTS/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_i2c.c -o CMakeFiles/project.dir/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_i2c.c.s
+	/usr/bin/arm-none-eabi-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /mnt/c/Users/joshc/ECE-5780-Project-GBJCTS/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_i2c.c -o CMakeFiles/project.dir/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_i2c.c.s
 
 CMakeFiles/project.dir/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_uart.c.obj: CMakeFiles/project.dir/flags.make
-CMakeFiles/project.dir/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_uart.c.obj: /home/gunnar/CS6780/Project/ECE-5780-Project-GBJCTS/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_uart.c
+CMakeFiles/project.dir/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_uart.c.obj: /mnt/c/Users/joshc/ECE-5780-Project-GBJCTS/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_uart.c
 CMakeFiles/project.dir/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_uart.c.obj: CMakeFiles/project.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/gunnar/CS6780/Project/ECE-5780-Project-GBJCTS/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_26) "Building C object CMakeFiles/project.dir/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_uart.c.obj"
-	/usr/bin/arm-none-eabi-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -MD -MT CMakeFiles/project.dir/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_uart.c.obj -MF CMakeFiles/project.dir/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_uart.c.obj.d -o CMakeFiles/project.dir/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_uart.c.obj -c /home/gunnar/CS6780/Project/ECE-5780-Project-GBJCTS/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_uart.c
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/mnt/c/Users/joshc/ECE-5780-Project-GBJCTS/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_26) "Building C object CMakeFiles/project.dir/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_uart.c.obj"
+	/usr/bin/arm-none-eabi-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -MD -MT CMakeFiles/project.dir/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_uart.c.obj -MF CMakeFiles/project.dir/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_uart.c.obj.d -o CMakeFiles/project.dir/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_uart.c.obj -c /mnt/c/Users/joshc/ECE-5780-Project-GBJCTS/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_uart.c
 
 CMakeFiles/project.dir/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_uart.c.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing C source to CMakeFiles/project.dir/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_uart.c.i"
-	/usr/bin/arm-none-eabi-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /home/gunnar/CS6780/Project/ECE-5780-Project-GBJCTS/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_uart.c > CMakeFiles/project.dir/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_uart.c.i
+	/usr/bin/arm-none-eabi-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /mnt/c/Users/joshc/ECE-5780-Project-GBJCTS/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_uart.c > CMakeFiles/project.dir/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_uart.c.i
 
 CMakeFiles/project.dir/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_uart.c.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling C source to assembly CMakeFiles/project.dir/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_uart.c.s"
-	/usr/bin/arm-none-eabi-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /home/gunnar/CS6780/Project/ECE-5780-Project-GBJCTS/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_uart.c -o CMakeFiles/project.dir/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_uart.c.s
+	/usr/bin/arm-none-eabi-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /mnt/c/Users/joshc/ECE-5780-Project-GBJCTS/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_uart.c -o CMakeFiles/project.dir/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_uart.c.s
 
 # Object files for target project
 project_OBJECTS = \
@@ -492,7 +492,7 @@ project.elf: CMakeFiles/project.dir/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_h
 project.elf: CMakeFiles/project.dir/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_uart.c.obj
 project.elf: CMakeFiles/project.dir/build.make
 project.elf: CMakeFiles/project.dir/link.txt
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --bold --progress-dir=/home/gunnar/CS6780/Project/ECE-5780-Project-GBJCTS/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_27) "Linking C executable project.elf"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --bold --progress-dir=/mnt/c/Users/joshc/ECE-5780-Project-GBJCTS/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_27) "Linking C executable project.elf"
 	$(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/project.dir/link.txt --verbose=$(VERBOSE)
 
 # Rule to build all files generated by this target.
@@ -504,6 +504,6 @@ CMakeFiles/project.dir/clean:
 .PHONY : CMakeFiles/project.dir/clean
 
 CMakeFiles/project.dir/depend:
-	cd /home/gunnar/CS6780/Project/ECE-5780-Project-GBJCTS/build && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" /home/gunnar/CS6780/Project/ECE-5780-Project-GBJCTS /home/gunnar/CS6780/Project/ECE-5780-Project-GBJCTS /home/gunnar/CS6780/Project/ECE-5780-Project-GBJCTS/build /home/gunnar/CS6780/Project/ECE-5780-Project-GBJCTS/build /home/gunnar/CS6780/Project/ECE-5780-Project-GBJCTS/build/CMakeFiles/project.dir/DependInfo.cmake "--color=$(COLOR)"
+	cd /mnt/c/Users/joshc/ECE-5780-Project-GBJCTS/build && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" /mnt/c/Users/joshc/ECE-5780-Project-GBJCTS /mnt/c/Users/joshc/ECE-5780-Project-GBJCTS /mnt/c/Users/joshc/ECE-5780-Project-GBJCTS/build /mnt/c/Users/joshc/ECE-5780-Project-GBJCTS/build /mnt/c/Users/joshc/ECE-5780-Project-GBJCTS/build/CMakeFiles/project.dir/DependInfo.cmake "--color=$(COLOR)"
 .PHONY : CMakeFiles/project.dir/depend
 

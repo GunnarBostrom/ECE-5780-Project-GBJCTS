@@ -6,7 +6,7 @@
 #include <stdint.h>
 #include <sys/_intsup.h>
 #include <sys/types.h>
-
+#include "motor.h"
 #include "config.h"
 
 // parallel logic for lidar and other peripherals
@@ -24,19 +24,95 @@ void SystemClock_Config(void);
   * @retval int
   */
 
-int main(void){
 
-  imu_init();
+// LED INIT for main loop heartbeat
+static void LED_init(void)
+{
+    GPIO_InitTypeDef init = {0};
 
+    __HAL_RCC_GPIOC_CLK_ENABLE();
 
+    // PC8 = orange, PC9 = green
+    init.Pin = GPIO_PIN_8 | GPIO_PIN_9;
+    init.Mode = GPIO_MODE_OUTPUT_PP;
+    init.Pull = GPIO_NOPULL;
+    init.Speed = GPIO_SPEED_FREQ_LOW;
 
-  while(1){
-    
-    imu_read();
+    HAL_GPIO_Init(GPIOC, &init);
 
+    HAL_GPIO_WritePin(GPIOC, GPIO_PIN_8 | GPIO_PIN_9, GPIO_PIN_RESET);
+}
 
+int main(void)
+{
 
-  }
+  //imu_init();
+  HAL_Init();
+  SystemClock_Config();
+  LED_init();
+  motor_init();
+
+  uint32_t last_heartbeat = HAL_GetTick();
+  uint32_t last_toggle = HAL_GetTick();
+
+  uint8_t motor_state = 0;
+
+  // Arm all ESCs at minimum throttle
+  motor_set_all(1000);
+  // motor_set_individual(1000, 1000, 1000, 1000);
+   HAL_Delay(8000);
+
+  // Hold Motors 1-4 at low throttle
+  // Note motor minimum value for all 4 motors to spin at min throttle is 1200
+  // motor_set_individual(1200, 1200, 1200, 1200);
+  motor_set_all(1200);
+
+  while (1)
+  {
+      HAL_GPIO_TogglePin(GPIOC, GPIO_PIN_9); // heartbeat
+      HAL_Delay(500);
+    }
+}
+  /*loop structure:*/
+  //read sensors
+  //compute error
+  //run PID
+  //mix motors
+  //update PWM
+  // while (1)
+  //   {
+  //       uint32_t now = HAL_GetTick();
+
+  //       // ---------------------------------------------------------------------
+  //       // HEARTBEAT (runs independently of motor timing)
+  //       // ---------------------------------------------------------------------
+  //       if (now - last_heartbeat >= 500)   // 2 Hz blink
+  //       {
+  //           HAL_GPIO_TogglePin(GPIOC, GPIO_PIN_9); // Green LED
+  //           last_heartbeat = now;
+  //       }
+
+  //       // ---------------------------------------------------------------------
+  //       // MOTOR TEST SEQUENCE
+  //       // ---------------------------------------------------------------------
+  //       if (now - last_toggle >= 3000)
+  //       {
+  //           last_toggle = now;
+
+  //           if (motor_state == 0)
+  //           {
+  //               motor_set_all(1150);  // low throttle
+  //               HAL_GPIO_WritePin(GPIOC, GPIO_PIN_8, GPIO_PIN_SET); // Orange ON
+  //               motor_state = 1;
+  //           }
+  //           else
+  //           {
+  //               motor_set_all(1000);  // idle
+  //               HAL_GPIO_WritePin(GPIOC, GPIO_PIN_8, GPIO_PIN_RESET); // Orange OFF
+  //               motor_state = 0;
+  //           }
+  //       }
+  //  }
 
   // END DRONE CODE
 
@@ -49,30 +125,30 @@ int main(void){
 
 
 
-  // BEGIN BLINKY CODE
+  // // BEGIN BLINKY CODE
 
-  /* Reset of all peripherals, Initializes the Flash interface and the Systick. */
-  HAL_Init();
-  /* Configure the system clock */
-  SystemClock_Config();
+  // /* Reset of all peripherals, Initializes the Flash interface and the Systick. */
+  // HAL_Init();
+  // /* Configure the system clock */
+  // SystemClock_Config();
 
-  RCC->AHBENR |= RCC_AHBENR_GPIOCEN;
-  (void)RCC->AHBENR;
+  // RCC->AHBENR |= RCC_AHBENR_GPIOCEN;
+  // (void)RCC->AHBENR;
   
-  GPIO_InitTypeDef initStr = {GPIO_PIN_6 | GPIO_PIN_7 | GPIO_PIN_8 | GPIO_PIN_9,
-                              GPIO_MODE_OUTPUT_PP,
-                              GPIO_SPEED_FREQ_LOW,
-                              GPIO_NOPULL};
+  // GPIO_InitTypeDef initStr = {GPIO_PIN_6 | GPIO_PIN_7 | GPIO_PIN_8 | GPIO_PIN_9,
+  //                             GPIO_MODE_OUTPUT_PP,
+  //                             GPIO_SPEED_FREQ_LOW,
+  //                             GPIO_NOPULL};
 
-  HAL_GPIO_Init(GPIOC, &initStr);
-  HAL_GPIO_WritePin(GPIOC, GPIO_PIN_6 | GPIO_PIN_7 | GPIO_PIN_8 | GPIO_PIN_9, GPIO_PIN_SET);
+  // HAL_GPIO_Init(GPIOC, &initStr);
+  // HAL_GPIO_WritePin(GPIOC, GPIO_PIN_6 | GPIO_PIN_7 | GPIO_PIN_8 | GPIO_PIN_9, GPIO_PIN_SET);
 
 
-  while (1){
-    HAL_GPIO_TogglePin(GPIOC, GPIO_PIN_8);
-    HAL_Delay(500);
-  }
-}
+  // while (1){
+  //   HAL_GPIO_TogglePin(GPIOC, GPIO_PIN_8);
+  //   HAL_Delay(500);
+  // }
+//}
 
 
 /**
