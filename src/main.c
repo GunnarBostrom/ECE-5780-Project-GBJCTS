@@ -81,38 +81,6 @@ int main(void)
   //update PWM
   // while (1)
   //   {
-  //       uint32_t now = HAL_GetTick();
-
-  //       // ---------------------------------------------------------------------
-  //       // HEARTBEAT (runs independently of motor timing)
-  //       // ---------------------------------------------------------------------
-  //       if (now - last_heartbeat >= 500)   // 2 Hz blink
-  //       {
-  //           HAL_GPIO_TogglePin(GPIOC, GPIO_PIN_9); // Green LED
-  //           last_heartbeat = now;
-  //       }
-
-  //       // ---------------------------------------------------------------------
-  //       // MOTOR TEST SEQUENCE
-  //       // ---------------------------------------------------------------------
-  //       if (now - last_toggle >= 3000)
-  //       {
-  //           last_toggle = now;
-
-  //           if (motor_state == 0)
-  //           {
-  //               motor_set_all(1150);  // low throttle
-  //               HAL_GPIO_WritePin(GPIOC, GPIO_PIN_8, GPIO_PIN_SET); // Orange ON
-  //               motor_state = 1;
-  //           }
-  //           else
-  //           {
-  //               motor_set_all(1000);  // idle
-  //               HAL_GPIO_WritePin(GPIOC, GPIO_PIN_8, GPIO_PIN_RESET); // Orange OFF
-  //               motor_state = 0;
-  //           }
-  //       }
-  //  }
 
   // END DRONE CODE
 
