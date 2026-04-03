@@ -2,7 +2,7 @@ Generate build files:
 `cmake -B build -S ./`  
 Compile:  
 `cmake --build build`  
-Flash to the the board:  
+Flash to board:  
 `cmake --build build --target flash_project`  
 
 
@@ -25,8 +25,7 @@ Weekly Milestones:
 **Flight Controller:** STM32F072 Discovery Board  
 **IMU:** LSM6DS3 on a NOYITO breakout board  
 **Altitude Sensor:** VL53L1X on an Adafruit breakout board  
-**Radio:** Team BlackSheep Crossfire Nano
-<!-- **SBUS Inverter:** 74HC14   -->
+**Radio:** Team BlackSheep Crossfire Nano  <!-- **SBUS Inverter:** 74HC14 (needed if using FrSky RX6R) -->
 **ESCs:** XILO 40A BLHeli_S ESC  
 **Motors:** EMAX ECO II 2207 2400KV  
 **Power:** 4S LiPo battery  
@@ -48,20 +47,12 @@ Weekly Milestones:
 - Control over motors demonstrated
 
 
-## Toolchain Setup
+## Toolchain
 This project uses a bare-metal embedded toolchain based on GCC, CMake, and OpenOCD.
-
-### Build Commands
-Generate build files:  
-`cmake -B build -S ./`  
-Compile:  
-`cmake --build build`  
-Flash to the the board:  
-`cmake --build build --target flash_project`
 
 ### Required Tools
 - **GNU ARM Embedded Toolchain** (compiler)  
-- **Make** (build system)  
+- **CMake** (build system)  
 - **OpenOCD** (flashing/debugging)  
 - **ST-Link** (hardware debug probe)
 <!-- - **STM32CubeMX**: [Download here](https://www.st.com/en/development-tools/stm32cubeide.html)   -->   
@@ -73,7 +64,9 @@ Flash to the the board:
 
 ---
 
-### macOS
+### Toolchain Installation
+
+#### macOS
 Install Homebrew if needed: https://brew.sh/
 
 ```bash
@@ -81,15 +74,23 @@ brew install --cask gcc-arm-embedded
 brew install openocd stlink make
 ```
 
-### Linux
+#### Linux
 ```bash
 sudo apt-get update
 sudo apt-get install gcc-arm-none-eabi binutils-arm-none-eabi make openocd stlink-tools
 ```
 
-### Windows
+#### Windows
 Recommended to use Windows Subsystem for Linux. Install WSL and use the Linux instructions above.  
 Setup guide: https://learn.microsoft.com/en-us/windows/wsl/install
+
+### Build & Flash
+Generate build files:  
+`cmake -B build -S ./`  
+Compile:  
+`cmake --build build`  
+Flash to board:  
+`cmake --build build --target flash_project`
 
 
 ## Project Info
