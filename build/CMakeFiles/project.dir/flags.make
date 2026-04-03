@@ -5,13 +5,13 @@
 # compile C with /usr/bin/arm-none-eabi-gcc
 ASM_DEFINES = -DSTM32F072xB -DUSE_HAL_DRIVER
 
-ASM_INCLUDES = -I/home/gunnar/CS6780/Project/ECE-5780-Project-GBJCTS/inc -I/home/gunnar/CS6780/Project/ECE-5780-Project-GBJCTS/Core/Inc -I/home/gunnar/CS6780/Project/ECE-5780-Project-GBJCTS/Drivers/STM32F0xx_HAL_Driver/Inc -I/home/gunnar/CS6780/Project/ECE-5780-Project-GBJCTS/Drivers/CMSIS/Device/ST/STM32F0xx/Include -I/home/gunnar/CS6780/Project/ECE-5780-Project-GBJCTS/Drivers/CMSIS/Include -I/home/gunnar/CS6780/Project/ECE-5780-Project-GBJCTS/Drivers/BSP -I/home/gunnar/CS6780/Project/ECE-5780-Project-GBJCTS/Drivers/SEGGER
+ASM_INCLUDES = -I/mnt/c/Users/joshc/ECE-5780-Project-GBJCTS/inc -I/mnt/c/Users/joshc/ECE-5780-Project-GBJCTS/Core/Inc -I/mnt/c/Users/joshc/ECE-5780-Project-GBJCTS/Drivers/STM32F0xx_HAL_Driver/Inc -I/mnt/c/Users/joshc/ECE-5780-Project-GBJCTS/Drivers/CMSIS/Device/ST/STM32F0xx/Include -I/mnt/c/Users/joshc/ECE-5780-Project-GBJCTS/Drivers/CMSIS/Include -I/mnt/c/Users/joshc/ECE-5780-Project-GBJCTS/Drivers/BSP -I/mnt/c/Users/joshc/ECE-5780-Project-GBJCTS/Drivers/SEGGER
 
 ASM_FLAGS =  -mcpu=cortex-m0 -mthumb -x assembler-with-cpp -MMD -MP
 
 C_DEFINES = -DSTM32F072xB -DUSE_HAL_DRIVER
 
-C_INCLUDES = -I/home/gunnar/CS6780/Project/ECE-5780-Project-GBJCTS/inc -I/home/gunnar/CS6780/Project/ECE-5780-Project-GBJCTS/Core/Inc -I/home/gunnar/CS6780/Project/ECE-5780-Project-GBJCTS/Drivers/STM32F0xx_HAL_Driver/Inc -I/home/gunnar/CS6780/Project/ECE-5780-Project-GBJCTS/Drivers/CMSIS/Device/ST/STM32F0xx/Include -I/home/gunnar/CS6780/Project/ECE-5780-Project-GBJCTS/Drivers/CMSIS/Include -I/home/gunnar/CS6780/Project/ECE-5780-Project-GBJCTS/Drivers/BSP -I/home/gunnar/CS6780/Project/ECE-5780-Project-GBJCTS/Drivers/SEGGER
+C_INCLUDES = -I/mnt/c/Users/joshc/ECE-5780-Project-GBJCTS/inc -I/mnt/c/Users/joshc/ECE-5780-Project-GBJCTS/Core/Inc -I/mnt/c/Users/joshc/ECE-5780-Project-GBJCTS/Drivers/STM32F0xx_HAL_Driver/Inc -I/mnt/c/Users/joshc/ECE-5780-Project-GBJCTS/Drivers/CMSIS/Device/ST/STM32F0xx/Include -I/mnt/c/Users/joshc/ECE-5780-Project-GBJCTS/Drivers/CMSIS/Include -I/mnt/c/Users/joshc/ECE-5780-Project-GBJCTS/Drivers/BSP -I/mnt/c/Users/joshc/ECE-5780-Project-GBJCTS/Drivers/SEGGER
 
 C_FLAGS =  -mcpu=cortex-m0 -mthumb -Wall -fdata-sections -ffunction-sections -std=gnu11
 

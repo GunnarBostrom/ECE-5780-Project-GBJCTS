@@ -53,10 +53,10 @@ RM = /usr/bin/cmake -E rm -f
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /home/gunnar/CS6780/Project/ECE-5780-Project-GBJCTS
+CMAKE_SOURCE_DIR = /mnt/c/Users/joshc/ECE-5780-Project-GBJCTS
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /home/gunnar/CS6780/Project/ECE-5780-Project-GBJCTS/build
+CMAKE_BINARY_DIR = /mnt/c/Users/joshc/ECE-5780-Project-GBJCTS/build
 
 # Utility rule file for flash_project.
 
@@ -67,7 +67,7 @@ include CMakeFiles/flash_project.dir/compiler_depend.make
 include CMakeFiles/flash_project.dir/progress.make
 
 CMakeFiles/flash_project: project.elf
-	/usr/bin/openocd -f interface/stlink.cfg -f target/stm32f0x.cfg -c 'program /home/gunnar/CS6780/Project/ECE-5780-Project-GBJCTS/build/project.elf verify reset exit'
+	/usr/bin/openocd -f interface/stlink.cfg -f target/stm32f0x.cfg -c 'program /mnt/c/Users/joshc/ECE-5780-Project-GBJCTS/build/project.elf verify reset exit'
 
 flash_project: CMakeFiles/flash_project
 flash_project: CMakeFiles/flash_project.dir/build.make
@@ -82,6 +82,6 @@ CMakeFiles/flash_project.dir/clean:
 .PHONY : CMakeFiles/flash_project.dir/clean
 
 CMakeFiles/flash_project.dir/depend:
-	cd /home/gunnar/CS6780/Project/ECE-5780-Project-GBJCTS/build && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" /home/gunnar/CS6780/Project/ECE-5780-Project-GBJCTS /home/gunnar/CS6780/Project/ECE-5780-Project-GBJCTS /home/gunnar/CS6780/Project/ECE-5780-Project-GBJCTS/build /home/gunnar/CS6780/Project/ECE-5780-Project-GBJCTS/build /home/gunnar/CS6780/Project/ECE-5780-Project-GBJCTS/build/CMakeFiles/flash_project.dir/DependInfo.cmake "--color=$(COLOR)"
+	cd /mnt/c/Users/joshc/ECE-5780-Project-GBJCTS/build && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" /mnt/c/Users/joshc/ECE-5780-Project-GBJCTS /mnt/c/Users/joshc/ECE-5780-Project-GBJCTS /mnt/c/Users/joshc/ECE-5780-Project-GBJCTS/build /mnt/c/Users/joshc/ECE-5780-Project-GBJCTS/build /mnt/c/Users/joshc/ECE-5780-Project-GBJCTS/build/CMakeFiles/flash_project.dir/DependInfo.cmake "--color=$(COLOR)"
 .PHONY : CMakeFiles/flash_project.dir/depend
 
