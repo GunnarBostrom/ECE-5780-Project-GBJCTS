@@ -55,7 +55,12 @@ static void LED_init(void)
 
 int main(void)
 {
-
+  /*loop structure:*/
+  //read sensors
+  //compute error
+  //run PID
+  //mix motors
+  //update PWM
   //imu_init();
   HAL_Init();
   SystemClock_Config();
@@ -83,14 +88,6 @@ int main(void)
       HAL_Delay(500);
     }
 }
-  /*loop structure:*/
-  //read sensors
-  //compute error
-  //run PID
-  //mix motors
-  //update PWM
-  // while (1)
-  //   {
 
   // END DRONE CODE
 

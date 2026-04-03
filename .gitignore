@@ -62,3 +62,9 @@ dkms.conf
 
 # Local configurations for testing
 inc/config_local.h
+
+# Build directory
+build/
+*.elf
+*.bin
+*.map
