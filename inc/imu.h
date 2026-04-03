@@ -13,7 +13,7 @@ typedef struct {
     uint8_t slave_addr;   // slave address
     uint16_t freq;        // I2C frequency in kHz
     int16_t ax, ay, az;   // accelerometer for each axis in g
-    int16_t gx,  gy,  gz; // gyroscope for each axis in dps
+    int16_t gx, gy, gz;   // gyroscope for each axis in dps
     float temp;           // temperature in c?
 } IMU_t;
 

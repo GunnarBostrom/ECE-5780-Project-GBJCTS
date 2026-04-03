@@ -12,15 +12,15 @@ I2C slave address: 0x6B (default), otherwise 0x6A
 #include "config.h"
 #include "imu.h"
 
-#define WHO_AM_I_REG    0x0F
+#define WHO_AM_I_REG    0x000F
 #define DEVICE_ID       0x69
-#define ACCEL_REG       0x28  // OUTX_L_XL (check datasheet)
-#define GYRO_REG        0x22  // OUTX_L_G  (check datasheet)
-#define TEMP_REG        0x20  // OUT_TEMP_L (check datasheet)
-#define CTRL1_XL        0x10  // accelerometer control register
-#define CTRL2_G         0x11  // gyroscope control register
-#define INT1_CTRL       0x0D  // interrupt1
-#define INT2_CTRL       0x0E
+#define ACCEL_REG       0x0028  // OUTX_L_XL - lowest accel output register
+#define GYRO_REG        0x0022  // OUTX_L_G - lowest gyro output register
+#define TEMP_REG        0x0020  // OUT_TEMP_L - lowest temp output register
+#define ACCEL_CFG       0x0010  // CTRL1_XL - accelerometer control register
+#define GYRO_CFG        0x0011  // CTRL2_G - gyroscope control register
+#define INT1_CFG        0x000D  // INT1_CTRL - interrupt1 control register
+#define INT2_CFG        0x000E  // INT2_CTRL - interrupt2 control register
 
 
 /* accelerometer config values */
@@ -67,13 +67,13 @@ void imu_init(IMU_t* imu, uint8_t slave_addr, uint16_t freq) {
 
     // configure IMU
     uint8_t accel_config = ACCEL_ODR_416HZ | ACCEL_FS_8G | ACCEL_BW_400HZ;
-    i2c_write(imu->slave_addr, CTRL1_XL, &accel_config, 1);
+    i2c_write(imu->slave_addr, ACCEL_CFG, &accel_config, 1);
 
     uint8_t gyro_config = GYRO_ODR_416HZ | GYRO_FS_2000DPS;
-    i2c_write(imu->slave_addr, CTRL2_G, &gyro_config, 1);
+    i2c_write(imu->slave_addr, GYRO_CFG, &gyro_config, 1);
 
     uint8_t int1_config = 0b00000011; // bit 1 = DRDY_G, bit 0 = DRDY_XL
-    i2c_write(imu->slave_addr, INT1_CTRL, &int1_config, 1);
+    i2c_write(imu->slave_addr, INT1_CFG, &int1_config, 1);
 }
 
 // Reads all inertial data (this does not include temperature)
@@ -114,7 +114,7 @@ void imu_read_temp(IMU_t* imu) {
     uint8_t buf[2];
 
     i2c_read(imu->slave_addr, TEMP_REG, buf, 2);
-    imu->temp  = (int16_t)(buf[0]  | buf[1]  << 8);
+    imu->temp = (int16_t)(buf[0]  | buf[1]  << 8);
 }
 
 // Reads all IMU data (including temperature)
@@ -122,16 +122,20 @@ void imu_read_all(IMU_t* imu) {
     uint8_t buf[14];
 
     i2c_read(imu->slave_addr, TEMP_REG, buf, 14);
-    imu->temp  = (int16_t)(buf[0]  | buf[1]  << 8);
-    imu->gx    = (int16_t)(buf[2]  | buf[3]  << 8);
-    imu->gy    = (int16_t)(buf[4]  | buf[5]  << 8);
-    imu->gz    = (int16_t)(buf[6]  | buf[7]  << 8);
-    imu->ax    = (int16_t)(buf[8]  | buf[9]  << 8);
-    imu->ay    = (int16_t)(buf[10] | buf[11] << 8);
-    imu->az    = (int16_t)(buf[12] | buf[13] << 8);
+    imu->temp = (int16_t)(buf[0]  | buf[1]  << 8);
+    imu->gx   = (int16_t)(buf[2]  | buf[3]  << 8);
+    imu->gy   = (int16_t)(buf[4]  | buf[5]  << 8);
+    imu->gz   = (int16_t)(buf[6]  | buf[7]  << 8);
+    imu->ax   = (int16_t)(buf[8]  | buf[9]  << 8);
+    imu->ay   = (int16_t)(buf[10] | buf[11] << 8);
+    imu->az   = (int16_t)(buf[12] | buf[13] << 8);
 }
 
 #else // use FAKE hardware
-void imu_init(void) { /* do nothing */ }
-void imu_read(void) { /* do nothing */ }
+void imu_init(IMU_t* imu, uint8_t slave_addr, uint16_t freq) { /* do nothing */ }
+void imu_read(IMU_t* imu) { /* do nothing */ }
+void imu_read_accel(IMU_t* imu) { /* do nothing */ }
+void imu_read_gyro(IMU_t* imu) { /* do nothing */ }
+void imu_read_temp(IMU_t* imu) { /* do nothing */ }
+void imu_read_all(IMU_t* imu) { /* do nothing */ }
 #endif
