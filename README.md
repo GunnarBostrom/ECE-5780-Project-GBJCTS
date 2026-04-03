@@ -1,15 +1,15 @@
-To build this project in CMake:
-use:
-cmake --build build
-To flash to the the board:
-cmake --build build --target flash_project
-
+Generate build files:  
+`cmake -B build -S ./`  
+Compile:  
+`cmake --build build`  
+Flash to the the board:  
+`cmake --build build --target flash_project`  
 
 
 # ECE-5780-Project-GBJCTS: Simple Quadcopter
 This is the final project for an embedded systems design course.
 
-This project involves developing a simple quadcopter to demonstrate proficiency in communication protocols, interrupts, system control, and sensor integration.
+This project involves developing a simple quadcopter to demonstrate proficiency in communication protocols, interrupts, system control, and sensor and actuator integration.
 
 Weekly Milestones:
 1. Development Environment & Hardware Setup
@@ -25,7 +25,7 @@ Weekly Milestones:
 **Flight Controller:** STM32F072 Discovery Board  
 **IMU:** LSM6DS3 on a NOYITO breakout board  
 **Altitude Sensor:** VL53L1X on an Adafruit breakout board  
-**Radio:** Team BlackSheep Crossfire Nano  
+**Radio:** Team BlackSheep Crossfire Nano
 <!-- **SBUS Inverter:** 74HC14   -->
 **ESCs:** XILO 40A BLHeli_S ESC  
 **Motors:** EMAX ECO II 2207 2400KV  
@@ -37,17 +37,27 @@ Weekly Milestones:
 
 
 ## Features
-### Current
-- none implemented
 
 ### Planned
 - radio controlled thrust input (altitude control)
 - stable flight (pitch and roll axes)
 - fixed altitude hover
 
+### Current Progress
+- Simulator and optimizer to tune PIDs in 4 axes
+- Control over motors demonstrated
+
 
 ## Toolchain Setup
-This project uses a bare-metal embedded toolchain based on GCC, Make, and OpenOCD.
+This project uses a bare-metal embedded toolchain based on GCC, CMake, and OpenOCD.
+
+### Build Commands
+Generate build files:  
+`cmake -B build -S ./`  
+Compile:  
+`cmake --build build`  
+Flash to the the board:  
+`cmake --build build --target flash_project`
 
 ### Required Tools
 - **GNU ARM Embedded Toolchain** (compiler)  
@@ -78,12 +88,12 @@ sudo apt-get install gcc-arm-none-eabi binutils-arm-none-eabi make openocd stlin
 ```
 
 ### Windows
-Recommended to use WSL. Install Windows Subsystem for Linux and use the Linux instructions above.  
+Recommended to use Windows Subsystem for Linux. Install WSL and use the Linux instructions above.  
 Setup guide: https://learn.microsoft.com/en-us/windows/wsl/install
 
 
 ## Project Info
-**Status:** In Progress  
+**Status:** Not Functional  
 **Language:** C  
 **License:** MIT License – see [LICENSE](./LICENSE)  
 **Authors:** [G. Bostram](https://github.com/GunnarBostrom), [J. Canada](https://github.com/JC919), [T. Stratton](https://github.com/POACH3)  
