@@ -57,6 +57,8 @@ void radio_read(void) {
         if(USART_read_register == 0xC8) {
             // Example: Toggle PC6 if 'A' is received
             HAL_GPIO_TogglePin(GPIOC, GPIO_PIN_6);
+        } else {
+            HAL_GPIO_TogglePin(GPIOC, GPIO_PIN_7); // Toggle PC7 for any other character
         }
 
         // Clear the flag after processing
