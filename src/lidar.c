@@ -20,6 +20,7 @@ Device ID: 0xEA
 
 #include "config.h"
 #include "lidar.h"
+#include "i2c.h"
 
 // define device
 #define WHO_AM_I_REG    0x010F
