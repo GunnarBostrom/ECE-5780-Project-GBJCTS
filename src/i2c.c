@@ -18,13 +18,14 @@ Notes:
 */
 
 #include "i2c.h"
+#include "stm32f0xx_hal.h"
 
 
-void i2c_init(uint16_t mode_freq) {
+void i2c_init(uint16_t i2c_freq) {
     
     
     GPIO_clocks_enable();
-    led_init();
+    //led_init();
 
     // set PB11 to alternate function mode, open-drain output type, I2C2_SDA as the alt function
     GPIOB->MODER &= ~(0b11 << 22);    // clear alt function mode
@@ -44,11 +45,11 @@ void i2c_init(uint16_t mode_freq) {
     GPIOB->OTYPER &= ~(0b1 << 13);
     GPIOB->OTYPER |= (0b1 << 13); // set output type to open-drain
 
-    GPIOB->AFR[1] &= (0b1111 << 20);
+    GPIOB->AFR[1] &= ~(0b1111 << 20);
     GPIOB->AFR[1] |= (0b0101 << 20); // set alt function type to i2c2_scl (AF5)
 
 
-    i2c_set_TIMINGR(mode_freq);
+    i2c_set_TIMINGR(i2c_freq);
     i2c_enable();
 
 
@@ -57,14 +58,14 @@ void i2c_init(uint16_t mode_freq) {
 /**
  * @brief Writes data to a peripheral register
  * 
- * @param slave_addr  Slave address of the IMU (0x6A or 0x6B)
+ * @param slave_addr  I2C slave address of peripheral
  * @param reg_addr    Target peripheral register address
  * @param data        Pointer to data buffer to write to target register
  * @param len         Number of bytes to write
  */
-void i2c_write(uint8_t slave_addr, uint8_t reg_addr, uint8_t* data, uint8_t len) {
+void i2c_write(uint8_t slave_addr, uint16_t reg_addr, uint8_t* data, uint8_t len) {
     
-    i2c_set_write_params(slave_addr, len);
+    i2c_set_write_params(slave_addr, reg_addr, len);
     i2c_write_transaction(reg_addr, data, len);
 
 }
@@ -72,29 +73,33 @@ void i2c_write(uint8_t slave_addr, uint8_t reg_addr, uint8_t* data, uint8_t len)
 /**
  * @brief Reads data from a peripheral
  * 
- * @param slave_addr  Slave address of the IMU (0x6A or 0x6B)
+ * @param slave_addr  I2C slave address of peripheral
  * @param reg_addr    Target peripheral register address
  * @param buf         Pointer to data buffer to write from target register
  * @param len         Number of bytes to write
  */
-void i2c_read(uint8_t slave_addr, uint8_t reg_addr, uint8_t* buf, uint8_t len) {
+void i2c_read(uint8_t slave_addr, uint16_t reg_addr, uint8_t* buf, uint8_t len) {
     
+    i2c_set_write_params(slave_addr, reg_addr, 0);
+    i2c_write_transaction(reg_addr, NULL, 0);
     i2c_set_read_params(slave_addr, len);
-    i2c_read_transaction(reg_addr, buf, len);
-
+    i2c_read_transaction(buf, len);
 }
 
 void GPIO_clocks_enable() {
   RCC->AHBENR |= (1 << 18); // GPIOB for I2C2
   //RCC->AHBENR |= RCC_AHBENR_GPIOBEN;
 
-  RCC->AHBENR |= (1 << 19); // GPIOC for LEDs
-  //RCC->AHBENR |= RCC_AHBENR_GPIOCEN;
+//   RCC->AHBENR |= (1 << 19); // GPIOC for LEDs
+//   //RCC->AHBENR |= RCC_AHBENR_GPIOCEN;
     
   RCC->APB1ENR |= (1 << 22); // for I2C2
   //RCC->APB1ENR |= RCC_APB1ENR_I2C2EN;
 }
 
+/**
+ * This is temporary and is just to use LEDs as signals for debugging
+ */
 void led_init() {
   // set PC6, PC7, PC8, PC9 to output mode
   GPIOC->MODER &= ~(0b11 << 12); // clear PC6 red
@@ -111,12 +116,18 @@ void led_init() {
 }
 
 /**
-If an invalid frequency is provided, 100 kHz (Standard-mode) will
-be selected.
+ * @brief Sets I2C frequency.
+ * 
+ * This function is to blame for this I2C driver only
+ * supporting Standard-mode and Fast-mode.
+ * If an invalid frequency is provided, 100 kHz (Standard-mode) will
+ * be selected.
+ * 
+ * @param i2c_freq  I2C frequency in kHz
 */
-void i2c_set_TIMINGR(uint8_t freq) {
+void i2c_set_TIMINGR(uint16_t i2c_freq) {
   
-  switch(freq):
+  switch(i2c_freq) {
     case 100: // Standard-mode - 100 kHz
         I2C2->TIMINGR =
             (0x1  << 28) |   // PRESC
@@ -141,8 +152,12 @@ void i2c_set_TIMINGR(uint8_t freq) {
             (0x0F <<  8) |   // SCLH
             (0x13 <<  0);    // SCLL
             break;
+  }
 }
 
+/**
+ * @brief IC2 already configured, now enable.
+ */
 void i2c_enable() {
   
   I2C2->CR1 |= (1 << 0);
@@ -151,83 +166,161 @@ void i2c_enable() {
   //SYSCFG->EXTICR[0] |= (0b100 << 4);
 }
 
-void i2c_set_write_params(uint8_t slave_addr, uint8_t len) {
+/**
+ * @brief Preps master for writing to slave.
+ * 
+ * This and the i2c_set_read_params function are to 
+ * blame for this I2C driver only supporting 7-bit 
+ * address mode. Fix the SADD shift if you actually 
+ * care that much.
+ * 
+ * @param slave_addr    I2C slave address
+ * @param reg_addr      Peripheral register to be written to
+ * @param len           Number of bytes of data to write
+ */
+void i2c_set_write_params(uint8_t slave_addr, uint16_t reg_addr, uint8_t len) {
+    // total bytes sent includes register as well
+    uint8_t total_bytes = (reg_addr > 0xFF) ? len + 2 : len + 1;
 
-    I2C2->CR2 &= ~((0x7F << 16) | (0x3FF << 0)); // clear NBYTES (16-23) and SADD (0-9)
+    //I2C2->CR2 &= ~((0x7F << 16) | (0x3FF << 0)); // clear NBYTES (16-23) and SADD (0-9)
+    I2C2->CR2 &= ~((0xFF << 16) | (0x3FF << 0)); // clear NBYTES (16-23) and SADD (0-9)
 
-    I2C2->CR2 |= slave_addr << 1;
-    I2C2->CR2 |= len << 16;
+    I2C2->CR2 |= slave_addr << 1;   // SADD shifted for 7-bit address mode
+    I2C2->CR2 |= total_bytes << 16; // NBYTES
 
     I2C2->CR2 &= ~(I2C_CR2_RD_WRN); // request write transfer
-    I2C2->CR2 |= I2C_CR2_START; //13?
+    I2C2->CR2 |= I2C_CR2_START;     // 13?
 }
 
-void i2c_write_transaction(uint8_t reg_addr, uint8_t* data, uint8_t len) {
+/**
+ * @brief Writes data to slave.
+ * 
+ * @param reg_addr  Peripheral register to be written to
+ * @param data      Pointer to data to write to register
+ * @param len       Number of bytes of data to write
+ */
+void i2c_write_transaction(uint16_t reg_addr, uint8_t* data, uint8_t len) {
     
+    //while (!(I2C2->ISR & (1 << 1)) && !(I2C2->ISR & (1 << 4))); // wait for ready to transmit or error
+    // while (!(I2C2->ISR & I2C_ISR_TXIS) && !(I2C2->ISR & I2C_ISR_NACKF)) {} // wait for ready to transmit or error
+    // if (I2C2->ISR & I2C_ISR_NACKF) {
+    //     // NACKF: probably should throw an error
+    //     I2C2->ICR |= I2C_ICR_NACKCF; // clear flag
+    //     I2C2->CR2 |= I2C_CR2_STOP;   // stop
+    //     return;
+    // }
 
-    I2C2->TXDR = reg_addr; // does this tell the STM which register to write the bytes to?
-
-    //write bytes to transmit
-    for (int i = 0; i < len; i++)
-    {
-        while (!(I2C2->ISR & (1 << 1)) && !(I2C2->ISR & (1 << 4))); // wait for ready to transmit or error
-        
-        if ( I2C2->ISR & (1 << 1) ) {
-            I2C2->TXDR = data[i];
-        }
-        else {
+    if (reg_addr > 0xFF) { // if 16-bit register
+        // wait
+        while (!(I2C2->ISR & I2C_ISR_TXIS) && !(I2C2->ISR & I2C_ISR_NACKF)) {}
+        if (I2C2->ISR & I2C_ISR_NACKF) {
             // NACKF: probably should throw an error
             I2C2->ICR |= I2C_ICR_NACKCF; // clear flag
             I2C2->CR2 |= I2C_CR2_STOP;   // stop
             return;
         }
+        
+        // send high byte 
+        I2C2->TXDR = (reg_addr >> 8) & 0xFF;
+
+        while (!(I2C2->ISR & I2C_ISR_TXIS) && !(I2C2->ISR & I2C_ISR_NACKF)) {} // wait for ready to transmit or error
+        if (I2C2->ISR & I2C_ISR_NACKF) {
+            // NACKF: probably should throw an error
+            I2C2->ICR |= I2C_ICR_NACKCF; // clear flag
+            I2C2->CR2 |= I2C_CR2_STOP;   // stop
+            return;
+        }
+
+        // send low byte
+        I2C2->TXDR = reg_addr & 0xFF;
+
+    }
+    else {
+        while (!(I2C2->ISR & I2C_ISR_TXIS) && !(I2C2->ISR & I2C_ISR_NACKF)) {}
+        if (I2C2->ISR & I2C_ISR_NACKF) {
+            // NACKF: probably should throw an error
+            I2C2->ICR |= I2C_ICR_NACKCF; // clear flag
+            I2C2->CR2 |= I2C_CR2_STOP;   // stop
+            return; 
+        }
+
+        I2C2->TXDR = reg_addr;
+    }
+
+    //write bytes to transmit
+    for (int i = 0; i < len; i++)
+    {
+        while (!(I2C2->ISR & I2C_ISR_TXIS) && !(I2C2->ISR & I2C_ISR_NACKF)) {} // wait for ready to transmit or error
+        if (I2C2->ISR & I2C_ISR_NACKF) {
+            // NACKF: probably should throw an error
+            I2C2->ICR |= I2C_ICR_NACKCF; // clear flag
+            I2C2->CR2 |= I2C_CR2_STOP;   // stop
+            return;
+        }
+        I2C2->TXDR = data[i];
     }
 
     while( !(I2C2->ISR & (1 << 6)) ) {}        // wait for transmit complete
-   
-    // either set stop
-    I2C2->CR2 |= I2C_CR2_STOP;                 //14?
-    // or wait for stop and clear flag
+    I2C2->CR2 |= I2C_CR2_STOP;                 // 14?
     while ( !(I2C2->ISR & I2C_ISR_STOPF) ) {}  // wait for stop condition
-    I2C2->ICR |= I2C_ICR_STOPCF;  
+    I2C2->ICR |= I2C_ICR_STOPCF;               // clear flag
 
 }
 
+/**
+ * @brief Preps the master for reading from slave.
+ * 
+ * This and the i2c_set_write_params function are to 
+ * blame for this I2C driver only supporting 7-bit 
+ * address mode. Fix the SADD shift if you actually 
+ * care that much.
+ * 
+ * @param slave_addr    I2C slave address
+ * @param len           Number of bytes to read from slave
+ */
 void i2c_set_read_params(uint8_t slave_addr, uint8_t len) {
-    
-    I2C2->CR2 &= ~((0x7F << 16) | (0x3FF << 0)); // clear NBYTES (16-23) and SADD (0-9)
+    // don't need to account for address in total bytes read (address sent with write params)
+
+    //I2C2->CR2 &= ~((0x7F << 16) | (0x3FF << 0)); // clear NBYTES (16-23) and SADD (0-9)
+    I2C2->CR2 &= ~((0xFF << 16) | (0x3FF << 0)); // clear NBYTES (16-23) and SADD (0-9)
     
     // I2C2->CR2 = 
     //     (len << 16) |  // nbytes
     //     (0x1 << 10) |  // rd_wrn - request read transfer
     //     (0x69 << 1);   // sadd
 
+    I2C2->CR2 |= len << 16;        // NBYTES
+    I2C2->CR2 |= slave_addr << 1;  // SADD shifted for 7-bit address mode
+
     I2C2->CR2 |= I2C_CR2_RD_WRN; // request read transfer
     I2C2->CR2 |= I2C_CR2_START;
 }
 
-void i2c_read_transaction(uint8_t reg_addr, uint8_t* buf, uint8_t len) {
-    
-    //I2C2->RXDR = reg_addr; //delete?
+/**
+ * @brief Reads data from slave.
+ * 
+ * @param buf   Buffer to receive data from slave
+ * @param len   Number of bytes to save to buffer
+ */
+void i2c_read_transaction(uint8_t* buf, uint8_t len) {
 
     for (int i = 0; i < len; i++) {
 
         while ( !(I2C2->ISR & I2C_ISR_RXNE) && !(I2C2->ISR & I2C_ISR_NACKF) ) {} // wait for ready to read or error
 
-        if (I2C2->ISR & I2C_ISR_RXNE) 
+        if (I2C2->ISR & I2C_ISR_NACKF) 
         {
-            buf[i] = I2C2->RXDR;
-        }
-        else {
             // NACKF: probably should throw an error
             I2C2->ICR |= I2C_ICR_NACKCF; // clear flag
             I2C2->CR2 |= I2C_CR2_STOP;   // stop
             return;
         }
+        buf[i] = I2C2->RXDR;
 
     }
 
-    while ( !(I2C2->ISR & I2C_ISR_TC) ) {} // wait for transfer complete
-    I2C2->CR2 |= I2C_CR2_STOP;   // stop
-
+    while ( !(I2C2->ISR & I2C_ISR_TC) ) {}     // wait for transfer complete
+    I2C2->CR2 |= I2C_CR2_STOP;                 // stop
+    while ( !(I2C2->ISR & I2C_ISR_STOPF) ) {}  // wait for stop condition
+    I2C2->ICR |= I2C_ICR_STOPCF;               // clear flag
 }
