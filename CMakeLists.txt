@@ -31,7 +31,7 @@ set(HAL_SOURCES
 set(PROJECT_SOURCES
 # Your project files
 Core/Src/system_stm32f0xx.c
-Core/Src/syscalls.c
+# Core/Src/syscalls.c # replaced with rdimon to allow semihosting
 Core/Src/sysmem.c
 src/control.c
 src/filter.c
@@ -82,6 +82,9 @@ target_compile_definitions(project PRIVATE
     STM32F072xB
     USE_HAL_DRIVER
 )
+
+# Linker flags for semihosting, not part of section 6.
+target_link_libraries(project PRIVATE m rdimon)
 
 # 7. Flashing Logic
 include(flash_stm32)
