@@ -90,7 +90,8 @@ Recommended to use Windows Subsystem for Linux. Install WSL and use the Linux in
 
 ### Build & Flash
 Generate build files:  
-`cmake -B build -S ./`  
+`cmake -B build -S ./` (regular build)  
+`cmake -B build -S ./ -DCMAKE_BUILD_TYPE=Debug` (build and include debug symbols for GDB)  
 Compile:  
 `cmake --build build`  
 Flash to board:  
