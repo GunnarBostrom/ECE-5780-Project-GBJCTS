@@ -31,13 +31,16 @@ Device ID: 0xEA
 
 void lidar_init(void) {}
 void lidar_read_range(void) {}
+void lidar_read_sigma(void) {}
 void lidar_read_status(void) {}
 void lidar_read_strength(void) {}
 void lidar_read_interference(void) {}
 
+
 #else //use FAKE hardware
 void lidar_init(void) { /* do nothing */ }
 void lidar_read_range(void) { /* do nothing */ }
+void lidar_read_sigma(void) { /* do nothing */ }
 void lidar_read_status(void) { /* do nothing */ }
 void lidar_read_strength(void) { /* do nothing */ }
 void lidar_read_interference(void) { /* do nothing */ }
