@@ -21,23 +21,22 @@ Weekly Milestones:
 7. Final System Integration & Flight Testing
 
 
-## Hardware Components (tentative)
+## Hardware Components
 **Flight Controller:** STM32F072 Discovery Board  
 **IMU:** LSM6DS3 on a NOYITO breakout board  
 **Altitude Sensor:** VL53L1X on an Adafruit breakout board  
-**Radio:** Team BlackSheep Crossfire Nano  <!-- **SBUS Inverter:** 74HC14 (needed if using FrSky RX6R) -->
+**Radio:** Team BlackSheep Crossfire Nano  
 **ESCs:** XILO 40A BLHeli_S ESC  
 **Motors:** EMAX ECO II 2207 2400KV  
 **Power:** 4S LiPo battery  
-**BEC:** MatekSys Micro BEC  
+**Voltage Regulator:** MatekSys Micro BEC  
 
 **Quadcopter Frame:** GEPRC GEP-Mark4 5"  
 **Propellers:** HQProp Ethix S3  
 
 <p align="center" style="display: flex; justify-content: center; gap: 50px;">
-  <img src="media/simple_drone_wire_diagram.png" alt="Wiring Diagram" width="800"/>
+  <img src="docs/simple_drone_wire_diagram.png" alt="Wiring Diagram" width="800"/>
 </p>
-
 
 ## Features & Progress
 
@@ -59,17 +58,11 @@ This project uses a bare-metal embedded toolchain based on GCC, CMake, and OpenO
 - **CMake** (build system)  
 - **OpenOCD** (flashing/debugging)  
 - **ST-Link** (hardware debug probe)
-<!-- - **STM32CubeMX**: [Download here](https://www.st.com/en/development-tools/stm32cubeide.html)   -->   
-
-<!-- ### Recommended
-- **Visual Studio Code:** [Download here](https://code.visualstudio.com/)  
-- **VSCode Extensions:**  
-   - [C/C++ Extension Pack](https://marketplace.visualstudio.com/items?itemName=ms-vscode.cpptools-extension-pack)  -->
 
 ### Toolchain Installation
 
 #### macOS
-Install [Homebrew](https://brew.sh/) if needed.
+[Install Homebrew](https://brew.sh/) if needed.
 
 ```bash
 brew install --cask gcc-arm-embedded
@@ -89,8 +82,7 @@ sudo apt install stlink-tools
 ```
 
 #### Windows
-Recommended to use Windows Subsystem for Linux. Install WSL and use the Linux instructions above.  
-[WSL setup guide](https://learn.microsoft.com/en-us/windows/wsl/install)
+Recommended to use Windows Subsystem for Linux. [Install WSL](https://learn.microsoft.com/en-us/windows/wsl/install) and use the Linux instructions above.  
 
 ### Build & Flash
 Generate build files:  
