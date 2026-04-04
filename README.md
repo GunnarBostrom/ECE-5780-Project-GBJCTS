@@ -9,7 +9,7 @@ Flash to board:
 # ECE-5780-Project-GBJCTS: Simple Quadcopter
 This is the final project for an embedded systems design course.
 
-This project involves developing a simple quadcopter to demonstrate proficiency in communication protocols, interrupts, system control, and sensor and actuator integration.
+This project involves developing a simple quadcopter to demonstrate proficiency in communication protocols, system control, as well as sensor and actuator integration and actuation.
 
 Weekly Milestones:
 1. Development Environment & Hardware Setup
@@ -35,7 +35,7 @@ Weekly Milestones:
 **Propellers:** HQProp Ethix S3  
 
 
-## Features
+## Features & Progress
 
 ### Planned
 - radio controlled thrust input (altitude control)
@@ -62,27 +62,31 @@ This project uses a bare-metal embedded toolchain based on GCC, CMake, and OpenO
 - **VSCode Extensions:**  
    - [C/C++ Extension Pack](https://marketplace.visualstudio.com/items?itemName=ms-vscode.cpptools-extension-pack)  -->
 
----
-
 ### Toolchain Installation
 
 #### macOS
-Install Homebrew if needed: https://brew.sh/
+Install [Homebrew](https://brew.sh/) if needed.
 
 ```bash
 brew install --cask gcc-arm-embedded
-brew install openocd stlink make
+brew install cmake
+brew install openocd
+brew install stlink
 ```
 
 #### Linux
 ```bash
-sudo apt-get update
-sudo apt-get install gcc-arm-none-eabi binutils-arm-none-eabi make openocd stlink-tools
+sudo apt update
+sudo apt install gcc-arm-none-eabi
+sudo apt install binutils-arm-none-eabi
+sudo apt install cmake
+sudo apt install openocd
+sudo apt install stlink-tools
 ```
 
 #### Windows
 Recommended to use Windows Subsystem for Linux. Install WSL and use the Linux instructions above.  
-Setup guide: https://learn.microsoft.com/en-us/windows/wsl/install
+[WSL setup guide](https://learn.microsoft.com/en-us/windows/wsl/install)
 
 ### Build & Flash
 Generate build files:  
