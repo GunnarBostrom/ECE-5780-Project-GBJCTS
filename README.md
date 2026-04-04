@@ -35,7 +35,7 @@ Weekly Milestones:
 **Propellers:** HQProp Ethix S3  
 
 <p align="center" style="display: flex; justify-content: center; gap: 50px;">
-  <img src="media/simple_drone_wire_diagram.png" alt="Wiring Diagram" width="400"/>
+  <img src="media/simple_drone_wire_diagram.png" alt="Wiring Diagram" width="800"/>
 </p>
 
 
