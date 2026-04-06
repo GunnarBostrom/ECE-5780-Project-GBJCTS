@@ -34,7 +34,7 @@ Device ID: 0xEA
 // define config vals
 
 
-//#if USE_LIDAR // use REAL hardware
+#if USE_LIDAR // use REAL hardware
 
 void lidar_init(LIDAR_t *lidar, uint8_t slave_addr) {
     lidar->slave_addr = slave_addr;
@@ -61,11 +61,11 @@ void lidar_read_strength(LIDAR_t *lidar) {}
 void lidar_read_interference(LIDAR_t *lidar) {}
 
 
-// #else //use FAKE hardware
-// void lidar_init(void) { /* do nothing */ }
-// void lidar_read_range(void) { /* do nothing */ }
-// void lidar_read_sigma(void) { /* do nothing */ }
-// void lidar_read_status(void) { /* do nothing */ }
-// void lidar_read_strength(void) { /* do nothing */ }
-// void lidar_read_interference(void) { /* do nothing */ }
-// #endif
+#else //use FAKE hardware
+void lidar_init(LIDAR_t *lidar, uint8_t slave_addr) { /* do nothing */ }
+void lidar_read_range(LIDAR_t *lidar) { /* do nothing */ }
+void lidar_read_sigma(LIDAR_t *lidar) { /* do nothing */ }
+void lidar_read_status(LIDAR_t *lidar) { /* do nothing */ }
+void lidar_read_strength(LIDAR_t *lidar) { /* do nothing */ }
+void lidar_read_interference(LIDAR_t *lidar) { /* do nothing */ }
+#endif

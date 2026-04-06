@@ -22,7 +22,7 @@
 void Error_Handler(void);
 void SystemClock_Config(void);
 
-void LED_init(void);
+static void LED_init(void);
 
 
 /* –––––––––– globals –––––––––– */
@@ -46,7 +46,7 @@ int main(void) {
   i2c_init(400);
 
   imu_init(&lsm6ds3, 0x6A); // i2c addr: 0x6A, 0x6B is default
-  lidar_init();             // i2c addr: 0x52
+  // lidar_init();             // i2c addr: 0x52
 
 
   // UART peripheral initialization
@@ -89,7 +89,7 @@ int main(void) {
 
     radio_read();       // medium priority - interrupt with flag
 
-    lidar_read();       // lowest priority - polls
+    // lidar_read();       // lowest priority - polls
 
     
 
