@@ -36,6 +36,7 @@ add_executable(project ${PROJECT_SOURCES}) # create executable named "project"
 target_include_directories(project PRIVATE
     inc
 )
+target_compile_options(project PRIVATE -g3 -O0)
 
 target_link_libraries(project PRIVATE
     STM32_Drivers
