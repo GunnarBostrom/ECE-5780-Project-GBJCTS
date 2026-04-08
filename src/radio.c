@@ -77,21 +77,6 @@ void radio_read(void) {
 
         radio_data.throttle = ch[0]; // channel 1 is throttle
         radio_data.armed = (ch[4] > 992) ? 1 : 0; // channel 5 above center is armed, below center is disarmed
-
-
-        if (radio_data.armed == 1) {
-            HAL_GPIO_WritePin(GPIOC, GPIO_PIN_6, GPIO_PIN_SET);   // orange on
-        } else if (radio_data.armed == 0) {
-            HAL_GPIO_WritePin(GPIOC, GPIO_PIN_6, GPIO_PIN_RESET); // orange off
-        }
-        // Test: orange LED = above center, blue LED = below center
-        if (radio_data.throttle > 992) {
-            HAL_GPIO_WritePin(GPIOC, GPIO_PIN_8, GPIO_PIN_SET);   // orange on
-            HAL_GPIO_WritePin(GPIOC, GPIO_PIN_7, GPIO_PIN_RESET); // blue off
-        } else {
-            HAL_GPIO_WritePin(GPIOC, GPIO_PIN_8, GPIO_PIN_RESET); // orange off
-            HAL_GPIO_WritePin(GPIOC, GPIO_PIN_7, GPIO_PIN_SET);   // blue on
-        }
     }
 }
  
