@@ -9,3 +9,4 @@ typedef struct {
 } Radio_t;
 
 extern volatile Radio_t radio_data;
+extern volatile short int new_radio_data_flag;

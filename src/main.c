@@ -4,6 +4,7 @@
  */
 
 #include "main.h"
+#include "control.h"
 #include "stm32f072xb.h"
 #include "stm32f0xx_hal.h"
 #include "stm32f0xx_hal_gpio.h"
@@ -61,14 +62,14 @@ int main(void) {
   uint8_t motor_state = 0;
 
   // Arm all ESCs at minimum throttle
-  motor_set_all(1000);
-  motor_set_individual(1000, 1000, 1000, 1000);
-  HAL_Delay(8000);
+  // motor_set_all(1000);
+  // motor_set_individual(1000, 1000, 1000, 1000);
+  // HAL_Delay(8000);
 
   // Hold Motors 1-4 at low throttle
   // Note motor minimum value for all 4 motors to spin at min throttle is 1200
-  motor_set_individual(1200, 1200, 1200, 1200);
-  motor_set_all(1200);
+  // motor_set_individual(1200, 1200, 1200, 1200);
+  // motor_set_all(1200);
   
   
 
@@ -88,8 +89,11 @@ int main(void) {
     // update motors as soon as IMU data ready
 
     radio_read();       // medium priority - interrupt with flag
-
-    lidar_read(&vl53l1x);       // lowest priority - polls
+    if(new_radio_data_flag) {
+        new_radio_data_flag = 0;
+        control_from_radio();
+    }
+    lidar_read(&vl53l1x);
 
     
 
