@@ -77,7 +77,12 @@ void radio_read(void) {
 
         radio_data.throttle = ch[0]; // channel 1 is throttle
         radio_data.armed = (ch[4] > 992) ? 1 : 0; // channel 5 above center is armed, below center is disarmed
+    } else {
+        // lost signal? set to safe values
+        radio_data.throttle = 50;
+        radio_data.armed = 0;
     }
+
 }
  
  /**
