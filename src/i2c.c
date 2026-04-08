@@ -117,60 +117,60 @@ void led_init() {
 */
 void i2c_set_TIMINGR(uint16_t i2c_freq) {
   
-  switch(i2c_freq) { // 8MHz
-    case 100: // Standard-mode - 100 kHz
-        I2C2->TIMINGR =
-            (0x1  << 28) |   // PRESC
-            (0x4  << 20) |   // SCLDEL
-            (0x2  << 16) |   // SDADEL
-            (0x0F <<  8) |   // SCLH
-            (0x13 <<  0);    // SCLL
-            break;
-    case 400: // Fast-mode - 400 kHz  !! doesn't work at 8MHz !!
-        I2C2->TIMINGR =
-            (0x0 << 28) |   // PRESC
-            (0x3 << 20) |   // SCLDEL
-            (0x1 << 16) |   // SDADEL
-            (0x3 <<  8) |   // SCLH
-            (0x9 <<  0);    // SCLL
-            break;
-    default: // Standard-mode - 100 kHz
-        I2C2->TIMINGR =
-            (0x1  << 28) |   // PRESC
-            (0x4  << 20) |   // SCLDEL
-            (0x2  << 16) |   // SDADEL
-            (0x0F <<  8) |   // SCLH
-            (0x13 <<  0);    // SCLL
-            break;
-  }
+//   switch(i2c_freq) { // 8MHz
+//     case 100: // Standard-mode - 100 kHz
+//         I2C2->TIMINGR =
+//             (0x1  << 28) |   // PRESC
+//             (0x4  << 20) |   // SCLDEL
+//             (0x2  << 16) |   // SDADEL
+//             (0x0F <<  8) |   // SCLH
+//             (0x13 <<  0);    // SCLL
+//             break;
+//     case 400: // Fast-mode - 400 kHz  !! doesn't work at 8MHz !!
+//         I2C2->TIMINGR =
+//             (0x0 << 28) |   // PRESC
+//             (0x3 << 20) |   // SCLDEL
+//             (0x1 << 16) |   // SDADEL
+//             (0x3 <<  8) |   // SCLH
+//             (0x9 <<  0);    // SCLL
+//             break;
+//     default: // Standard-mode - 100 kHz
+//         I2C2->TIMINGR =
+//             (0x1  << 28) |   // PRESC
+//             (0x4  << 20) |   // SCLDEL
+//             (0x2  << 16) |   // SDADEL
+//             (0x0F <<  8) |   // SCLH
+//             (0x13 <<  0);    // SCLL
+//             break;
+//   }
 
-    // switch(i2c_freq) { // 48MHz
+    switch(i2c_freq) { // 48MHz
 
-    //     case 100: // 100 kHz at 48MHz
-    //         I2C2->TIMINGR =
-    //             (0xB << 28) |  // PRESC
-    //             (0x4 << 20) |  // SCLDEL
-    //             (0x2 << 16) |  // SDADEL
-    //             (0xF <<  8) |  // SCLH
-    //             (0x13 << 0);   // SCLL
-    //         break;
-    //     case 400: // 400 kHz at 48MHz
-    //         I2C2->TIMINGR =
-    //             (0x5 << 28) |  // PRESC
-    //             (0x3 << 20) |  // SCLDEL
-    //             (0x1 << 16) |  // SDADEL
-    //             (0x3 <<  8) |  // SCLH
-    //             (0x9 <<  0);   // SCLL
-    //         break;
-    //     default: // Standard-mode - 100 kHz at 48MHz
-    //         I2C2->TIMINGR =
-    //             (0xB << 28) |  // PRESC
-    //             (0x4 << 20) |  // SCLDEL
-    //             (0x2 << 16) |  // SDADEL
-    //             (0xF <<  8) |  // SCLH
-    //             (0x13 << 0);   // SCLL
-    //         break;
-    // }
+        case 100: // 100 kHz at 48MHz
+            I2C2->TIMINGR =
+                (0xB << 28) |  // PRESC
+                (0x4 << 20) |  // SCLDEL
+                (0x2 << 16) |  // SDADEL
+                (0xF <<  8) |  // SCLH
+                (0x13 << 0);   // SCLL
+            break;
+        case 400: // 400 kHz at 48MHz
+            I2C2->TIMINGR =
+                (0x5 << 28) |  // PRESC
+                (0x3 << 20) |  // SCLDEL
+                (0x1 << 16) |  // SDADEL
+                (0x3 <<  8) |  // SCLH
+                (0x9 <<  0);   // SCLL
+            break;
+        default: // Standard-mode - 100 kHz at 48MHz
+            I2C2->TIMINGR =
+                (0xB << 28) |  // PRESC
+                (0x4 << 20) |  // SCLDEL
+                (0x2 << 16) |  // SDADEL
+                (0xF <<  8) |  // SCLH
+                (0x13 << 0);   // SCLL
+            break;
+    }
 }
 
 /**
