@@ -12,7 +12,7 @@ STM VL53L1X
 
 // just what we need
 typedef struct {
-    uint8_t slave_addr;
+    uint16_t slave_addr;
     uint16_t range_mm;      // range in millimeters
     uint32_t range_sigma;   // signal standard deviation (divide by 65536 for real value)
     uint8_t range_status;   // signal validity           (0 = valid)
@@ -31,7 +31,8 @@ typedef struct {
     uint8_t  range_status;  // 0 = valid
 } TOF_t;
 
-void lidar_init(LIDAR_t *lidar, uint8_t slave_addr);
+void lidar_init(LIDAR_t *lidar, uint16_t slave_addr);
+void lidar_read(LIDAR_t *lidar);
 void lidar_read_range(LIDAR_t *lidar);
 void lidar_read_sigma(LIDAR_t *lidar);
 void lidar_read_status(LIDAR_t *lidar);

@@ -44,17 +44,17 @@ void i2c_set_TIMINGR(uint16_t i2c_freq);
 // Enables I2C after configure
 void i2c_enable(void);
 
-// Preps master for write
-void i2c_set_write_params(uint8_t slave_addr, uint16_t reg_addr, uint8_t len);
+// // One shot write to slave
+// void i2c_write(uint8_t slave_addr, uint16_t reg_addr, uint8_t* data, uint8_t len);
 
 // Writes to slave
-void i2c_write_transaction(uint16_t reg_addr, uint8_t* data, uint8_t len);
+void i2c_write_transaction(uint8_t slave_addr, uint16_t reg_addr, uint8_t* data, uint8_t len);
 
-// Preps master for read
-void i2c_set_read_params(uint8_t slave_addr, uint8_t len);
+// // Preps master for read
+// void i2c_read(uint8_t slave_addr, uint16_t reg_addr, uint8_t* buf,uint8_t len);
 
 // Reads from slave
-void i2c_read_transaction(uint8_t* buf, uint8_t len);
+void i2c_read_transaction(uint8_t slave_addr, uint8_t* buf, uint8_t len);
 
 
 

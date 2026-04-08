@@ -30,6 +30,7 @@ Device ID: 0x69
 
 #define WHO_AM_I_REG    0x0F
 #define DEVICE_ID       0x69
+// #define DEVICE_ID       0x2B
 
 /* ––––– output registers ––––– */
 #define ACCEL_REG       0x28  // OUTX_L_XL - lowest accel output register
@@ -99,6 +100,7 @@ void imu_init(IMU_t* imu, uint8_t slave_addr) {
     
     // verify device
     uint8_t buf[1];
+
     i2c_read(imu->slave_addr, WHO_AM_I_REG, buf, 1);
     if (buf[0] != DEVICE_ID) {
         // wrong device: throw an error
@@ -111,6 +113,8 @@ void imu_init(IMU_t* imu, uint8_t slave_addr) {
 
     uint8_t gyro_config = GYRO_ODR_416HZ | GYRO_FS_2000DPS;
     i2c_write(imu->slave_addr, GYRO_CFG, &gyro_config, 1);
+
+    //HAL_Delay(100);
 
     /*
     // interrupts
