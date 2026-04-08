@@ -58,11 +58,11 @@ void motor_init(void)
     // -------------------------------------------------------------------------
     // TIMER CONFIG
     //
-    // Assuming timer clock = 8 MHz
-    // PSC = 7 -> 1 MHz timer tick -> 1 us per tick
+    // Assuming timer clock = 48 MHz
+    // PSC = 47 -> 48 MHz / (47 + 1) = 1 MHz -> 1 us per tick
     // ARR = 19999 -> 20 ms period -> 50 Hz ESC PWM
     // -------------------------------------------------------------------------
-    TIM2->PSC = 7;
+    TIM2->PSC = 47;
     TIM2->ARR = 20000 - 1;
 
     // Safe minimum throttle to start
