@@ -30,12 +30,13 @@ Device ID: 0x69
 
 #define WHO_AM_I_REG    0x0F
 #define DEVICE_ID       0x69
-// #define DEVICE_ID       0x2B
+
 
 /* ––––– output registers ––––– */
 #define ACCEL_REG       0x28  // OUTX_L_XL - lowest accel output register
 #define GYRO_REG        0x22  // OUTX_L_G - lowest gyro output register
 #define TEMP_REG        0x20  // OUT_TEMP_L - lowest temp output register
+
 
 /* ––––– configuration registers ––––– */
 #define ACCEL_CFG       0x10  // CTRL1_XL - accelerometer control register
@@ -104,6 +105,13 @@ void imu_init(IMU_t* imu, uint8_t slave_addr) {
     i2c_read(imu->slave_addr, WHO_AM_I_REG, buf, 1);
     if (buf[0] != DEVICE_ID) {
         // wrong device: throw an error
+
+        while (1) {
+            HAL_GPIO_TogglePin(GPIOC, GPIO_PIN_7);
+            HAL_GPIO_TogglePin(GPIOC, GPIO_PIN_8);
+            HAL_Delay(200);
+        }
+
         return;
     }
 
@@ -134,12 +142,6 @@ void imu_init(IMU_t* imu, uint8_t slave_addr) {
  * Hence the gyro data is accessed first because it is the lowest register.
  */
 void imu_read(IMU_t* imu) {
-
-    // while (1) {
-    //   HAL_GPIO_TogglePin(GPIOC, GPIO_PIN_9);
-    //   HAL_GPIO_TogglePin(GPIOC, GPIO_PIN_6);
-    //   HAL_Delay(200);
-    // }
     uint8_t buf[12];
 
     i2c_read(imu->slave_addr, GYRO_REG, buf, 12);
@@ -149,14 +151,6 @@ void imu_read(IMU_t* imu) {
     imu->ax = (int16_t)(buf[6]  | buf[7]  << 8);
     imu->ay = (int16_t)(buf[8]  | buf[9]  << 8);
     imu->az = (int16_t)(buf[10] | buf[11] << 8);
-
-    // while (1) {
-    //   HAL_GPIO_TogglePin(GPIOC, GPIO_PIN_7);
-    //   HAL_GPIO_TogglePin(GPIOC, GPIO_PIN_8);
-    //   HAL_Delay(200);
-    // }
-    // HAL_GPIO_TogglePin(GPIOC, GPIO_PIN_7);
-    // HAL_GPIO_TogglePin(GPIOC, GPIO_PIN_8);
 }
 
 //Reads IMU acceleration data
@@ -180,6 +174,8 @@ void imu_read_gyro(IMU_t* imu) {
 }
 
 // Reads IMU temperature data
+// This output is raw. The conversion to celsius is:
+// celsius_temp = (raw_temp / 16) + 25  (± the offset error)
 void imu_read_temp(IMU_t* imu) {
     uint8_t buf[2];
 
