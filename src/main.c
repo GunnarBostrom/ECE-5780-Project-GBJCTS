@@ -43,7 +43,7 @@ int main(void) {
   
 
   // I2C peripheral initialization
-  i2c_init(400);
+  // i2c_init(400);
 
   imu_init(&lsm6ds3, 0x6B);    // i2c addr: 0x6A, 0x6B is default
   lidar_init(&vl53l1x, 0x52); // i2c addr: 0x52
@@ -84,7 +84,7 @@ int main(void) {
     // need to think about precedence and data frequency
 
     
-    imu_read(&lsm6ds3); // highest priority - interrupt with flag
+    // imu_read(&lsm6ds3); // highest priority - interrupt with flag
     // update motors as soon as IMU data ready
 
     radio_read();       // medium priority - interrupt with flag
