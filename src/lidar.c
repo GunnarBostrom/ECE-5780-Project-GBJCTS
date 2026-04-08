@@ -1,77 +1,84 @@
-// /**
-// LiDAR
+/**
+LiDAR
 
-// STM VL53L1X
-// Can operate at "up to 400 kHz".
+STM VL53L1X
+Can operate at "up to 400 kHz".
 
-// Data peripheral provides:
-//     - range
-//     - range standard deviation
-//     - range validity
-//     - signal strength
-//     - ambient interference
-//     - reading count
-//     - active SPAD count
+Data peripheral provides:
+    - range
+    - range standard deviation
+    - range validity
+    - signal strength
+    - ambient interference
+    - reading count
+    - active SPAD count
 
 
-// lidar.c --> VL53L1X_api.c --> vl53l1x_platform.c --> i2c.c
+lidar.c --> VL53L1X_api.c --> vl53l1x_platform.c --> i2c.c
 
-// I2C slave address: 0x52
-// WHO_AM_I register: 0x010F
-// Device ID: 0xEA
-// */
+I2C slave address: 0x52
+WHO_AM_I register: 0x010F
+Device ID: 0xEA
+*/
 
-// #include "config.h"
-// #include "lidar.h"
-// #include "i2c.h" // remove?
-// #include "VL53L1X_api.h"
+#include "config.h"
+#include "lidar.h"
+#include "i2c.h" // remove?
+#include "VL53L1X_api.h"
 
-// // define device
-// #define WHO_AM_I_REG    0x010F
-// #define DEVICE_ID       0xEA        // or maybe 0xEEAC
+// define device
+#define WHO_AM_I_REG    0x010F
+#define DEVICE_ID       0xEA        // or maybe 0xEEAC
 
-// // define output regs
+// define output regs
 
 
 #if USE_LIDAR // use REAL hardware
-// // define config regs
-// // define config vals
+// define config regs
+// define config vals
 
 
-// VL53L1X_Result_t lidar_data;
-// VL53L1X_ERROR lidar_error;
-// uint16_t dev;
-// uint16_t lidar_id = DEVICE_ID;
-// uint8_t state;
+VL53L1X_Result_t lidar_data;
+VL53L1X_ERROR lidar_error;
+uint16_t dev;
+uint16_t lidar_id = DEVICE_ID;
+uint8_t state;
 
-// uint8_t Status;		/*!< ResultStatus */
-// uint16_t Distance;	/*!< ResultDistance */
-// uint16_t Ambient;	/*!< ResultAmbient */
-// uint16_t SigPerSPAD;/*!< ResultSignalPerSPAD */
-// uint16_t NumSPADs;	/*!< ResultNumSPADs */
+uint8_t Status;		/*!< ResultStatus */
+uint16_t Distance;	/*!< ResultDistance */
+uint16_t Ambient;	/*!< ResultAmbient */
+uint16_t SigPerSPAD;/*!< ResultSignalPerSPAD */
+uint16_t NumSPADs;	/*!< ResultNumSPADs */
 
 
-// //#if USE_LIDAR // use REAL hardware
+//#if USE_LIDAR // use REAL hardware
 
-// void lidar_init(LIDAR_t *lidar, uint16_t slave_addr) {
-//     lidar->slave_addr = slave_addr;
-//     dev = slave_addr;
+void lidar_init(LIDAR_t *lidar, uint16_t slave_addr) {
+    lidar->slave_addr = slave_addr;
+    dev = slave_addr;
 
-//     // initialize
-//     lidar_error = VL53L1X_SensorInit(slave_addr);
-//     //wait for a bit?
-//     VL53L1X_BootState(lidar->slave_addr, &state);
+    // initialize
+    lidar_error = VL53L1X_SensorInit(slave_addr);
+    //wait for a bit?
+    VL53L1X_BootState(lidar->slave_addr, &state);
     
-//     if (VL53L1X_GetSensorId(lidar->slave_addr, &lidar_id) != DEVICE_ID) {
-//         // wrong device: throw an error
-//         return;
-//     }
+    if (VL53L1X_GetSensorId(lidar->slave_addr, &lidar_id) != DEVICE_ID) {
+        // wrong device: throw an error
+        return;
+    }
+}
 
-    
+void lidar_read(LIDAR_t *lidar) { /* do nothing */ }
+void lidar_read_range(LIDAR_t *lidar) { /* do nothing */ }
+void lidar_read_sigma(LIDAR_t *lidar) { /* do nothing */ }
+void lidar_read_status(LIDAR_t *lidar) { /* do nothing */ }
+void lidar_read_strength(LIDAR_t *lidar) { /* do nothing */ }
+void lidar_read_interference(LIDAR_t *lidar) { /* do nothing */ } 
 
 
 #else //use FAKE hardware
-void lidar_init(LIDAR_t *lidar, uint8_t slave_addr) { /* do nothing */ }
+void lidar_init(LIDAR_t *lidar, uint16_t slave_addr) { /* do nothing */ }
+void lidar_read(LIDAR_t *lidar) { /* do nothing */ }
 void lidar_read_range(LIDAR_t *lidar) { /* do nothing */ }
 void lidar_read_sigma(LIDAR_t *lidar) { /* do nothing */ }
 void lidar_read_status(LIDAR_t *lidar) { /* do nothing */ }
