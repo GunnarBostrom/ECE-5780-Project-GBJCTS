@@ -7,7 +7,6 @@
 
 volatile char USART_read_register;
 volatile short int new_data_flag = 0;
-volatile short int new_radio_data_flag = 0;
 
 volatile char radio_buffer[26];
 volatile uint8_t radio_buffer_index = 0;
@@ -78,7 +77,6 @@ void radio_read(void) {
 
         radio_data.throttle = ch[0]; // channel 1 is throttle
         radio_data.armed = (ch[4] > 992) ? 1 : 0; // channel 5 above center is armed, below center is disarmed
-        new_radio_data_flag = 1;
     }
 }
  

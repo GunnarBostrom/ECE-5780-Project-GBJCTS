@@ -89,10 +89,8 @@ int main(void) {
     // update motors as soon as IMU data ready
 
     radio_read();       // medium priority - interrupt with flag
-    if(new_radio_data_flag) {
-        new_radio_data_flag = 0;
-        control_from_radio();
-    }
+
+    control_from_radio();
     lidar_read(&vl53l1x);
 
     
