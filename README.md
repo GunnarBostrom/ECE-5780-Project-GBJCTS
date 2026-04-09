@@ -9,16 +9,16 @@ Flash to board:
 # ECE-5780-Project-GBJCTS: Simple Quadcopter
 This is the final project for an embedded systems design course.
 
-This project involves developing a simple quadcopter to demonstrate proficiency in communication protocols, system control, as well as sensor and actuator integration and actuation.
+This project involves developing a simple quadcopter to demonstrate proficiency in communication protocols, system control, as well as sensor and actuator integration.
 
 Weekly Milestones:
-1. Development Environment & Hardware Setup
-2. IMU Sensor Interface
-3. Altitude Sensor Interface
-4. Radio Receiver Interface
-5. ESC Control and Motor PWM Output
-6. Feedback Control Implementation
-7. Final System Integration & Flight Testing
+1. Development environment & hardware setup  
+2. ESC control and motor PWM output  
+3. RF radio receiver interface & IMU sensor interface  
+4. LiDAR interface & peripheral integration  
+5. State estimation (sensor fusion and filtering)  
+6. Control & safety systems implementation  
+7. PID tuning & flight testing  
 
 
 ## Hardware Components
@@ -47,7 +47,9 @@ Weekly Milestones:
 
 ### Current Progress
 - Simulator and optimizer to tune PIDs in 4 axes
-- Control over motors demonstrated
+- Motor control via PWM
+- RF radio link integrated via UART
+- IMU data read via I2C
 
 
 ## Toolchain
@@ -95,7 +97,7 @@ Flash to board:
 
 
 ## Project Info
-**Status:** Not Functional  
+**Status:** Sensing and actuating peripherals 
 **Language:** C  
 **License:** MIT License – see [LICENSE](./LICENSE)  
 **Authors:** [G. Bostram](https://github.com/GunnarBostrom), [J. Canada](https://github.com/JC919), [T. Stratton](https://github.com/POACH3)  
