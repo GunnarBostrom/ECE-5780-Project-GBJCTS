@@ -44,6 +44,9 @@ Device ID: 0x69
 #define INT1_CFG        0x0D  // INT1_CTRL - interrupt1 control register
 #define INT2_CFG        0x0E  // INT2_CTRL - interrupt2 control register
 
+#define CTRL3_C         0x12  // these are for interrupts
+#define CTRL4_C         0x13
+
 
 /* ––––– accelerometer config values ––––– */
 // 12.5 Hz to 6.66 kHz ODR available, default is Power-down
@@ -83,6 +86,7 @@ Device ID: 0x69
 #define INT2_GYRO_EN     (0b1 << 1)  // INT2_DRDY_G
 #define INT2_ACCEL_EN    (0b1 << 0)  // INT2_DRDY_XL
 
+volatile uint8_t imu_ready = 0;
 
 #if USE_IMU // use REAL hardware
 
@@ -115,6 +119,16 @@ void imu_init(IMU_t* imu, uint8_t slave_addr) {
         return;
     }
 
+
+    // Global control: BDU + auto-increment, active-high push-pull INT
+    uint8_t ctrl3 = 0x44;  // IF_INC | BDU
+    i2c_write(imu->slave_addr, CTRL3_C, &ctrl3, 1);
+
+    // Mask DRDY until filters settle
+    uint8_t ctrl4 = 0x08;  // DRDY_MASK
+    i2c_write(imu->slave_addr, CTRL4_C, &ctrl4, 1);
+
+
     // configure IMU
     uint8_t accel_config = ACCEL_ODR_416HZ | ACCEL_FS_8G | ACCEL_BW_400HZ;
     i2c_write(imu->slave_addr, ACCEL_CFG, &accel_config, 1);
@@ -122,16 +136,15 @@ void imu_init(IMU_t* imu, uint8_t slave_addr) {
     uint8_t gyro_config = GYRO_ODR_416HZ | GYRO_FS_2000DPS;
     i2c_write(imu->slave_addr, GYRO_CFG, &gyro_config, 1);
 
-    //HAL_Delay(100);
+    HAL_Delay(100); // from the data sheet:   t_start = max(t_boot, 1/ODR * filter_settling_samples)
 
-    /*
     // interrupts
     uint8_t int1_config = INT1_GYRO_EN | INT1_ACCEL_EN;
     i2c_write(imu->slave_addr, INT1_CFG, &int1_config, 1);
 
-    uint8_t int2_config = INT2_GYRO_EN | INT2_ACCEL_EN;
-    i2c_write(imu->slave_addr, INT2_CFG, &int2_config, 1);
-    */
+    // uint8_t int2_config = INT2_GYRO_EN | INT2_ACCEL_EN;
+    // i2c_write(imu->slave_addr, INT2_CFG, &int2_config, 1);
+    
 }
 
 /**

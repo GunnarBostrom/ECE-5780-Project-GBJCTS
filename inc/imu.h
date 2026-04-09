@@ -16,6 +16,7 @@ typedef struct {
     float temp;           // temperature in c?
 } IMU_t;
 
+extern volatile uint8_t imu_ready;
 
 /**
 * @brief Initializes and configures IMU.

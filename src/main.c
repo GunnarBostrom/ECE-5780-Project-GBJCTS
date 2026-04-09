@@ -24,6 +24,7 @@ void Error_Handler(void);
 void SystemClock_Config(void);
 
 static void LED_init(void);
+void imu_interrupt_init(void);
 
 
 /* –––––––––– globals –––––––––– */
@@ -42,6 +43,8 @@ int main(void) {
   i2c_init(400);
 
   imu_init(&lsm6ds3, 0x6B);     // i2c addr: 0x6B
+  imu_interrupt_init();            // then arm the EXTI
+
   lidar_init(&vl53l1x, 0x52); // i2c addr: 0x52
 
 
@@ -57,14 +60,14 @@ int main(void) {
   uint8_t motor_state = 0;
 
   // Arm all ESCs at minimum throttle
-  // motor_set_all(1000);
-  // motor_set_individual(1000, 1000, 1000, 1000);
-  // HAL_Delay(8000);
+  motor_set_all(1000);
+  motor_set_individual(1000, 1000, 1000, 1000);
+  HAL_Delay(8000);
 
   // Hold Motors 1-4 at low throttle
   // Note motor minimum value for all 4 motors to spin at min throttle is 1200
-  // motor_set_individual(1200, 1200, 1200, 1200);
-  // motor_set_all(1200);
+  motor_set_individual(1200, 1200, 1200, 1200);
+  motor_set_all(1200);
   
   
 
@@ -80,7 +83,14 @@ int main(void) {
     // need to think about precedence and data frequency
 
     
-    // imu_read(&lsm6ds3); // highest priority - interrupt with flag
+    if (imu_ready) {
+      imu_ready = 0;
+      imu_read(&lsm6ds3); // highest priority - interrupt with flag
+      
+      // HAL_GPIO_TogglePin(GPIOC, GPIO_PIN_7); // blue off
+      // HAL_Delay(500);
+    }
+    
     // update motors as soon as IMU data ready
 
     radio_read();       // medium priority - interrupt with flag
@@ -154,10 +164,7 @@ static void LED_init(void) {
   // a real cute power on sequence
   HAL_GPIO_WritePin(GPIOC, GPIO_PIN_6 | GPIO_PIN_7 | GPIO_PIN_8 | GPIO_PIN_9, GPIO_PIN_SET); // leds on
   HAL_Delay(1000);
-  HAL_GPIO_TogglePin(GPIOC, GPIO_PIN_6); // red off
-  HAL_GPIO_TogglePin(GPIOC, GPIO_PIN_9); // green off
-  HAL_GPIO_TogglePin(GPIOC, GPIO_PIN_7); // blue off
-  HAL_GPIO_TogglePin(GPIOC, GPIO_PIN_8); // orange off
+  HAL_GPIO_TogglePin(GPIOC, GPIO_PIN_6 | GPIO_PIN_7 | GPIO_PIN_8 | GPIO_PIN_9); // leds off
   HAL_Delay(500);
   HAL_GPIO_WritePin(GPIOC, GPIO_PIN_6 | GPIO_PIN_7 | GPIO_PIN_8 | GPIO_PIN_9, GPIO_PIN_SET); // leds on
   HAL_Delay(500);
@@ -169,15 +176,9 @@ static void LED_init(void) {
   HAL_Delay(500);
   HAL_GPIO_TogglePin(GPIOC, GPIO_PIN_8); // orange off
   HAL_Delay(500);
-  HAL_GPIO_TogglePin(GPIOC, GPIO_PIN_6); // red on
-  HAL_GPIO_TogglePin(GPIOC, GPIO_PIN_9); // green on
-  HAL_GPIO_TogglePin(GPIOC, GPIO_PIN_7); // blue on
-  HAL_GPIO_TogglePin(GPIOC, GPIO_PIN_8); // orange on
+  HAL_GPIO_WritePin(GPIOC, GPIO_PIN_6 | GPIO_PIN_7 | GPIO_PIN_8 | GPIO_PIN_9, GPIO_PIN_SET); // leds on
   HAL_Delay(1000);
-  HAL_GPIO_TogglePin(GPIOC, GPIO_PIN_6); // red off
-  HAL_GPIO_TogglePin(GPIOC, GPIO_PIN_9); // green off
-  HAL_GPIO_TogglePin(GPIOC, GPIO_PIN_7); // blue off
-  HAL_GPIO_TogglePin(GPIOC, GPIO_PIN_8); // orange off
+  HAL_GPIO_TogglePin(GPIOC, GPIO_PIN_6 | GPIO_PIN_7 | GPIO_PIN_8 | GPIO_PIN_9); // leds off
   HAL_Delay(500);
 
   // while (1){
@@ -187,7 +188,33 @@ static void LED_init(void) {
 
 }
 
-
+void imu_interrupt_init(void) {
+    // Enable GPIOC clock
+    __HAL_RCC_GPIOC_CLK_ENABLE();
+    
+    // Configure PC0 as input, no pull (LSM6DS3 drives actively)
+    GPIO_InitTypeDef gpio = {0};
+    gpio.Pin  = GPIO_PIN_0;
+    gpio.Mode = GPIO_MODE_IT_RISING;  // LSM6DS3 INT1 is active-high pulse
+    gpio.Pull = GPIO_NOPULL;
+    HAL_GPIO_Init(GPIOC, &gpio);
+    
+    // Enable SYSCFG clock (required for EXTI mux)
+    __HAL_RCC_SYSCFG_CLK_ENABLE();
+    
+    // Connect EXTI line 0 to Port C via SYSCFG
+    SYSCFG->EXTICR[0] &= ~SYSCFG_EXTICR1_EXTI0;
+    SYSCFG->EXTICR[0] |=  SYSCFG_EXTICR1_EXTI0_PC;
+    
+    // Configure EXTI line 0
+    EXTI->IMR  |= EXTI_IMR_MR0;    // unmask line 0
+    EXTI->RTSR |= EXTI_RTSR_TR0;   // rising edge trigger
+    EXTI->FTSR &= ~EXTI_FTSR_TR0;  // not falling edge
+    
+    // Configure and enable NVIC
+    NVIC_SetPriority(EXTI0_1_IRQn, 1);
+    NVIC_EnableIRQ(EXTI0_1_IRQn);
+}
 
 
 /**
