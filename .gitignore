@@ -70,3 +70,4 @@ build/
 *.map
 
 .cache/
+.settings/
