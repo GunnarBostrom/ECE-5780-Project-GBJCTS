@@ -197,15 +197,18 @@ void i2c_bus_reset(void) {
     for (int i = 0; i < 9; i++) {
         GPIOB->BSRR = (1 << 11);  // SDA high
         GPIOB->BSRR = (1 << 13);  // SCL high
-        for (volatile int d = 0; d < 100; d++);
+        //for (volatile int d = 0; d < 100; d++); // // for 8MHz clock, 100kHz I2C
+        for (volatile int d = 0; d < 600; d++); // for 48MHz clock, 400kHz I2C
         GPIOB->BSRR = (1 << (13 + 16)); // SCL low
-        for (volatile int d = 0; d < 100; d++);
+        //for (volatile int d = 0; d < 100; d++); // for 8MHz clock, 100kHz I2C
+        for (volatile int d = 0; d < 600; d++); // for 48MHz clock, 400kHz I2C
     }
 
     // send STOP condition: SCL high, SDA low → high
     GPIOB->BSRR = (1 << (11 + 16));         // SDA low
     GPIOB->BSRR = (1 << 13);                // SCL high
-    for (volatile int d = 0; d < 100; d++);
+    //for (volatile int d = 0; d < 100; d++);
+    for (volatile int d = 0; d < 600; d++);
     GPIOB->BSRR = (1 << 11);                // SDA high
 
     // pins back to alt function mode
