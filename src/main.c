@@ -35,40 +35,35 @@ int main(void) {
   HAL_Init();
   SystemClock_Config();
 
-  // semihosting to redirect printf for debugging (must be first in main)
-  // extern void initialise_monitor_handles(void);
-  // initialise_monitor_handles();
-
   LED_init();
   
-
   // I2C peripheral initialization
   i2c_init(400);
 
   imu_init(&lsm6ds3, 0x6B);     // i2c addr: 0x6B
-  // lidar_init(&vl53l1x, 0x52); // i2c addr: 0x52
+  lidar_init(&vl53l1x, 0x52); // i2c addr: 0x52
 
 
-  // // UART peripheral initialization
-  // radio_init();
+  // UART peripheral initialization
+  radio_init();
 
 
-  // // PWM peripheral initialization
-  // motor_init();
+  // PWM peripheral initialization
+  motor_init();
 
-  // uint32_t last_heartbeat = HAL_GetTick();
-  // uint32_t last_toggle = HAL_GetTick();
-  // uint8_t motor_state = 0;
+  uint32_t last_heartbeat = HAL_GetTick();
+  uint32_t last_toggle = HAL_GetTick();
+  uint8_t motor_state = 0;
 
-  // // Arm all ESCs at minimum throttle
-  // motor_set_all(1000);
-  // motor_set_individual(1000, 1000, 1000, 1000);
-  // HAL_Delay(8000);
+  // Arm all ESCs at minimum throttle
+  motor_set_all(1000);
+  motor_set_individual(1000, 1000, 1000, 1000);
+  HAL_Delay(8000);
 
-  // // Hold Motors 1-4 at low throttle
-  // // Note motor minimum value for all 4 motors to spin at min throttle is 1200
-  // motor_set_individual(1200, 1200, 1200, 1200);
-  // motor_set_all(1200);
+  // Hold Motors 1-4 at low throttle
+  // Note motor minimum value for all 4 motors to spin at min throttle is 1200
+  motor_set_individual(1200, 1200, 1200, 1200);
+  motor_set_all(1200);
   
   
 
@@ -87,9 +82,9 @@ int main(void) {
     imu_read(&lsm6ds3); // highest priority - interrupt with flag
     // update motors as soon as IMU data ready
 
-    // radio_read();       // medium priority - interrupt with flag
+    radio_read();       // medium priority - interrupt with flag
 
-    // lidar_read(&vl53l1x);       // lowest priority - polls
+    lidar_read(&vl53l1x);       // lowest priority - polls
 
     
 
