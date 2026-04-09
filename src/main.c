@@ -39,7 +39,7 @@ int main(void) {
   LED_init();
   
   // I2C peripheral initialization
-  // i2c_init(400);
+  i2c_init(400);
 
   imu_init(&lsm6ds3, 0x6B);     // i2c addr: 0x6B
   lidar_init(&vl53l1x, 0x52); // i2c addr: 0x52
