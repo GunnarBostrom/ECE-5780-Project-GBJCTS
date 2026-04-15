@@ -4,7 +4,17 @@
  */
 
 #include "main.h"
+#include "config.h"
 #include "control.h"
+#include "filter.h"
+#include "i2c.h"
+#include "imu.h"
+#include "lidar.h"
+#include "motor.h"
+#include "pid.h"
+#include "pwm.h"
+#include "radio.h"
+#include "uart.h"
 #include "stm32f072xb.h"
 #include "stm32f0xx_hal.h"
 #include "stm32f0xx_hal_gpio.h"
@@ -13,12 +23,6 @@
 #include <stdio.h>
 #include <sys/_intsup.h>
 #include <sys/types.h>
-#include "motor.h"
-#include "config.h"
-#include "i2c.h"
-#include "imu.h"
-#include "lidar.h"
-#include "radio.h"
 
 void Error_Handler(void);
 void SystemClock_Config(void);
