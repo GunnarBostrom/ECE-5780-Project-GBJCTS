@@ -164,6 +164,7 @@ void imu_read(IMU_t* imu) {
     imu->ax = (int16_t)(buf[6]  | buf[7]  << 8);
     imu->ay = (int16_t)(buf[8]  | buf[9]  << 8);
     imu->az = (int16_t)(buf[10] | buf[11] << 8);
+    imu_convert_units(imu);
 }
 
 //Reads IMU acceleration data
@@ -174,6 +175,9 @@ void imu_read_accel(IMU_t* imu) {
     imu->ax = (int16_t)(buf[0] | buf[1] << 8);
     imu->ay = (int16_t)(buf[2] | buf[3] << 8);
     imu->az = (int16_t)(buf[4] | buf[5] << 8);
+    imu->ax_g = (float)imu->ax * 0.000244f;
+    imu->ay_g = (float)imu->ay * 0.000244f;
+    imu->az_g = (float)imu->az * 0.000244f;
 }
 
 // Reads IMU gyroscope data
@@ -184,6 +188,9 @@ void imu_read_gyro(IMU_t* imu) {
     imu->gx = (int16_t)(buf[0] | buf[1] << 8);
     imu->gy = (int16_t)(buf[2] | buf[3] << 8);
     imu->gz = (int16_t)(buf[4] | buf[5] << 8);
+    mu->gx_dps = (float)imu->gx * 0.070f;
+    imu->gy_dps = (float)imu->gy * 0.070f;
+    imu->gz_dps = (float)imu->gz * 0.070f;
 }
 
 // Reads IMU temperature data
@@ -208,6 +215,21 @@ void imu_read_all(IMU_t* imu) {
     imu->ax   = (int16_t)(buf[8]  | buf[9]  << 8);
     imu->ay   = (int16_t)(buf[10] | buf[11] << 8);
     imu->az   = (int16_t)(buf[12] | buf[13] << 8);
+    imu_convert_units(imu);
+}
+
+static void imu_convert_units(IMU_t* imu)
+{
+    const float accel_scale_g_per_lsb = 0.000244f; // ±8 g
+    const float gyro_scale_dps_per_lsb = 0.070f;   // 2000 dps
+
+    imu->ax_g = (float)imu->ax * accel_scale_g_per_lsb;
+    imu->ay_g = (float)imu->ay * accel_scale_g_per_lsb;
+    imu->az_g = (float)imu->az * accel_scale_g_per_lsb;
+
+    imu->gx_dps = (float)imu->gx * gyro_scale_dps_per_lsb;
+    imu->gy_dps = (float)imu->gy * gyro_scale_dps_per_lsb;
+    imu->gz_dps = (float)imu->gz * gyro_scale_dps_per_lsb;
 }
 
 #else // use FAKE hardware

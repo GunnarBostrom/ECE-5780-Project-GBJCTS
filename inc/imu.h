@@ -1,53 +1,41 @@
-/**
-IMU
-STM LSM6DS3
-
-*/
-
 #ifndef IMU_H
 #define IMU_H
 
 #include <stdint.h>
 
 typedef struct {
-    uint8_t slave_addr;   // slave address
-    int16_t ax, ay, az;   // accelerometer for each axis in g
-    int16_t gx, gy, gz;   // gyroscope for each axis in dps
-    float temp;           // temperature in c?
+    uint8_t slave_addr;
+
+    // Raw sensor outputs from the LSM6DS3 registers
+    int16_t ax;
+    int16_t ay;
+    int16_t az;
+
+    int16_t gx;
+    int16_t gy;
+    int16_t gz;
+
+    int16_t temp_raw;
+
+    // Scaled physical units for filtering/control
+    float ax_g;
+    float ay_g;
+    float az_g;
+
+    float gx_dps;
+    float gy_dps;
+    float gz_dps;
+
+    float temp_c;
 } IMU_t;
 
 extern volatile uint8_t imu_ready;
 
-/**
-* @brief Initializes and configures IMU.
-*
-* Hard-coded configuration of the output data rate, accelerometer full-scale, 
-* gyroscope full-scale, and an interrupt.
-*
-* @param imu            Pointer to IMU struct
-* @param slave_addr     I2C slave address of the IMU
-*/ 
-void imu_init(IMU_t* imu, uint8_t slave_addr); // config IMU outside of init?
-
-// Reads all inertial data.
+void imu_init(IMU_t* imu, uint8_t slave_addr);
 void imu_read(IMU_t* imu);
-
-// Reads acceleration data.
 void imu_read_accel(IMU_t* imu);
-
-// Reads angular rate data.
 void imu_read_gyro(IMU_t* imu);
-
-// Reads temperature data.
 void imu_read_temp(IMU_t* imu);
-
-// Reads all data the IMU can provide.
 void imu_read_all(IMU_t* imu);
-
-
-
-// void imu_set_rate(void); // data rate
-// void imu_set_range(void); // accelerometer range
-// anything else?
 
 #endif // IMU_H
