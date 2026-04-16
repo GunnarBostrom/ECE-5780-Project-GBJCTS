@@ -86,6 +86,8 @@ int main(void) {
       - mix motors
       - update PWM
   */
+  static uint32_t last_print = 0;
+
   while(1) {
     // need to think about precedence and data frequency
 
@@ -94,15 +96,15 @@ int main(void) {
       imu_ready = 0;
       imu_read(&lsm6ds3); // highest priority - interrupt with flag
       
-      accept_string("IMU data received\r\n");
-      char buffer[100];
+      if (HAL_GetTick() - last_print >= 500) {  // print at ~10 Hz
+              last_print = HAL_GetTick();
+              char buffer[100];
+              sprintf(buffer, "ax:%d ay:%d az:%d gx:%d gy:%d gz:%d\r\n",
+                      lsm6ds3.ax, lsm6ds3.ay, lsm6ds3.az,
+                      lsm6ds3.gx, lsm6ds3.gy, lsm6ds3.gz);
+              accept_string(buffer);
+          }
 
-      sprintf(buffer, "ax: %d \n\ray: %d\n\raz: %d\n\r\n\rgx: %d\n\rgy: %d\n\rgz: %d\n\r", lsm6ds3.ax, lsm6ds3.ay, lsm6ds3.az, lsm6ds3.gx, lsm6ds3.gy, lsm6ds3.gz); // convert to char for simple display, not actual value
-      accept_string(buffer);
-
-      
-      HAL_Delay(1000);
-      GPIOC->ODR ^= GPIO_PIN_6; // red toggle on IMU read
       
     }
     
