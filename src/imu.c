@@ -149,7 +149,7 @@ bool imu_init(LSM6DS3_t* imu) {
  * shot of the data in a register as well as the n bytes desired after it.
  * Hence the gyro data is accessed first because it is the lowest register.
  */
-void imu_read(LSM6DS3_t* imu) {
+void imu_read(IMU_t* imu) {
     uint8_t buf[12];
 
     i2c_read(IMU_ADDR, GYRO_REG, buf, 12);
