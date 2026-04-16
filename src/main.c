@@ -87,8 +87,6 @@ int main(void) {
       imu_ready = 0;
       imu_read(&lsm6ds3); // highest priority - interrupt with flag
       
-      // HAL_GPIO_TogglePin(GPIOC, GPIO_PIN_7); // blue off
-      // HAL_Delay(500);
     }
     
     // update motors as soon as IMU data ready
