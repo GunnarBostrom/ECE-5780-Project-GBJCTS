@@ -135,7 +135,6 @@ void imu_init(LSM6DS3* imu, uint8_t slave_addr) {
         return;
     }
 
-
     // freeze registers for read on block data update
     uint8_t ctrl3 = 0x40;  // BDU
     i2c_write(imu->slave_addr, CTRL3_C, &ctrl3, 1);
@@ -144,6 +143,13 @@ void imu_init(LSM6DS3* imu, uint8_t slave_addr) {
     uint8_t ctrl4 = 0x08;  // DRDY_MASK
     i2c_write(imu->slave_addr, CTRL4_C, &ctrl4, 1);
 
+    // interrupts
+    uint8_t int1_config = INT1_GYRO_EN | INT1_ACCEL_EN;
+    i2c_write(imu->slave_addr, INT1_CFG, &int1_config, 1);
+
+    // uint8_t int2_config = INT2_GYRO_EN | INT2_ACCEL_EN;
+    // i2c_write(imu->slave_addr, INT2_CFG, &int2_config, 1);
+
     // configure
     uint8_t accel_config = ACCEL_ODR_416HZ | ACCEL_FS_8G | ACCEL_BW_400HZ;
     i2c_write(imu->slave_addr, ACCEL_CFG, &accel_config, 1);
@@ -151,16 +157,7 @@ void imu_init(LSM6DS3* imu, uint8_t slave_addr) {
     uint8_t gyro_config = GYRO_ODR_416HZ | GYRO_FS_2000DPS;
     i2c_write(imu->slave_addr, GYRO_CFG, &gyro_config, 1);
 
-    HAL_Delay(100); // from the data sheet:   t_start = max(t_boot, 1/ODR * filter_settling_samples)
-
-
-    // interrupts
-    uint8_t int1_config = INT1_GYRO_EN | INT1_ACCEL_EN;
-    i2c_write(imu->slave_addr, INT1_CFG, &int1_config, 1);
-
-    // uint8_t int2_config = INT2_GYRO_EN | INT2_ACCEL_EN;
-    // i2c_write(imu->slave_addr, INT2_CFG, &int2_config, 1);
-    
+    while (!imu_ready) { }  
 }
 
 /**
