@@ -23,6 +23,11 @@
 #include <stdio.h>
 #include <sys/_intsup.h>
 #include <sys/types.h>
+#include "imu.h"
+#include "filter.h"
+#include "control.h"
+#include "radio.h"
+#include "motor.h"
 
 void Error_Handler(void);
 void SystemClock_Config(void);
@@ -34,6 +39,7 @@ void imu_interrupt_init(void);
 /* –––––––––– globals –––––––––– */
 IMU_t lsm6ds3;
 LIDAR_t vl53l1x;
+Attitude_t attitude;
 
 
 
@@ -63,6 +69,11 @@ int main(void) {
   uint32_t last_toggle = HAL_GetTick();
   uint8_t motor_state = 0;
 
+  const float dt = 1.0f / 416.0f;
+
+  filter_init(&attitude);
+  control_init(dt);
+
   // Arm all ESCs at minimum throttle
   motor_set_all(1000);
   motor_set_individual(1000, 1000, 1000, 1000);
@@ -83,59 +94,28 @@ int main(void) {
       - mix motors
       - update PWM
   */
-  while(1) {
-    // need to think about precedence and data frequency
+ while (1)
+{
+    radio_read();
 
-    
-    if (imu_ready) {
-      imu_ready = 0;
-      imu_read(&lsm6ds3); // highest priority - interrupt with flag
-      
-      // HAL_GPIO_TogglePin(GPIOC, GPIO_PIN_7); // blue off
-      // HAL_Delay(500);
+    if (imu_ready)
+    {
+        imu_ready = 0;
+
+        imu_read(&lsm6ds3);
+
+        filter_update(&attitude,
+                      lsm6ds3.gx_dps,
+                      lsm6ds3.gy_dps,
+                      lsm6ds3.gz_dps,
+                      lsm6ds3.ax_g,
+                      lsm6ds3.ay_g,
+                      lsm6ds3.az_g,
+                      dt);
+
+        control_update(&lsm6ds3, &attitude);
     }
-    
-    // update motors as soon as IMU data ready
-
-    radio_read();       // medium priority - interrupt with flag
-
-    control_from_radio();
-    lidar_read(&vl53l1x);
-
-    
-
-
-
-
-
-    HAL_GPIO_TogglePin(GPIOC, GPIO_PIN_9); // heartbeat
-    HAL_Delay(250);
-
-
-
-    /* tentative loop structure */
-
-    // if (imu_ready) {
-    //   imu_ready = 0;
-    //   imu_read(&lsm6ds3);
-
-    //   lidar_counter++;
-    //   if (lidar_counter > some_threshold){
-    //     lidar_counter = 0;
-    //     lidar_read(&vl53l1x);
-    //   }
-
-    //   run_pid();
-    //   update_motors();
-    // }
-
-    // if (radio_ready) {
-    //   radio_ready = 0;
-    //   radio_read();
-    // }
-
-
-  }
+}
   // nothing should be in main() below the control loop
 }
 
