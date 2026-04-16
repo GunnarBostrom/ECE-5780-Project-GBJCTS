@@ -7,6 +7,7 @@ typedef struct
 {
     uint16_t throttle;
     uint8_t armed;
+    uint8_t failsafe;
 } Radio_t;
 
 extern volatile Radio_t radio_data;
