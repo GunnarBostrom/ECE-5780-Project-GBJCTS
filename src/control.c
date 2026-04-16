@@ -1,10 +1,13 @@
 #include "control.h"
 #include "radio.h"
 #include "motor.h"
+#include "stm32f072xb.h"
 #include <stdint.h>
 
 #define THROTTLE_MIN 1000
 #define THROTTLE_MAX 1900
+
+
 void control_from_radio() {
     
     uint16_t throttle = 1000;

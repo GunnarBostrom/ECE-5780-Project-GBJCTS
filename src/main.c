@@ -89,27 +89,31 @@ int main(void) {
     // need to think about precedence and data frequency
 
     
+    radio_read();       // medium priority - interrupt with flag
+
+    control_from_radio();
+
+
     if (imu_ready) {
       imu_ready = 0;
       imu_read(&lsm6ds3); // highest priority - interrupt with flag
       
       if (HAL_GetTick() - last_print >= 500) {  // print at ~10 Hz
-              last_print = HAL_GetTick();
-              char buffer[100];
-              sprintf(buffer, "ax:%d ay:%d az:%d gx:%d gy:%d gz:%d\r\n",
-                      lsm6ds3.ax, lsm6ds3.ay, lsm6ds3.az,
-                      lsm6ds3.gx, lsm6ds3.gy, lsm6ds3.gz);
-              accept_string(buffer);
-          }
+          last_print = HAL_GetTick();
+          char buffer[100];
+          sprintf(buffer, "ax:%d ay:%d az:%d gx:%d gy:%d gz:%d\r\n",
+                  lsm6ds3.ax, lsm6ds3.ay, lsm6ds3.az,
+                  lsm6ds3.gx, lsm6ds3.gy, lsm6ds3.gz);
+          accept_string(buffer);
+          GPIOC->ODR ^= GPIO_PIN_6; // toggle red LED on IMU read for visual feedback
+
+      }
 
       
     }
     
     // update motors as soon as IMU data ready
 
-    radio_read();       // medium priority - interrupt with flag
-
-    control_from_radio();
     lidar_read(&vl53l1x);
 
 
