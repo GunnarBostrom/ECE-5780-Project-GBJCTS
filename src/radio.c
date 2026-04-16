@@ -13,6 +13,7 @@ volatile uint8_t radio_buffer_index = 0;
 volatile Radio_t radio_data = {0};
 
 #if USE_RADIO
+#define RADIO_FAILSAFE_MS 500  // declare lost signal after 500 ms with no frame
 
 
 void radio_init(void) { 
@@ -55,6 +56,8 @@ void radio_read(void) {
     if (new_data_flag) {
         new_data_flag = 0;
 
+        last_frame_tick = HAL_GetTick();  // record time of last good frame
+
         const volatile uint8_t *p = (const volatile uint8_t *)&radio_buffer[3];
 
         uint16_t ch[16];
@@ -77,10 +80,15 @@ void radio_read(void) {
 
         radio_data.throttle = ch[0]; // channel 1 is throttle
         radio_data.armed = (ch[4] > 992) ? 1 : 0; // channel 5 above center is armed, below center is disarmed
+        radio_data.failsafe = 0;  // signal is healthy
+    
     } else {
         // lost signal? set to safe values
-        radio_data.throttle = 50;
-        radio_data.armed = 0;
+        if ((HAL_GetTick() - last_frame_tick) > RADIO_FAILSAFE_MS) {
+            radio_data.throttle = 0;
+            radio_data.armed    = 0;
+            radio_data.failsafe = 1;  // signal lost flag
+        }
     }
 
 }

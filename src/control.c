@@ -14,12 +14,20 @@ void control_from_radio() {
     if (radio_data.throttle < 230) throttle = 1000;
     else if (radio_data.throttle > 1750) throttle = 1900;
     else throttle = ((radio_data.throttle - 230) * (THROTTLE_MAX - THROTTLE_MIN)) / (1750 - 230) + THROTTLE_MIN;
-    if (radio_data.armed) {
-        // For simplicity, set all motors to the same throttle value
-        motor_set_all(throttle);
-    } else {
-        // Disarmed, set motors to minimum
+    // FAILSAFE: lost radio signal → kill motors immediately
+    if (radio_data.failsafe) {
+        PID_Reset(&roll_pid);
+        PID_Reset(&pitch_pid);
         motor_set_all(1000);
+        return;
+    }
+
+    // SAFETY: disarmed → idle motors
+    if (!radio_data.armed) {
+        PID_Reset(&roll_pid);
+        PID_Reset(&pitch_pid);
+        motor_set_all(1000);
+        return;
     }
 
 }
