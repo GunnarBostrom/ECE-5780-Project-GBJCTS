@@ -107,6 +107,7 @@ void imu_init(IMU_t* imu, uint8_t slave_addr) {
     uint8_t buf[1];
 
     i2c_read(imu->slave_addr, WHO_AM_I_REG, buf, 1);
+    
     if (buf[0] != DEVICE_ID) {
         // wrong device: throw an error
 
