@@ -90,6 +90,8 @@ volatile uint8_t imu_ready = 0;
 
 #if USE_IMU // use REAL hardware
 
+static void imu_convert_units(IMU_t* imu);
+
 /**
  * @brief LSM6DS3 configuration and initialization.
  * 
@@ -189,7 +191,7 @@ void imu_read_gyro(IMU_t* imu) {
     imu->gx = (int16_t)(buf[0] | buf[1] << 8);
     imu->gy = (int16_t)(buf[2] | buf[3] << 8);
     imu->gz = (int16_t)(buf[4] | buf[5] << 8);
-    mu->gx_dps = (float)imu->gx * 0.070f;
+    imu->gx_dps = (float)imu->gx * 0.070f;
     imu->gy_dps = (float)imu->gy * 0.070f;
     imu->gz_dps = (float)imu->gz * 0.070f;
 }
@@ -201,7 +203,7 @@ void imu_read_temp(IMU_t* imu) {
     uint8_t buf[2];
 
     i2c_read(imu->slave_addr, TEMP_REG, buf, 2);
-    imu->temp = (int16_t)(buf[0]  | buf[1]  << 8);
+    imu->temp_raw = (int16_t)(buf[0]  | buf[1]  << 8);
 }
 
 // Reads all IMU data (including temperature)
@@ -209,7 +211,7 @@ void imu_read_all(IMU_t* imu) {
     uint8_t buf[14];
 
     i2c_read(imu->slave_addr, TEMP_REG, buf, 14);
-    imu->temp = (int16_t)(buf[0]  | buf[1]  << 8);
+    imu->temp_raw = (int16_t)(buf[0]  | buf[1]  << 8);
     imu->gx   = (int16_t)(buf[2]  | buf[3]  << 8);
     imu->gy   = (int16_t)(buf[4]  | buf[5]  << 8);
     imu->gz   = (int16_t)(buf[6]  | buf[7]  << 8);
