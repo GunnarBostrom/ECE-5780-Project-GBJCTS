@@ -23,10 +23,11 @@
 #include <stdio.h>
 #include <sys/_intsup.h>
 #include <sys/types.h>
-#include <string.h>
-
-
-#include "uart_test_data.h"
+#include "imu.h"
+#include "filter.h"
+#include "control.h"
+#include "radio.h"
+#include "motor.h"
 
 void Error_Handler(void);
 void SystemClock_Config(void);
@@ -38,6 +39,7 @@ void imu_interrupt_init(void);
 /* –––––––––– globals –––––––––– */
 IMU_t lsm6ds3;
 LIDAR_t vl53l1x;
+Attitude_t attitude;
 
 
 
@@ -62,8 +64,9 @@ int main(void) {
   // PWM peripheral initialization
   motor_init();
   
-  uart_test_init();
   
+  filter_init(&attitude);
+  control_init(dt);
 
   /*
    CONTROL LOOP STRUCTURE
@@ -73,64 +76,30 @@ int main(void) {
       - mix motors
       - update PWM
   */
-  static uint32_t last_print = 0;
+ while (1)
+{
+    radio_read();
+    lidar_read(LIDAR_t *lidar);
 
-  while(1) {
-    // need to think about precedence and data frequency
+    if (imu_ready)
+    {
+        imu_ready = 0;
 
-    
-    radio_read();       // medium priority - interrupt with flag
+        imu_read(&lsm6ds3);
 
-    control_from_radio();
+        filter_update(&attitude,
+                      lsm6ds3.gx_dps,
+                      lsm6ds3.gy_dps,
+                      lsm6ds3.gz_dps,
+                      lsm6ds3.ax_g,
+                      lsm6ds3.ay_g,
+                      lsm6ds3.az_g,
+                      dt);
 
-
-    if (imu_ready) {
-      imu_ready = 0;
-      imu_read(&lsm6ds3); // highest priority - interrupt with flag
-      
-      if (HAL_GetTick() - last_print >= 500) {  // print at ~10 Hz
-          last_print = HAL_GetTick();
-          char buffer[100];
-          sprintf(buffer, "ax:%d ay:%d az:%d gx:%d gy:%d gz:%d\r\n",
-                  lsm6ds3.ax, lsm6ds3.ay, lsm6ds3.az,
-                  lsm6ds3.gx, lsm6ds3.gy, lsm6ds3.gz);
-          accept_string(buffer);
-          GPIOC->ODR ^= GPIO_PIN_6; // toggle red LED on IMU read for visual feedback
-
-      }
-
-      
+        control_update(&lsm6ds3, &attitude);
     }
-    
-    // update motors as soon as IMU data ready
-
-    lidar_read(&vl53l1x);
-
-
-
-    /* tentative loop structure */
-
-    // if (imu_ready) {
-    //   imu_ready = 0;
-    //   imu_read(&lsm6ds3);
-
-    //   lidar_counter++;
-    //   if (lidar_counter > some_threshold){
-    //     lidar_counter = 0;
-    //     lidar_read(&vl53l1x);
-    //   }
-
-    //   run_pid();
-    //   update_motors();
-    // }
-
-    // if (radio_ready) {
-    //   radio_ready = 0;
-    //   radio_read();
-    // }
-
-
-  }
+}
+  // nothing should be in main() below the control loop
 }
 
 
