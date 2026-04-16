@@ -23,6 +23,10 @@
 #include <stdio.h>
 #include <sys/_intsup.h>
 #include <sys/types.h>
+#include <string.h>
+
+
+#include "uart_test_data.h"
 
 void Error_Handler(void);
 void SystemClock_Config(void);
@@ -45,12 +49,12 @@ int main(void) {
   
   // I2C peripheral initialization
   i2c_init(400);
-
+  
   imu_init(&lsm6ds3, 0x6B);     // i2c addr: 0x6B
   imu_interrupt_init();            // then arm the EXTI
-
+  
   lidar_init(&vl53l1x, 0x52); // i2c addr: 0x52
-
+  
 
   // UART peripheral initialization
   radio_init();
@@ -66,13 +70,12 @@ int main(void) {
   // Arm all ESCs at minimum throttle
   motor_set_all(1000);
   motor_set_individual(1000, 1000, 1000, 1000);
-  HAL_Delay(8000);
 
   // Hold Motors 1-4 at low throttle
   // Note motor minimum value for all 4 motors to spin at min throttle is 1200
-  motor_set_individual(1200, 1200, 1200, 1200);
-  motor_set_all(1200);
+  motor_set_all(1040);
   
+  uart_test_init();
   
 
   /*
@@ -100,15 +103,6 @@ int main(void) {
     control_from_radio();
     lidar_read(&vl53l1x);
 
-    
-
-
-
-
-
-    HAL_GPIO_TogglePin(GPIOC, GPIO_PIN_9); // heartbeat
-    HAL_Delay(250);
-
 
 
     /* tentative loop structure */
@@ -134,7 +128,6 @@ int main(void) {
 
 
   }
-  // nothing should be in main() below the control loop
 }
 
 
@@ -148,10 +141,6 @@ int main(void) {
  * PC9 - green
  */
 static void LED_init(void) {
-  // GPIO_InitTypeDef init = {0};
-
-  // __HAL_RCC_GPIOC_CLK_ENABLE();
-
 
   RCC->AHBENR |= RCC_AHBENR_GPIOCEN;
   (void)RCC->AHBENR;
@@ -183,10 +172,7 @@ static void LED_init(void) {
   HAL_GPIO_TogglePin(GPIOC, GPIO_PIN_6 | GPIO_PIN_7 | GPIO_PIN_8 | GPIO_PIN_9); // leds off
   HAL_Delay(500);
 
-  // while (1){
-  //   HAL_GPIO_TogglePin(GPIOC, GPIO_PIN_8);
-  //   HAL_Delay(500);
-  // }
+
 
 }
 
@@ -214,7 +200,7 @@ void imu_interrupt_init(void) {
     EXTI->FTSR &= ~EXTI_FTSR_TR0;  // not falling edge
     
     // Configure and enable NVIC
-    NVIC_SetPriority(EXTI0_1_IRQn, 1);
+    NVIC_SetPriority(EXTI0_1_IRQn, 3U);
     NVIC_EnableIRQ(EXTI0_1_IRQn);
 }
 
