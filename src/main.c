@@ -63,9 +63,6 @@ int main(void) {
   // PWM peripheral initialization
   motor_init();
 
-  uint32_t last_heartbeat = HAL_GetTick();
-  uint32_t last_toggle = HAL_GetTick();
-  uint8_t motor_state = 0;
 
   // Arm all ESCs at minimum throttle
   motor_set_all(1000);

@@ -90,8 +90,6 @@ volatile uint8_t imu_ready = 0;
 
 #if USE_IMU // use REAL hardware
 
-static void imu_convert_units(IMU_t* imu);
-
 /**
  * @brief LSM6DS3 configuration and initialization.
  * 
@@ -108,8 +106,18 @@ void imu_init(IMU_t* imu, uint8_t slave_addr) {
     // verify device
     uint8_t buf[1];
 
+    imu->ax_g = 0.0f;
+    imu->ay_g = 0.0f;
+    imu->az_g = 0.0f;
+
+    imu->gx_dps = 0.0f;
+    imu->gy_dps = 0.0f;
+    imu->gz_dps = 0.0f;
+
+    imu->temp_c = 0.0f;
+    imu->temp_raw = 0;
+
     i2c_read(imu->slave_addr, WHO_AM_I_REG, buf, 1);
-    
     if (buf[0] != DEVICE_ID) {
         // wrong device: throw an error
 
@@ -148,6 +156,19 @@ void imu_init(IMU_t* imu, uint8_t slave_addr) {
     // uint8_t int2_config = INT2_GYRO_EN | INT2_ACCEL_EN;
     // i2c_write(imu->slave_addr, INT2_CFG, &int2_config, 1);
     
+}
+static void imu_convert_units(IMU_t* imu)
+{
+    const float accel_scale_g_per_lsb = 0.000244f; // ±8 g
+    const float gyro_scale_dps_per_lsb = 0.070f;   // 2000 dps
+
+    imu->ax_g = (float)imu->ax * accel_scale_g_per_lsb;
+    imu->ay_g = (float)imu->ay * accel_scale_g_per_lsb;
+    imu->az_g = (float)imu->az * accel_scale_g_per_lsb;
+
+    imu->gx_dps = (float)imu->gx * gyro_scale_dps_per_lsb;
+    imu->gy_dps = (float)imu->gy * gyro_scale_dps_per_lsb;
+    imu->gz_dps = (float)imu->gz * gyro_scale_dps_per_lsb;
 }
 
 /**
@@ -199,11 +220,13 @@ void imu_read_gyro(IMU_t* imu) {
 // Reads IMU temperature data
 // This output is raw. The conversion to celsius is:
 // celsius_temp = (raw_temp / 16) + 25  (± the offset error)
-void imu_read_temp(IMU_t* imu) {
+void imu_read_temp(IMU_t* imu)
+{
     uint8_t buf[2];
 
     i2c_read(imu->slave_addr, TEMP_REG, buf, 2);
-    imu->temp_raw = (int16_t)(buf[0]  | buf[1]  << 8);
+
+    imu->temp_raw = (int16_t)(buf[0] | (buf[1] << 8));
 }
 
 // Reads all IMU data (including temperature)
@@ -211,7 +234,7 @@ void imu_read_all(IMU_t* imu) {
     uint8_t buf[14];
 
     i2c_read(imu->slave_addr, TEMP_REG, buf, 14);
-    imu->temp_raw = (int16_t)(buf[0]  | buf[1]  << 8);
+    imu->temp_raw = (int16_t)(buf[0] | (buf[1] << 8));
     imu->gx   = (int16_t)(buf[2]  | buf[3]  << 8);
     imu->gy   = (int16_t)(buf[4]  | buf[5]  << 8);
     imu->gz   = (int16_t)(buf[6]  | buf[7]  << 8);
@@ -221,19 +244,6 @@ void imu_read_all(IMU_t* imu) {
     imu_convert_units(imu);
 }
 
-static void imu_convert_units(IMU_t* imu)
-{
-    const float accel_scale_g_per_lsb = 0.000244f; // ±8 g
-    const float gyro_scale_dps_per_lsb = 0.070f;   // 2000 dps
-
-    imu->ax_g = (float)imu->ax * accel_scale_g_per_lsb;
-    imu->ay_g = (float)imu->ay * accel_scale_g_per_lsb;
-    imu->az_g = (float)imu->az * accel_scale_g_per_lsb;
-
-    imu->gx_dps = (float)imu->gx * gyro_scale_dps_per_lsb;
-    imu->gy_dps = (float)imu->gy * gyro_scale_dps_per_lsb;
-    imu->gz_dps = (float)imu->gz * gyro_scale_dps_per_lsb;
-}
 
 #else // use FAKE hardware
 void imu_init(IMU_t* imu, uint8_t slave_addr) { /* do nothing */ }
