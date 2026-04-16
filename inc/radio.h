@@ -1,3 +1,6 @@
+#ifndef RADIO_H
+#define RADIO_H
+
 #include <stdint.h>
 
 void radio_init(void);
@@ -11,3 +14,5 @@ typedef struct {
 } Radio_t;
 
 extern volatile Radio_t radio_data;
+
+#endif // RADIO_H
