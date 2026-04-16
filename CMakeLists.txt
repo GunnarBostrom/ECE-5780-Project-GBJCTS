@@ -22,7 +22,6 @@ set(PROJECT_SOURCES
     src/lidar.c
     src/main.c
     src/motor.c
-    src/pwm.c
     src/radio.c
     src/uart.c
     src/pid.c
@@ -92,7 +91,6 @@ flash_target(project)
 # src/lidar.c
 # src/main.c
 # src/motor.c
-# src/pwm.c
 # src/radio.c
 # src/uart.c
 
