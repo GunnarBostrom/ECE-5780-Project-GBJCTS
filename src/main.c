@@ -129,7 +129,7 @@ int main(void)
 
             // Run the controller using the estimated attitude
             control_update(&lsm6ds3, &attitude);
-        }
+          }
 
         // Background tasks can be added here later as long as they stay short
         //
@@ -263,6 +263,23 @@ void Error_Handler(void) {
   while (1)
   {
   }
+}
+
+void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
+{
+    if (GPIO_Pin == GPIO_PIN_0)   // PC0 = IMU INT1
+    {
+        static uint16_t imu_led_divider = 0;
+
+        imu_ready = 1;
+
+        // Debug: make the 416 Hz IMU interrupt visible as a 1 Hz blink.
+        if (++imu_led_divider >= 208)
+        {
+            imu_led_divider = 0;
+            GPIOC->ODR ^= GPIO_ODR_8;
+        }
+    }
 }
 
 #ifdef USE_FULL_ASSERT

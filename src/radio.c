@@ -5,6 +5,8 @@
 #include <stdio.h>
 #include <string.h>
 
+#define RADIO_TIMEOUT_MS 100U
+
 volatile char USART_read_register;
 volatile short int new_data_flag = 0;
 
@@ -52,8 +54,11 @@ void radio_init(void) {
 
 
 void radio_read(void) {
+    static uint32_t last_frame_ms = 0;
+
     if (new_data_flag) {
         new_data_flag = 0;
+        last_frame_ms = HAL_GetTick();
 
         const volatile uint8_t *p = (const volatile uint8_t *)&radio_buffer[3];
 
@@ -77,7 +82,7 @@ void radio_read(void) {
 
         radio_data.throttle = ch[0]; // channel 1 is throttle
         radio_data.armed = (ch[4] > 992) ? 1 : 0; // channel 5 above center is armed, below center is disarmed
-    } else {
+    } else if ((HAL_GetTick() - last_frame_ms) > RADIO_TIMEOUT_MS) {
         // lost signal? set to safe values
         radio_data.throttle = 50;
         radio_data.armed = 0;

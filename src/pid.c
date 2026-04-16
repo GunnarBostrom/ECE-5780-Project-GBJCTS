@@ -80,11 +80,11 @@ float PID_Update(PIDController *pid, float setpoint, float measurement)
         tau = 1.0e-6f;
     }
 
-    float raw_derivative = (error - pid->prev_error) / pid->dt;
+    float error_delta = error - pid->prev_error;
 
     pid->differentiator =
         ((2.0f * tau - pid->dt) / (2.0f * tau + pid->dt)) * pid->differentiator +
-        ((2.0f * pid->kd) / (2.0f * tau + pid->dt)) * raw_derivative;
+        ((2.0f * pid->kd) / (2.0f * tau + pid->dt)) * error_delta;
 
     float output = proportional + pid->integrator + pid->differentiator;
     output = clampf(output, pid->out_min, pid->out_max);

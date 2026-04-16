@@ -25,7 +25,7 @@ set(PROJECT_SOURCES
     src/pwm.c
     src/radio.c
     src/uart.c
-
+    src/pid.c
     src/stm32f0xx_it.c
     src/stm32f0xx_hal_msp.c
 )

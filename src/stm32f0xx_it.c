@@ -1,7 +1,6 @@
 #include "main.h"
 #include "stm32f0xx_hal.h"
 #include "stm32f0xx_it.h"
-#include "imu.h"
 
 /******************************************************************************/
 /*           Cortex-M0 Processor Interruption and Exception Handlers          */
@@ -50,15 +49,10 @@ void SysTick_Handler(void)
 
 
 /**
-  * @brief Handles IMU interrupts by setting a flag.
+  * @brief Handles EXTI line 0/1 interrupts.
   */
 void EXTI0_1_IRQHandler(void) {
-  
-  if (EXTI->PR & EXTI_PR_PR0) {
-    EXTI->PR = EXTI_PR_PR0;
-    imu_ready = 1;
-  }
-  
+  HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_0);
 }
 /******************************************************************************/
 /* STM32F0xx Peripheral Interrupt Handlers                                    */
@@ -66,5 +60,4 @@ void EXTI0_1_IRQHandler(void) {
 /* For the available peripheral interrupt handler names,                      */
 /* please refer to the startup file (startup_stm32f0xx.s).                    */
 /******************************************************************************/
-
 

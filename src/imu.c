@@ -88,7 +88,7 @@ Device ID: 0x69
 
 volatile uint8_t imu_ready = 0;
 
-#if USE_IMU // use REAL hardware
+//#if USE_IMU // use REAL hardware
 
 /**
  * @brief LSM6DS3 configuration and initialization.
@@ -100,11 +100,22 @@ volatile uint8_t imu_ready = 0;
  * @param imu           Pointer to IMU struct
  * @param slave_addr    I2C slave address of the IMU
  */
-void imu_init(IMU_t* imu, uint8_t slave_addr) {
-    imu->slave_addr = slave_addr;
-    
-    // verify device
+void imu_init(IMU_t* imu, uint8_t slave_addr)
+{
     uint8_t buf[1];
+
+    imu->slave_addr = slave_addr;
+
+    // Initialize cached sensor outputs to known values
+    imu->ax = 0;
+    imu->ay = 0;
+    imu->az = 0;
+
+    imu->gx = 0;
+    imu->gy = 0;
+    imu->gz = 0;
+
+    imu->temp_raw = 0;
 
     imu->ax_g = 0.0f;
     imu->ay_g = 0.0f;
@@ -115,48 +126,78 @@ void imu_init(IMU_t* imu, uint8_t slave_addr) {
     imu->gz_dps = 0.0f;
 
     imu->temp_c = 0.0f;
-    imu->temp_raw = 0;
 
+    // Verify that the device on the bus is actually the LSM6DS3
     i2c_read(imu->slave_addr, WHO_AM_I_REG, buf, 1);
-    if (buf[0] != DEVICE_ID) {
-        // wrong device: throw an error
-
-        while (1) {
+    if (buf[0] != DEVICE_ID)
+    {
+        // Wrong device detected
+        //
+        // Blink blue + orange LEDs forever so startup failure is obvious
+        while (1)
+        {
             HAL_GPIO_TogglePin(GPIOC, GPIO_PIN_7);
             HAL_GPIO_TogglePin(GPIOC, GPIO_PIN_8);
             HAL_Delay(200);
         }
-
-        return;
     }
 
-
-    // Global control: BDU + auto-increment, active-high push-pull INT
-    uint8_t ctrl3 = 0x44;  // IF_INC | BDU
+    // -------------------------------------------------------------------------
+    // CTRL3_C
+    //
+    // BDU    = 1  -> block data update
+    // IF_INC = 1  -> auto-increment register addresses for burst reads
+    //
+    // 0x44 = 0100 0100b
+    // -------------------------------------------------------------------------
+    uint8_t ctrl3 = 0x44;
     i2c_write(imu->slave_addr, CTRL3_C, &ctrl3, 1);
 
-    // Mask DRDY until filters settle
-    uint8_t ctrl4 = 0x08;  // DRDY_MASK
+    // -------------------------------------------------------------------------
+    // CTRL4_C
+    //
+    // DRDY_MASK = 1
+    //
+    // Masks data-ready until output data has settled
+    // -------------------------------------------------------------------------
+    uint8_t ctrl4 = 0x08;
     i2c_write(imu->slave_addr, CTRL4_C, &ctrl4, 1);
 
-
-    // configure IMU
+    // -------------------------------------------------------------------------
+    // CTRL1_XL
+    //
+    // Accelerometer:
+    //   ODR = 416 Hz
+    //   FS  = ±8 g
+    //   BW  = 400 Hz
+    // -------------------------------------------------------------------------
     uint8_t accel_config = ACCEL_ODR_416HZ | ACCEL_FS_8G | ACCEL_BW_400HZ;
     i2c_write(imu->slave_addr, ACCEL_CFG, &accel_config, 1);
 
+    // -------------------------------------------------------------------------
+    // CTRL2_G
+    //
+    // Gyroscope:
+    //   ODR = 416 Hz
+    //   FS  = 2000 dps
+    // -------------------------------------------------------------------------
     uint8_t gyro_config = GYRO_ODR_416HZ | GYRO_FS_2000DPS;
     i2c_write(imu->slave_addr, GYRO_CFG, &gyro_config, 1);
 
-    HAL_Delay(100); // from the data sheet:   t_start = max(t_boot, 1/ODR * filter_settling_samples)
+    // Allow startup / filter settling time
+    HAL_Delay(100);
 
-    // interrupts
+    // -------------------------------------------------------------------------
+    // INT1_CTRL
+    //
+    // Route accel + gyro data-ready to INT1
+    //
+    // This is the key step required for PC0 EXTI interrupts to occur.
+    // -------------------------------------------------------------------------
     uint8_t int1_config = INT1_GYRO_EN | INT1_ACCEL_EN;
     i2c_write(imu->slave_addr, INT1_CFG, &int1_config, 1);
-
-    // uint8_t int2_config = INT2_GYRO_EN | INT2_ACCEL_EN;
-    // i2c_write(imu->slave_addr, INT2_CFG, &int2_config, 1);
-    
 }
+
 static void imu_convert_units(IMU_t* imu)
 {
     const float accel_scale_g_per_lsb = 0.000244f; // ±8 g
@@ -245,11 +286,11 @@ void imu_read_all(IMU_t* imu) {
 }
 
 
-#else // use FAKE hardware
-void imu_init(IMU_t* imu, uint8_t slave_addr) { /* do nothing */ }
-void imu_read(IMU_t* imu) { /* do nothing */ }
-void imu_read_accel(IMU_t* imu) { /* do nothing */ }
-void imu_read_gyro(IMU_t* imu) { /* do nothing */ }
-void imu_read_temp(IMU_t* imu) { /* do nothing */ }
-void imu_read_all(IMU_t* imu) { /* do nothing */ }
-#endif
+// #else // use FAKE hardware
+// void imu_init(IMU_t* imu, uint8_t slave_addr) { /* do nothing */ }
+// void imu_read(IMU_t* imu) { /* do nothing */ }
+// void imu_read_accel(IMU_t* imu) { /* do nothing */ }
+// void imu_read_gyro(IMU_t* imu) { /* do nothing */ }
+// void imu_read_temp(IMU_t* imu) { /* do nothing */ }
+// void imu_read_all(IMU_t* imu) { /* do nothing */ }
+// #endif
