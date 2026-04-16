@@ -41,82 +41,106 @@ IMU_t lsm6ds3;
 LIDAR_t vl53l1x;
 Attitude_t attitude;
 
-
-
-int main(void) {
-  HAL_Init();
-  SystemClock_Config();
-
-  LED_init();
-  
-  // I2C peripheral initialization
-  i2c_init(400);
-
-  imu_init(&lsm6ds3, 0x6B);     // i2c addr: 0x6B
-  imu_interrupt_init();            // then arm the EXTI
-
-  lidar_init(&vl53l1x, 0x52); // i2c addr: 0x52
-
-
-  // UART peripheral initialization
-  radio_init();
-
-
-  // PWM peripheral initialization
-  motor_init();
-
-  uint32_t last_heartbeat = HAL_GetTick();
-  uint32_t last_toggle = HAL_GetTick();
-  uint8_t motor_state = 0;
-
-  const float dt = 1.0f / 416.0f;
-
-  filter_init(&attitude);
-  control_init(dt);
-
-  // Arm all ESCs at minimum throttle
-  motor_set_all(1000);
-  motor_set_individual(1000, 1000, 1000, 1000);
-  HAL_Delay(8000);
-
-  // Hold Motors 1-4 at low throttle
-  // Note motor minimum value for all 4 motors to spin at min throttle is 1200
-  motor_set_individual(1200, 1200, 1200, 1200);
-  motor_set_all(1200);
-  
-  
-
-  /*
-   CONTROL LOOP STRUCTURE
-      - read sensors
-      - compute error
-      - run PID
-      - mix motors
-      - update PWM
-  */
- while (1)
+int main(void)
 {
-    radio_read();
+    // Core HAL and clock setup
+    HAL_Init();
+    SystemClock_Config();
 
-    if (imu_ready)
+    // Optional LED setup for heartbeat / debug indication
+    LED_init();
+
+    // Peripheral initialization
+
+    // Initialize I2C bus at 400 kHz for IMU and lidar communication
+    i2c_init(400);
+
+    // Initialize IMU, then enable its interrupt so new samples can trigger updates
+    imu_init(&lsm6ds3, 0x6B);      // LSM6DS3 I2C address = 0x6B
+    imu_interrupt_init();
+
+    // Initialize lidar sensor
+    lidar_init(&vl53l1x, 0x52);    // VL53L1X I2C address = 0x52
+
+    // Initialize radio receiver interface
+    radio_init();
+
+    // Initialize ESC / motor PWM outputs
+    motor_init();
+
+    // Estimation and control initialization
+
+    // Fixed timestep used by the filter and controller
+    //
+    // This assumes the IMU data-ready interrupt occurs at 416 Hz and that each
+    // interrupt corresponds to one fresh sensor sample
+    //
+    // Because the control loop only runs when imu_ready is asserted, this is far
+    // better than using the same dt inside a free-running while loop
+    const float dt = 1.0f / 416.0f;
+
+    // Initialize attitude estimate state
+    filter_init(&attitude);
+
+    // Initialize roll/pitch controllers using the same fixed timestep
+    control_init(dt);
+
+    // Start with motors at minimum command for safety
+    motor_set_all(1000);
+
+    /*
+     * CONTROL LOOP STRUCTURE
+     *
+     * 1. Wait for a new IMU sample
+     * 2. Read IMU data
+     * 3. Update roll/pitch estimate
+     * 4. Run controller
+     * 5. Update motors
+     *
+     * The loop is event-driven by the IMU interrupt rather than running
+     * continuously at full speed.
+     */
+    while (1)
     {
-        imu_ready = 0;
+        // Read and process radio input in the background
+        //
+        // This keeps the latest throttle / arm state updated even while waiting
+        // for the next IMU sample.
+        radio_read();
 
-        imu_read(&lsm6ds3);
+        // Run one control update per fresh IMU interrupt
+        if (imu_ready)
+        {
+            // Clear the flag immediately so the next sensor interrupt can be captured
+            imu_ready = 0;
 
-        filter_update(&attitude,
-                      lsm6ds3.gx_dps,
-                      lsm6ds3.gy_dps,
-                      lsm6ds3.gz_dps,
-                      lsm6ds3.ax_g,
-                      lsm6ds3.ay_g,
-                      lsm6ds3.az_g,
-                      dt);
+            // Read the newest IMU sample
+            imu_read(&lsm6ds3);
 
-        control_update(&lsm6ds3, &attitude);
+            // Update attitude estimate from gyro + accelerometer data
+            filter_update(&attitude,
+                          lsm6ds3.gx_dps,
+                          lsm6ds3.gy_dps,
+                          lsm6ds3.gz_dps,
+                          lsm6ds3.ax_g,
+                          lsm6ds3.ay_g,
+                          lsm6ds3.az_g,
+                          dt);
+
+            // Run the controller using the estimated attitude
+            control_update(&lsm6ds3, &attitude);
+        }
+
+        // Background tasks can be added here later as long as they stay short
+        //
+        // Examples:
+        //   - heartbeat LED
+        //   - telemetry output
+        //   - lidar processing
+        //   - safety / fault checks
     }
-}
-  // nothing should be in main() below the control loop
+
+    // Nothing should execute below the main control loop
 }
 
 
@@ -164,11 +188,6 @@ static void LED_init(void) {
   HAL_Delay(1000);
   HAL_GPIO_TogglePin(GPIOC, GPIO_PIN_6 | GPIO_PIN_7 | GPIO_PIN_8 | GPIO_PIN_9); // leds off
   HAL_Delay(500);
-
-  // while (1){
-  //   HAL_GPIO_TogglePin(GPIOC, GPIO_PIN_8);
-  //   HAL_Delay(500);
-  // }
 
 }
 

@@ -44,7 +44,7 @@ void radio_init(void) {
 
     USART3->CR1 |= USART_CR1_UE; // Enable USART3
 
-    // Enable USART3 interrupt in NVIC and set priority
+    // Enable USART3 interrupt in NVIC and set priority 3
     NVIC_EnableIRQ(USART3_4_IRQn);
     NVIC_SetPriority(USART3_4_IRQn, 3U);
 
