@@ -59,18 +59,8 @@ int main(void) {
   // UART peripheral initialization
   radio_init();
 
-
   // PWM peripheral initialization
   motor_init();
-
-
-  // Arm all ESCs at minimum throttle
-  motor_set_all(1000);
-  motor_set_individual(1000, 1000, 1000, 1000);
-
-  // Hold Motors 1-4 at low throttle
-  // Note motor minimum value for all 4 motors to spin at min throttle is 1200
-  motor_set_all(1040);
   
   uart_test_init();
   

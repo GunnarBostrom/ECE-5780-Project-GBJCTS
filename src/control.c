@@ -1,7 +1,10 @@
 #include "control.h"
 #include "radio.h"
 #include "motor.h"
+#include "pid.h"
 #include "stm32f072xb.h"
+#include "stm32f0xx_hal.h"
+#include "stm32f0xx_hal_gpio.h"
 #include <stdint.h>
 
 #define THROTTLE_MIN 1000
@@ -14,20 +17,31 @@ void control_from_radio() {
     if (radio_data.throttle < 230) throttle = 1000;
     else if (radio_data.throttle > 1750) throttle = 1900;
     else throttle = ((radio_data.throttle - 230) * (THROTTLE_MAX - THROTTLE_MIN)) / (1750 - 230) + THROTTLE_MIN;
-    // FAILSAFE: lost radio signal → kill motors immediately
-    if (radio_data.failsafe) {
-        PID_Reset(&roll_pid);
-        PID_Reset(&pitch_pid);
-        motor_set_all(1000);
-        return;
-    }
+    if (radio_data.armed) {
+        // For simplicity, set all motors to the same throttle value
+        motor_set_all(throttle);
+        GPIOC->ODR |= GPIO_PIN_9; // turn on blue LED to indicate active control
+        GPIOC->ODR &= ~GPIO_PIN_8; // turn off orange LED to indicate disarmed
 
-    // SAFETY: disarmed → idle motors
-    if (!radio_data.armed) {
-        PID_Reset(&roll_pid);
-        PID_Reset(&pitch_pid);
-        motor_set_all(1000);
-        return;
+    } else {
+        GPIOC->ODR |= GPIO_PIN_8; // turn off orange LED to indicate disarmed
+        GPIOC->ODR &= ~GPIO_PIN_9; // turn off orange LED to indicate disarmed
+
+        // FAILSAFE: lost radio signal → kill motors immediately
+        if (radio_data.failsafe) {
+            // PID_Reset(&roll_pid);
+            // PID_Reset(&pitch_pid);
+            motor_set_all(1000);
+            return;
+        }
+
+        // SAFETY: disarmed → idle motors
+        if (!radio_data.armed) {
+            // PID_Reset(&roll_pid);
+            // PID_Reset(&pitch_pid);
+            motor_set_all(1000);
+            return;
+        }
     }
 
 }

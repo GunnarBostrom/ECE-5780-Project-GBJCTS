@@ -13,7 +13,7 @@ volatile uint8_t radio_buffer_index = 0;
 volatile Radio_t radio_data = {0};
 
 #if USE_RADIO
-#define RADIO_FAILSAFE_MS 500  // declare lost signal after 500 ms with no frame
+#define RADIO_FAILSAFE_MS 250  // declare lost signal after 250 ms with no frame
 
 
 void radio_init(void) { 
@@ -53,6 +53,7 @@ void radio_init(void) {
 
 
 void radio_read(void) {
+    uint32_t last_frame_tick = 0;
     if (new_data_flag) {
         new_data_flag = 0;
 
