@@ -1,5 +1,5 @@
 /**
-IMU
+IMU driver
 STM LSM6DS3
 
 */
@@ -10,8 +10,6 @@ STM LSM6DS3
 #include <stdint.h>
 
 typedef struct {
-    uint8_t slave_addr;
-
     // raw sensor outputs
     int16_t ax, ay, az;
     int16_t gx, gy, gz;
@@ -25,12 +23,11 @@ typedef struct {
 
 extern volatile uint8_t imu_ready;
 
-void imu_init(LSM6DS3* imu, uint8_t slave_addr);
-void imu_read(LSM6DS3* imu);
-void imu_read_accel(LSM6DS3* imu);
-void imu_read_gyro(LSM6DS3* imu);
-void imu_read_temp(LSM6DS3* imu);
-void imu_read_all(LSM6DS3* imu);
-static void imu_convert_units(LSM6DS3* imu)
+bool imu_init(LSM6DS3_t* imu);
+void imu_read(LSM6DS3_t* imu);
+void imu_read_accel(LSM6DS3_t* imu);
+void imu_read_gyro(LSM6DS3_t* imu);
+void imu_read_temp(LSM6DS3_t* imu);
+void imu_read_all(LSM6DS3_t* imu);
 
 #endif // IMU_H

@@ -1,17 +1,14 @@
 /**
-IMU
+IMU driver
 
 STM LSM6DS3
 LSM6DS3 can operate at 100 kHz or 400 kHz.
 
-Data peripheral provides:
+Data provided:
     - 3 axis acceleration
     - 3 axis angular rate
     - temperature
 
-I2C slave address: 0x6B (default), otherwise 0x6A
-WHO_AM_I register: 0x0F
-Device ID: 0x69
 */
 
 #include "config.h"
@@ -28,8 +25,10 @@ Device ID: 0x69
 #include <sys/_intsup.h>
 #include <sys/types.h>
 
-#define WHO_AM_I_REG    0x0F
-#define DEVICE_ID       0x69
+#define IMU_ADDR        0x6B  // default I2C slave address
+//#define IMU_ADDR      0x6A  // another I2C slave address option
+#define WHO_AM_I_REG    0x0F  // 
+#define IMU_ID          0x69  // I2C device id, the value in WHO_AM_I_REG
 
 
 /* ––––– output registers ––––– */
@@ -101,6 +100,9 @@ Device ID: 0x69
 #define G_FS_1000   35
 #define G_FS_2000   70
 
+
+static void imu_convert_units(LSM6DS3_t* imu);
+
 volatile uint8_t imu_ready = 0;
 
 
@@ -113,18 +115,15 @@ volatile uint8_t imu_ready = 0;
  *      - accelerometer: 416Hz data rate, ±8g full-scale, 400Hz anti-aliasing
  *      - gyroscope:     416Hz data rate, 2000 dps
  * 
- * @param imu           Pointer to IMU struct
- * @param slave_addr    I2C slave address of the IMU
+ * @param imu       Pointer to IMU struct
+ * @return          true if peripheral successfully initialized, false otherwise
  */
-void imu_init(LSM6DS3* imu, uint8_t slave_addr) {
-    imu->slave_addr = slave_addr;
-    
+bool imu_init(LSM6DS3_t* imu) {
     // verify device
-    uint8_t buf[1];
-
-    i2c_read(imu->slave_addr, WHO_AM_I_REG, buf, 1);
+    uint8_t device_id;
+    i2c_read(IMU_ADDR, WHO_AM_I_REG, &device_id, 1);
     
-    if (buf[0] != DEVICE_ID) {
+    if (device_id != IMU_ID) {
         // wrong device: throw an error
         while (1) {
             HAL_GPIO_TogglePin(GPIOC, GPIO_PIN_7);
@@ -132,32 +131,34 @@ void imu_init(LSM6DS3* imu, uint8_t slave_addr) {
             HAL_Delay(200);
         }
 
-        return;
+        return false;
     }
 
     // freeze registers for read on block data update
     uint8_t ctrl3 = 0x40;  // BDU
-    i2c_write(imu->slave_addr, CTRL3_C, &ctrl3, 1);
+    i2c_write(IMU_ADDR, CTRL3_C, &ctrl3, 1);
 
     // prevent interrupt fire at startup with data ready mask
     uint8_t ctrl4 = 0x08;  // DRDY_MASK
-    i2c_write(imu->slave_addr, CTRL4_C, &ctrl4, 1);
+    i2c_write(IMU_ADDR, CTRL4_C, &ctrl4, 1);
 
     // interrupts
     uint8_t int1_config = INT1_GYRO_EN | INT1_ACCEL_EN;
-    i2c_write(imu->slave_addr, INT1_CFG, &int1_config, 1);
+    i2c_write(IMU_ADDR, INT1_CFG, &int1_config, 1);
 
     // uint8_t int2_config = INT2_GYRO_EN | INT2_ACCEL_EN;
-    // i2c_write(imu->slave_addr, INT2_CFG, &int2_config, 1);
+    // i2c_write(IMU_ADDR, INT2_CFG, &int2_config, 1);
 
     // configure
     uint8_t accel_config = ACCEL_ODR_416HZ | ACCEL_FS_8G | ACCEL_BW_400HZ;
-    i2c_write(imu->slave_addr, ACCEL_CFG, &accel_config, 1);
+    i2c_write(IMU_ADDR, ACCEL_CFG, &accel_config, 1);
 
     uint8_t gyro_config = GYRO_ODR_416HZ | GYRO_FS_2000DPS;
-    i2c_write(imu->slave_addr, GYRO_CFG, &gyro_config, 1);
+    i2c_write(IMU_ADDR, GYRO_CFG, &gyro_config, 1);
 
     while (!imu_ready) { }  
+
+    return true;
 }
 
 /**
@@ -167,37 +168,42 @@ void imu_init(LSM6DS3* imu, uint8_t slave_addr) {
  * shot of the data in a register as well as the n bytes desired after it.
  * Hence the gyro data is accessed first because it is the lowest register.
  */
-void imu_read(LSM6DS3* imu) {
+void imu_read(LSM6DS3_t* imu) {
     uint8_t buf[12];
 
-    i2c_read(imu->slave_addr, GYRO_REG, buf, 12);
+    i2c_read(IMU_ADDR, GYRO_REG, buf, 12);
     imu->gx = (int16_t)(buf[0]  | buf[1]  << 8);
     imu->gy = (int16_t)(buf[2]  | buf[3]  << 8);
     imu->gz = (int16_t)(buf[4]  | buf[5]  << 8);
     imu->ax = (int16_t)(buf[6]  | buf[7]  << 8);
     imu->ay = (int16_t)(buf[8]  | buf[9]  << 8);
     imu->az = (int16_t)(buf[10] | buf[11] << 8);
+
     imu_convert_units(imu);
 }
 
 // Reads IMU acceleration data
-void imu_read_accel(LSM6DS3* imu) {
+void imu_read_accel(LSM6DS3_t* imu) {
     uint8_t buf[6]; // 6 bytes: X, Y, Z (2 bytes each)
 
-    i2c_read(imu->slave_addr, ACCEL_REG, buf, 6);
+    i2c_read(IMU_ADDR, ACCEL_REG, buf, 6);
     imu->ax = (int16_t)(buf[0] | buf[1] << 8);
     imu->ay = (int16_t)(buf[2] | buf[3] << 8);
     imu->az = (int16_t)(buf[4] | buf[5] << 8);
+
+    imu_convert_units(imu);
 }
 
 // Reads IMU gyroscope data
-void imu_read_gyro(LSM6DS3* imu) {
+void imu_read_gyro(LSM6DS3_t* imu) {
     uint8_t buf[6]; // 6 bytes: X, Y, Z (2 bytes each)
 
-    i2c_read(imu->slave_addr, GYRO_REG, buf, 6);
+    i2c_read(IMU_ADDR, GYRO_REG, buf, 6);
     imu->gx = (int16_t)(buf[0] | buf[1] << 8);
     imu->gy = (int16_t)(buf[2] | buf[3] << 8);
     imu->gz = (int16_t)(buf[4] | buf[5] << 8);
+
+    imu_convert_units(imu);
 }
 
 /**
@@ -206,18 +212,20 @@ void imu_read_gyro(LSM6DS3* imu) {
  * This output is raw. The conversion to celsius is:
  *      celsius_temp = (raw_temp / 16) + 25  (± the offset error)
  */ 
-void imu_read_temp(LSM6DS3* imu) {
+void imu_read_temp(LSM6DS3_t* imu) {
     uint8_t buf[2];
 
-    i2c_read(imu->slave_addr, TEMP_REG, buf, 2);
+    i2c_read(IMU_ADDR, TEMP_REG, buf, 2);
     imu->temp = (int16_t)(buf[0] | buf[1]  << 8);
+
+    imu_convert_units(imu);
 }
 
 // Reads all IMU data (including temperature)
-void imu_read_all(LSM6DS3* imu) {
+void imu_read_all(LSM6DS3_t* imu) {
     uint8_t buf[14];
 
-    i2c_read(imu->slave_addr, TEMP_REG, buf, 14);
+    i2c_read(IMU_ADDR, TEMP_REG, buf, 14);
     imu->temp = (int16_t)(buf[0]  | buf[1]  << 8);
     imu->gx   = (int16_t)(buf[2]  | buf[3]  << 8);
     imu->gy   = (int16_t)(buf[4]  | buf[5]  << 8);
@@ -225,6 +233,7 @@ void imu_read_all(LSM6DS3* imu) {
     imu->ax   = (int16_t)(buf[8]  | buf[9]  << 8);
     imu->ay   = (int16_t)(buf[10] | buf[11] << 8);
     imu->az   = (int16_t)(buf[12] | buf[13] << 8);
+
     imu_convert_units(imu);
 }
 
@@ -232,23 +241,23 @@ void imu_read_all(LSM6DS3* imu) {
  * This conversion is hard coded for the configs we selected. Accuracy can be
  * increased by using micro g and micro dps.
  */
-static void imu_convert_units(LSM6DS3* imu) {
+static void imu_convert_units(LSM6DS3_t* imu) {
     imu->ax_mg   = (int32_t)imu->ax * 244 / 1000; // 244 for ±8g full-scale
     imu->ay_mg   = (int32_t)imu->ay * 244 / 1000;
     imu->az_mg   = (int32_t)imu->az * 244 / 1000;
 
-    imu->gx_mdps = (int32_t)imu->gx * 70 / 1000; // 70 for ±2000dps full-scale
+    imu->gx_mdps = (int32_t)imu->gx * 70 / 1000;  // 70 for ±2000dps full-scale
     imu->gy_mdps = (int32_t)imu->gy * 70 / 1000;
     imu->gz_mdps = (int32_t)imu->gz * 70 / 1000;
 
-    //imu->temp_c  = ((int8_t)imu->temp >> 4) + 25;
+    //imu->temp_c  = ((int32_t)imu->temp >> 4) + 25;
 }
 
 #else // use FAKE hardware
-void imu_init(LSM6DS3* imu, uint8_t slave_addr) { /* do nothing */ }
-void imu_read(LSM6DS3* imu) { /* do nothing */ }
-void imu_read_accel(LSM6DS3* imu) { /* do nothing */ }
-void imu_read_gyro(LSM6DS3* imu) { /* do nothing */ }
-void imu_read_temp(LSM6DS3* imu) { /* do nothing */ }
-void imu_read_all(LSM6DS3* imu) { /* do nothing */ }
+bool imu_init(LSM6DS3_t* imu) { return true; }
+void imu_read(LSM6DS3_t* imu) { /* do nothing */ }
+void imu_read_accel(LSM6DS3_t* imu) { /* do nothing */ }
+void imu_read_gyro(LSM6DS3_t* imu) { /* do nothing */ }
+void imu_read_temp(LSM6DS3_t* imu) { /* do nothing */ }
+void imu_read_all(LSM6DS3_t* imu) { /* do nothing */ }
 #endif
