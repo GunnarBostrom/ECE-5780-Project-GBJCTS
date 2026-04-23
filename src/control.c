@@ -8,7 +8,7 @@
 #define THROTTLE_MIN_US 1000   // minimum throttle (motors idle)
 #define THROTTLE_MAX_US 1900   // maximum throttle (full power)
 #define THROTTLE_IDLE_DEADBAND_US 50
-#define THROTTLE_STABILIZE_START_US 1100
+#define THROTTLE_ATTITUDE_START_US (THROTTLE_MIN_US + THROTTLE_IDLE_DEADBAND_US)
 #define THROTTLE_FULL_AUTHORITY_US 1250
 
 // PID controllers for attitude stabilization
@@ -64,16 +64,16 @@ static uint16_t map_throttle_to_us(uint16_t raw)
     return (uint16_t)(((raw - 230) * (THROTTLE_MAX_US - THROTTLE_MIN_US)) / (1750 - 230) + THROTTLE_MIN_US);
 }
 
-// Initialize control system
+// Initialize the attitude controller.
 //
-// dt = control loop timestep (seconds)
-//
-// Sets up PID controllers for roll and pitch stabilization
+// `dt` is the fixed control-loop timestep in seconds. It must match the rate at
+// which `control_update()` is called so the PID gains operate on the intended
+// sample interval.
 void control_init(float dt)
 {
     // Roll PID controller
     PID_Init(&roll_pid,
-             6.0f,     // kp  proportional gain (main correction term)
+             5.0f,     // kp  proportional gain (main correction term)
              0.0f,     // ki  integral gain (eliminates steady-state error)
              0.02f,    // kd  derivative gain (damping / smoothing)
              dt,
@@ -85,7 +85,7 @@ void control_init(float dt)
 
     // Pitch PID controller (same tuning as roll for now)
     PID_Init(&pitch_pid,
-             6.0f,
+             5.0f,
              0.0f,
              0.02f,
              dt,
@@ -96,16 +96,16 @@ void control_init(float dt)
              0.02f);
 }
 
-// Main control update (called at fixed loop rate)
+// Run one attitude-control update.
 //
 // Inputs:
-//   imu       → raw IMU data (currently unused here estimating at the attitude level from filter.c)
-//   attitude  → estimated roll/pitch angles (deg)
+//   imu       -> accepted for interface consistency and future extensions
+//   attitude  -> estimated roll/pitch angles used by the current controller
 //
 // Function:
-//   - Reads throttle from radio
-//   - Runs PID control for roll/pitch
-//   - Mixes commands into 4 motor outputs
+//   - Reads throttle and arm state from the radio module
+//   - Computes roll/pitch stabilization commands from the attitude estimate
+//   - Mixes the resulting commands into four motor outputs
 
 void control_update(const IMU_t* imu, const Attitude_t* attitude)
 {
@@ -143,21 +143,15 @@ void control_update(const IMU_t* imu, const Attitude_t* attitude)
 
     // Keep motors quiet at zero/idle stick. Without this, PID corrections can
     // still be mixed into a 1000 us throttle command and spin motors hard.
+    //
+    // Reset the controller only in the true idle/disarmed states. Preserving
+    // controller history through spool-up avoids a hard restart when the quad
+    // crosses the stabilization threshold.
     if (throttle_us <= (THROTTLE_MIN_US + THROTTLE_IDLE_DEADBAND_US))
     {
         PID_Reset(&roll_pid);
         PID_Reset(&pitch_pid);
         motor_set_all(THROTTLE_MIN_US);
-        return;
-    }
-
-    // Below this point, keep all motors equal. There is not enough headroom for
-    // attitude correction without clipping some motors down to 1000 us.
-    if (throttle_us < THROTTLE_STABILIZE_START_US)
-    {
-        PID_Reset(&roll_pid);
-        PID_Reset(&pitch_pid);
-        motor_set_all(throttle_us);
         return;
     }
 
@@ -168,10 +162,14 @@ void control_update(const IMU_t* imu, const Attitude_t* attitude)
 
     // Compute PID corrections based on current attitude
     roll_cmd = PID_Update(&roll_pid, roll_sp_deg, attitude->roll_deg);
-    pitch_cmd = PID_Update(&pitch_pid, pitch_sp_deg, attitude->pitch_deg);
+    pitch_cmd = -PID_Update(&pitch_pid, pitch_sp_deg, attitude->pitch_deg);
 
-    authority = (float)(throttle_us - THROTTLE_STABILIZE_START_US) /
-                (float)(THROTTLE_FULL_AUTHORITY_US - THROTTLE_STABILIZE_START_US);
+    authority = (float)(throttle_us - THROTTLE_ATTITUDE_START_US) /
+                (float)(THROTTLE_FULL_AUTHORITY_US - THROTTLE_ATTITUDE_START_US);
+    if (authority < 0.0f)
+    {
+        authority = 0.0f;
+    }
     if (authority > 1.0f)
     {
         authority = 1.0f;

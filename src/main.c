@@ -75,7 +75,8 @@ int main(void)
     // interrupt corresponds to one fresh sensor sample
     //
     // Because the control loop only runs when imu_ready is asserted, this is far
-    // better than using the same dt inside a free-running while loop
+    // better than using the same dt inside a free-running while loop. Motor
+    // outputs are refreshed independently by TIM2 at a higher ESC update rate.
     const float dt = 1.0f / 416.0f;
 
     // Initialize attitude estimate state

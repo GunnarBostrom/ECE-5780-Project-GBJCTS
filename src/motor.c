@@ -5,6 +5,9 @@
 #include "motor.h"
 #include "stm32f0xx.h"
 
+#define MOTOR_TIMER_TICK_HZ 1000000U
+#define MOTOR_PWM_RATE_HZ 400U
+
 static uint16_t clamp_us(uint16_t val)
 {
     if (val < 1000) return 1000;
@@ -60,10 +63,13 @@ void motor_init(void)
     //
     // Assuming timer clock = 48 MHz
     // PSC = 47 -> 48 MHz / (47 + 1) = 1 MHz -> 1 us per tick
-    // ARR = 19999 -> 20 ms period -> 50 Hz ESC PWM
+    // ARR = 2499 -> 2.5 ms period -> 400 Hz ESC PWM
+    //
+    // This keeps the motor output stage much closer to the 416 Hz control loop
+    // without changing how the controller itself is scheduled.
     // -------------------------------------------------------------------------
     TIM2->PSC = 47;
-    TIM2->ARR = 20000 - 1;
+    TIM2->ARR = (MOTOR_TIMER_TICK_HZ / MOTOR_PWM_RATE_HZ) - 1;
 
     // Safe minimum throttle to start
     TIM2->CCR1 = 1000;
