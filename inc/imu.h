@@ -8,6 +8,7 @@ STM LSM6DS3
 #define IMU_H
 
 #include <stdint.h>
+#include <stdbool.h>
 
 typedef struct {
     // raw sensor outputs

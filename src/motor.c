@@ -5,6 +5,8 @@
 #include "motor.h"
 #include "stm32f0xx.h"
 
+#if USE_MOTOR // use REAL hardware
+
 static uint16_t clamp_us(uint16_t val)
 {
     if (val < 1000) return 1000;
@@ -112,3 +114,9 @@ void motor_set_individual(uint16_t m1, uint16_t m2, uint16_t m3, uint16_t m4)
     TIM2->CCR3 = clamp_us(m3);
     TIM2->CCR4 = clamp_us(m4);
 }
+
+#else // use FAKE hardware
+void motor_init(void) { /* do nothing */ }
+void motor_set_all(uint16_t pulse_us) { /* do nothing */ }
+void motor_set_individual(uint16_t m1, uint16_t m2, uint16_t m3, uint16_t m4) { /* do nothing */ }
+#endif
