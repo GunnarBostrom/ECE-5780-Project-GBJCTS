@@ -392,7 +392,9 @@ void i2c_write_transaction(uint8_t slave_addr, uint16_t reg_addr, uint8_t* data,
 
 
     // total bytes sent includes register as well
-    uint8_t total_bytes = (reg_addr > 0xFF) ? len + 2 : len + 1;
+    /* this is part of the lidar debug mentioned below */
+    uint8_t total_bytes = len + 2;
+    //uint8_t total_bytes = (reg_addr > 0xFF) ? len + 2 : len + 1;
 
     I2C1->CR2 &= ~(I2C_CR2_SADD | I2C_CR2_NBYTES | I2C_CR2_RD_WRN | I2C_CR2_START | I2C_CR2_AUTOEND);
 
@@ -410,24 +412,30 @@ void i2c_write_transaction(uint8_t slave_addr, uint16_t reg_addr, uint8_t* data,
         return;
     }
 
-    if (reg_addr > 0xFF) { // if 16-bit register
-        // send high byte 
-        I2C1->TXDR = (reg_addr >> 8) & 0xFF;
+    // if (reg_addr > 0xFF) { // if 16-bit register
+    //     // send high byte 
+    //     I2C1->TXDR = (reg_addr >> 8) & 0xFF;
 
-        while (!(I2C1->ISR & I2C_ISR_TXIS) && !(I2C1->ISR & I2C_ISR_NACKF)) {} // wait for ready to transmit or error
-        if (I2C1->ISR & I2C_ISR_NACKF) {
-            // NACKF: probably should throw an error
-            I2C1->ICR |= I2C_ICR_NACKCF; // clear flag
-            I2C1->CR2 |= I2C_CR2_STOP;   // stop
-            return;
-        }
+    //     while (!(I2C1->ISR & I2C_ISR_TXIS) && !(I2C1->ISR & I2C_ISR_NACKF)) {} // wait for ready to transmit or error
+    //     if (I2C1->ISR & I2C_ISR_NACKF) {
+    //         // NACKF: probably should throw an error
+    //         I2C1->ICR |= I2C_ICR_NACKCF; // clear flag
+    //         I2C1->CR2 |= I2C_CR2_STOP;   // stop
+    //         return;
+    //     }
 
-        // send low byte
-        I2C1->TXDR = reg_addr & 0xFF;
-    }
-    else {
-        I2C1->TXDR = reg_addr;
-    }
+    //     // send low byte
+    //     I2C1->TXDR = reg_addr & 0xFF;
+    // }
+    // else {
+    //     I2C1->TXDR = reg_addr;
+    // }
+
+/* debugging lidar which has 16 bit registers –– this will break IMU */
+    // always send 16-bit register address
+    I2C1->TXDR = (reg_addr >> 8) & 0xFF;  // high byte (0x00 for low registers)
+    // wait for TXIS...
+    I2C1->TXDR = reg_addr & 0xFF;          // low byte
 
     // write bytes to transmit
     for (int i = 0; i < len; i++)

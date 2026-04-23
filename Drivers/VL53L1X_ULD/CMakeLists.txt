@@ -5,6 +5,7 @@ add_library(VL53L1X_ULD OBJECT)
 
 target_include_directories(VL53L1X_ULD PUBLIC
     ${CMAKE_SOURCE_DIR}/Drivers/VL53L1X_ULD/Inc
+    ${CMAKE_SOURCE_DIR}/inc
 )
 
 target_sources(VL53L1X_ULD PRIVATE

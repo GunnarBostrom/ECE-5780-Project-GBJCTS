@@ -117,15 +117,21 @@ bool imu_init(LSM6DS3_t* imu) {
     }
 
     // freeze registers for read on block data update
-    uint8_t ctrl3 = 0x40;  // BDU
+    uint8_t ctrl3 = 0x44;  // BDU
     i2c_write(IMU_ADDR, CTRL3_C, &ctrl3, 1);
 
     // prevent interrupt fire at startup with data ready mask
     uint8_t ctrl4 = 0x08;  // DRDY_MASK
     i2c_write(IMU_ADDR, CTRL4_C, &ctrl4, 1);
 
+<<<<<<< Updated upstream
     uint8_t int1_config = INT1_GYRO_EN | INT1_ACCEL_EN;
     i2c_write(IMU_ADDR, INT1_CFG, &int1_config, 1);
+=======
+    // interrupts
+//   uint8_t int1_config = INT1_GYRO_EN | INT1_ACCEL_EN;
+//   i2c_write(IMU_ADDR, INT1_CFG, &int1_config, 1);
+>>>>>>> Stashed changes
 
     // uint8_t int2_config = INT2_GYRO_EN | INT2_ACCEL_EN;
     // i2c_write(IMU_ADDR, INT2_CFG, &int2_config, 1);
@@ -137,7 +143,7 @@ bool imu_init(LSM6DS3_t* imu) {
     uint8_t gyro_config = GYRO_ODR_416HZ | GYRO_FS_2000DPS;
     i2c_write(IMU_ADDR, GYRO_CFG, &gyro_config, 1);
 
-    while (!imu_ready) { }  
+//    while (!imu_ready) { }  
 
     return true;
 }

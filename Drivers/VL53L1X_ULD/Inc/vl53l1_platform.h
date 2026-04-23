@@ -96,6 +96,9 @@ int8_t VL53L1_WaitMs(
 		uint16_t dev,
 		int32_t       wait_ms);
 
+// // helper function
+// static inline void pack_index(uint8_t *buf, uint16_t index)
+
 #ifdef __cplusplus
 }
 #endif

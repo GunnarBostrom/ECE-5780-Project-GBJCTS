@@ -57,7 +57,12 @@ int main(void)
   imu_init(&imu);
   imu_interrupt_init();        // then arm the EXTI
   
-  lidar_init(&vl53l1x, 0x52); // i2c addr: 0x52
+  lidar_init(&lidar);
+
+  while(1) { 
+    lidar_read(&lidar);
+    //imu_read(&imu); 
+  }
   
 
   // UART peripheral initialization
@@ -67,8 +72,8 @@ int main(void)
   radio_init();
 
 
-  // PWM peripheral initialization
-  motor_init();
+  // // PWM peripheral initialization
+  // motor_init();
 
     const float dt = 1.0f / 416.0f;
 
@@ -114,16 +119,16 @@ static void LED_init(void)
   
   
 
-  /*
-   CONTROL LOOP STRUCTURE
-      - read sensors
-      - compute error
-      - run PID
-      - mix motors
-      - update PWM
-  */
-  while(1) {
-    // need to think about precedence and data frequency
+  // /*
+  //  CONTROL LOOP STRUCTURE
+  //     - read sensors
+  //     - compute error
+  //     - run PID
+  //     - mix motors
+  //     - update PWM
+  // */
+  // while(1) {
+  //   // need to think about precedence and data frequency
 
     
     if (imu_ready) {
@@ -131,17 +136,17 @@ static void LED_init(void)
       //imu_read(&lsm6ds3); // highest priority - interrupt with flag
       imu_read(&imu);
       
-      HAL_Delay(1000);
-      GPIOC->ODR ^= GPIO_PIN_6; // red toggle on IMU read
+  //     HAL_Delay(1000);
+  //     GPIOC->ODR ^= GPIO_PIN_6; // red toggle on IMU read
       
-    }
+  //   }
     
-    // update motors as soon as IMU data ready
+  //   // update motors as soon as IMU data ready
 
-    radio_read();       // medium priority - interrupt with flag
+  //   radio_read();       // medium priority - interrupt with flag
 
-    control_from_radio();
-    lidar_read(&vl53l1x);
+  //   control_from_radio();
+  //   lidar_read(&lidar);
 
     if (HAL_GetTick() - last_print >= 500) {  // print at ~10 Hz
       last_print = HAL_GetTick();
@@ -170,7 +175,7 @@ static void LED_init(void)
     // }
 
 
-  }
+//   }
 }
 
 
