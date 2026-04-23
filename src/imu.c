@@ -12,14 +12,12 @@ Data provided:
 */
 
 #include "config.h"
-#include "imu.h"
 #include "i2c.h"
+#include "imu.h"
 
-// copied in just for debugging with LEDs
 #include "stm32f072xb.h"
 #include "stm32f0xx_hal.h"
 #include "stm32f0xx_hal_gpio.h"
-#include "stm32f0xx_it.h"
 #include <stdint.h>
 #include <stdio.h>
 #include <sys/_intsup.h>
@@ -30,56 +28,40 @@ Data provided:
 #define WHO_AM_I_REG    0x0F  // 
 #define IMU_ID          0x69  // I2C device id, the value in WHO_AM_I_REG
 
+#define ACCEL_REG       0x28
+#define GYRO_REG        0x22
+#define TEMP_REG        0x20
 
-/* ––––– output registers ––––– */
-#define ACCEL_REG       0x28  // OUTX_L_XL - lowest accel output register
-#define GYRO_REG        0x22  // OUTX_L_G - lowest gyro output register
-#define TEMP_REG        0x20  // OUT_TEMP_L - lowest temp output register
+#define ACCEL_CFG       0x10
+#define GYRO_CFG        0x11
+#define INT1_CFG        0x0D
+#define INT2_CFG        0x0E
 
-
-/* ––––– configuration registers ––––– */
-#define ACCEL_CFG       0x10  // CTRL1_XL - accelerometer control register
-#define GYRO_CFG        0x11  // CTRL2_G - gyroscope control register
-#define INT1_CFG        0x0D  // INT1_CTRL - interrupt1 control register
-#define INT2_CFG        0x0E  // INT2_CTRL - interrupt2 control register
-
-#define CTRL3_C         0x12  // these are for interrupts
+#define CTRL3_C         0x12
 #define CTRL4_C         0x13
 
-
-/* ––––– accelerometer config values ––––– */
-// 12.5 Hz to 6.66 kHz ODR available, default is Power-down
 #define ACCEL_ODR_104HZ  (0b0100 << 4)
 #define ACCEL_ODR_208HZ  (0b0101 << 4)
 #define ACCEL_ODR_416HZ  (0b0110 << 4)
 
-// ±2 g to ±16 g full-scale available, default is ±2 g
 #define ACCEL_FS_2G      (0b00 << 2)
 #define ACCEL_FS_4G      (0b10 << 2)
 #define ACCEL_FS_8G      (0b11 << 2)
 #define ACCEL_FS_16G     (0b01 << 2)
 
-// 50 Hz to 400 Hz anti-aliasing available, default is 400 Hz
 #define ACCEL_BW_200HZ   (0b01 << 0)
 #define ACCEL_BW_400HZ   (0b00 << 0)
 
-
-/* ––––– gyroscope config values ––––– */
-// 12.5 Hz to 1.66 kHz ODR available, default is Power-down
 #define GYRO_ODR_104HZ   (0b0100 << 4)
 #define GYRO_ODR_208HZ   (0b0101 << 4)
 #define GYRO_ODR_416HZ   (0b0110 << 4)
 
-// 125 dps to 2000 dps full-scale available, default is 250 dps
-#define GYRO_FS_500DPS   (0b10 << 2)  
+#define GYRO_FS_500DPS   (0b10 << 2)
 #define GYRO_FS_2000DPS  (0b11 << 2)
-#define GYRO_FS_125DPS   (0b1  << 1) // 125 dps enabled overrides other modes
+#define GYRO_FS_125DPS   (0b1  << 1)
 
-
-/* ––––– interrupt config values ––––– */
-// data ready registers disabled by default
-#define INT1_GYRO_EN     (0b1 << 1)  // INT1_DRDY_G
-#define INT1_ACCEL_EN    (0b1 << 0)  // INT1_DRDY_XL
+#define INT1_GYRO_EN     (0b1 << 1)
+#define INT1_ACCEL_EN    (0b1 << 0)
 
 #define INT2_TEMP_EN     (0b1 << 2)  // INT2_DRDY_TEMP
 #define INT2_GYRO_EN     (0b1 << 1)  // INT2_DRDY_G
@@ -142,7 +124,6 @@ bool imu_init(LSM6DS3_t* imu) {
     uint8_t ctrl4 = 0x08;  // DRDY_MASK
     i2c_write(IMU_ADDR, CTRL4_C, &ctrl4, 1);
 
-    // interrupts
     uint8_t int1_config = INT1_GYRO_EN | INT1_ACCEL_EN;
     i2c_write(IMU_ADDR, INT1_CFG, &int1_config, 1);
 
@@ -206,13 +187,10 @@ void imu_read_gyro(LSM6DS3_t* imu) {
     imu_convert_units(imu);
 }
 
-/**
- * Reads IMU temperature data.
- *
- * This output is raw. The conversion to celsius is:
- *      celsius_temp = (raw_temp / 16) + 25  (± the offset error)
- */ 
-void imu_read_temp(LSM6DS3_t* imu) {
+// Reads IMU temperature data
+// This output is raw. The conversion to celsius is:
+// celsius_temp = (raw_temp / 16) + 25  (± the offset error)
+void imu_read_temp(IMU_t* imu) {
     uint8_t buf[2];
 
     i2c_read(IMU_ADDR, TEMP_REG, buf, 2);

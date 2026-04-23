@@ -15,16 +15,16 @@ add_subdirectory(Drivers) # run the CMakeLists inside Drivers
 
 # all of this project's source files and some system files
 set(PROJECT_SOURCES
+    src/main.c
     src/control.c
     src/filter.c
+    src/pid.c
     src/i2c.c
+    src/uart.c
     src/imu.c
     src/lidar.c
-    src/main.c
-    src/motor.c
-    src/pwm.c
     src/radio.c
-    src/uart.c
+    src/motor.c
     src/debugger.c
 
     src/stm32f0xx_it.c
