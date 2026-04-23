@@ -70,12 +70,12 @@ static uint16_t map_throttle_to_us(uint16_t raw)
 // which `control_update()` is called so the PID gains operate on the intended
 // sample interval.
 void control_init(float dt)
-{   //Tune one axis at a time, start with roll then pitch. Proportional->Derivative->Integral
+{   //Tune one axis at a time, start with roll then pitch. Proportional-> Derivative-> Integral
     // Roll PID controller
     PID_Init(&roll_pid,
-             3.0f,     // kp  proportional gain (main correction term)
-             0.0f,     // ki  integral gain (eliminates steady-state error)
-             0.00f,    // kd  derivative gain (damping / smoothing)
+             3.5f,     // kp  proportional gain (main correction term)
+             1.0f,     // ki  integral gain (eliminates steady-state error)
+             0.06f,    // kd  derivative gain (damping / smoothing)
              dt,
              -180.0f,  // output min (limits correction authority) not sure if these min/max values are applicable yet
              180.0f,   // output max
@@ -83,11 +83,11 @@ void control_init(float dt)
              50.0f,    // integrator max
              0.02f);   // derivative filter time constant
 
-    // Pitch PID controller (same tuning as roll for now)
+    // Pitch PID controller 
     PID_Init(&pitch_pid,
-             0.0f,
-             0.0f,
-             0.00f,
+             3.2f,
+             1.0f,
+             0.02f,
              dt,
              -180.0f,
              180.0f,
