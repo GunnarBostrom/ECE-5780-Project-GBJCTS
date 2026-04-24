@@ -92,7 +92,7 @@ void control_init(float dt)
 //   - Computes roll/pitch stabilization commands from the attitude estimate
 //   - Mixes the resulting commands into four motor outputs
 
-void control_update(const IMU_t* imu, const Attitude_t* attitude)
+void control_update(const LSM6DS3_t* imu, const Attitude_t* attitude)
 {
     uint16_t throttle_us;
     float roll_sp_deg;
@@ -133,7 +133,7 @@ void control_update(const IMU_t* imu, const Attitude_t* attitude)
         return;
     }
 
-    // Self-level mode (no user angle input yet)
+    // Self-level mode (no user angle input)
     // Forces quad to stay level (0 deg roll/pitch)
     roll_sp_deg = 0.0f;
     pitch_sp_deg = 0.0f;
