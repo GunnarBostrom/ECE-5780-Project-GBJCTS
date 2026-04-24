@@ -1,4 +1,5 @@
 #include "control.h"
+#include "imu.h"
 #include "motor.h"
 #include "pid.h"
 #include "radio.h"
@@ -74,7 +75,7 @@ void control_init(float dt)
              0.02f);
 }
 
-void control_update(const IMU_t* imu, const Attitude_t* attitude)
+void control_update(const LSM6DS3_t* imu, const Attitude_t* attitude)
 {
     uint16_t throttle_us;
     float roll_sp_deg;

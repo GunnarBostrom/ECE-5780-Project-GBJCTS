@@ -2,12 +2,13 @@
 UART debugger to read out sensor values.
 
 Set up on USART1
-PA9 - STM32 TX
-PA10 - STM32 RX
+PA9 - STM32 TX -- gray -- Serial RX
+PA10 - STM32 RX -- purple -- Serial TX
 */
 
 #include "stm32f072xb.h"
 #include "stm32f0xx_hal.h"
+#include "config.h"
 #include "debugger.h"
 
 volatile char usart_read_register;

@@ -12,3 +12,6 @@
 #ifndef USE_MOTOR
     #define USE_MOTOR 1
 #endif
+#ifndef USE_DEBUGGER
+    #define USE_DEBUGGER 1
+#endif

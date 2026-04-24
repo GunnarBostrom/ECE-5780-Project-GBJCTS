@@ -26,7 +26,7 @@ Wiring:
 void i2c_init(uint16_t i2c_freq) {
     GPIO_clocks_enable();
     i2c_bus_reset();
-
+    
     //led_init();
 
     // // PB11 - I2C2_SDA
@@ -91,6 +91,8 @@ void i2c_read(uint8_t slave_addr, uint16_t reg_addr, uint8_t* buf, uint8_t len) 
 
     i2c_write_transaction(slave_addr, reg_addr, NULL, 0, 0);
     i2c_read_transaction(slave_addr, buf, len);
+    HAL_GPIO_TogglePin(GPIOC, GPIO_PIN_9); // led green
+    HAL_Delay(1000);
     
 }
 
@@ -324,7 +326,9 @@ void i2c_bus_reset(void) {
  * @param len       Number of bytes of data to write
  */
 void i2c_write_transaction(uint8_t slave_addr, uint16_t reg_addr, uint8_t* data, uint8_t len, uint8_t send_stop) {
-    // // total bytes sent includes register as well
+    
+    // below here is set up for i2c2, imu
+    // total bytes sent includes register as well
     // uint8_t total_bytes = (reg_addr > 0xFF) ? len + 2 : len + 1;
 
     // I2C2->CR2 &= ~(I2C_CR2_SADD | I2C_CR2_NBYTES | I2C_CR2_RD_WRN | I2C_CR2_START | I2C_CR2_AUTOEND);
@@ -346,6 +350,7 @@ void i2c_write_transaction(uint8_t slave_addr, uint16_t reg_addr, uint8_t* data,
     //     I2C2->CR2 |= I2C_CR2_STOP;   // stop
     //     return;
     // }
+    // HAL_GPIO_TogglePin(GPIOC, GPIO_PIN_6);
 
     // if (reg_addr > 0xFF) { // if 16-bit register
     //     // send high byte 
@@ -386,15 +391,14 @@ void i2c_write_transaction(uint8_t slave_addr, uint16_t reg_addr, uint8_t* data,
     //     while ( !(I2C2->ISR & I2C_ISR_STOPF) ) {}
     //     I2C2->ICR |= I2C_ICR_STOPCF;
     // }
-    // // if not sending stop, leave TC set — the peripheral holds the bus and i2c_read_transaction will issue the repeated START
+    // if not sending stop, leave TC set — the peripheral holds the bus and i2c_read_transaction will issue the repeated START
+    // above here is set up for i2c2, imu
 
-
-
-
+    // below here is set up for i2c1, imu
     // total bytes sent includes register as well
-    /* this is part of the lidar debug mentioned below */
-    uint8_t total_bytes = len + 2;
-    //uint8_t total_bytes = (reg_addr > 0xFF) ? len + 2 : len + 1;
+
+
+    uint8_t total_bytes = (reg_addr > 0xFF) ? len + 2 : len + 1;
 
     I2C1->CR2 &= ~(I2C_CR2_SADD | I2C_CR2_NBYTES | I2C_CR2_RD_WRN | I2C_CR2_START | I2C_CR2_AUTOEND);
 
@@ -411,6 +415,45 @@ void i2c_write_transaction(uint8_t slave_addr, uint16_t reg_addr, uint8_t* data,
         I2C1->CR2 |= I2C_CR2_STOP;   // stop
         return;
     }
+
+    if (reg_addr > 0xFF) { // if 16-bit register
+        // send high byte 
+        I2C1->TXDR = (reg_addr >> 8) & 0xFF;
+
+        while (!(I2C1->ISR & I2C_ISR_TXIS) && !(I2C1->ISR & I2C_ISR_NACKF)) {} // wait for ready to transmit or error
+        if (I2C1->ISR & I2C_ISR_NACKF) {
+            // NACKF: probably should throw an error
+            I2C1->ICR |= I2C_ICR_NACKCF; // clear flag
+            I2C1->CR2 |= I2C_CR2_STOP;   // stop
+            return;
+        }
+
+        // send low byte
+        I2C1->TXDR = reg_addr & 0xFF;
+    }
+    else {
+        I2C1->TXDR = reg_addr;
+    }
+    // above here is set up for i2c1, imu
+
+    // below here is set up for i2c1, lidar (for sure)
+    // uint8_t total_bytes = len + 2;
+
+    // I2C1->CR2 &= ~(I2C_CR2_SADD | I2C_CR2_NBYTES | I2C_CR2_RD_WRN | I2C_CR2_START | I2C_CR2_AUTOEND);
+
+    // I2C1->CR2 |= slave_addr << 1;   // SADD shifted for 7-bit address mode
+    // I2C1->CR2 |= total_bytes << 16; // NBYTES
+    
+    // I2C1->CR2 &= ~(I2C_CR2_RD_WRN); // request write transfer
+    // I2C1->CR2 |= I2C_CR2_START;   // 13
+
+    // while (!(I2C1->ISR & I2C_ISR_TXIS) && !(I2C1->ISR & I2C_ISR_NACKF)) {} // wait for ready to transmit or error
+    // if (I2C1->ISR & I2C_ISR_NACKF) {
+    //     // NACKF: probably should throw an error
+    //     I2C1->ICR |= I2C_ICR_NACKCF; // clear flag
+    //     I2C1->CR2 |= I2C_CR2_STOP;   // stop
+    //     return;
+    // }
 
     // if (reg_addr > 0xFF) { // if 16-bit register
     //     // send high byte 
@@ -430,34 +473,36 @@ void i2c_write_transaction(uint8_t slave_addr, uint16_t reg_addr, uint8_t* data,
     // else {
     //     I2C1->TXDR = reg_addr;
     // }
+// above here is set up for i2c1, lidar (for sure)
 
-/* debugging lidar which has 16 bit registers –– this will break IMU */
-    // always send 16-bit register address
-    I2C1->TXDR = (reg_addr >> 8) & 0xFF;  // high byte (0x00 for low registers)
-    // wait for TXIS...
-    I2C1->TXDR = reg_addr & 0xFF;          // low byte
+// below here is set up for i2c1, lidar (i think)
+// /* debugging lidar which has 16 bit registers –– this will break IMU */
+//     // always send 16-bit register address
+//     I2C1->TXDR = (reg_addr >> 8) & 0xFF;  // high byte (0x00 for low registers)
+//     // wait for TXIS...
+//     I2C1->TXDR = reg_addr & 0xFF;          // low byte
 
-    // write bytes to transmit
-    for (int i = 0; i < len; i++)
-    {
-        while (!(I2C1->ISR & I2C_ISR_TXIS) && !(I2C1->ISR & I2C_ISR_NACKF)) {} // wait for ready to transmit or error
-        if (I2C1->ISR & I2C_ISR_NACKF) {
-            // NACKF: probably should throw an error
-            I2C1->ICR |= I2C_ICR_NACKCF; // clear flag
-            I2C1->CR2 |= I2C_CR2_STOP;   // stop
-            return;
-        }
-        I2C1->TXDR = data[i];
-    }
+//     // write bytes to transmit
+//     for (int i = 0; i < len; i++)
+//     {
+//         while (!(I2C1->ISR & I2C_ISR_TXIS) && !(I2C1->ISR & I2C_ISR_NACKF)) {} // wait for ready to transmit or error
+//         if (I2C1->ISR & I2C_ISR_NACKF) {
+//             // NACKF: probably should throw an error
+//             I2C1->ICR |= I2C_ICR_NACKCF; // clear flag
+//             I2C1->CR2 |= I2C_CR2_STOP;   // stop
+//             return;
+//         }
+//         I2C1->TXDR = data[i];
+//     }
 
-    while( !(I2C1->ISR & I2C_ISR_TC) ) {}  // wait for transmit complete
+//     while( !(I2C1->ISR & I2C_ISR_TC) ) {}  // wait for transmit complete
 
-    if (send_stop) {
-        I2C1->CR2 |= I2C_CR2_STOP;
-        while ( !(I2C1->ISR & I2C_ISR_STOPF) ) {}
-        I2C1->ICR |= I2C_ICR_STOPCF;
-    }
-    // if not sending stop, leave TC set — the peripheral holds the bus and i2c_read_transaction will issue the repeated START
+//     if (send_stop) {
+//         I2C1->CR2 |= I2C_CR2_STOP;
+//         while ( !(I2C1->ISR & I2C_ISR_STOPF) ) {}
+//         I2C1->ICR |= I2C_ICR_STOPCF;
+//     }
+//     // if not sending stop, leave TC set — the peripheral holds the bus and i2c_read_transaction will issue the repeated START
 
 }
 
@@ -474,6 +519,8 @@ void i2c_write_transaction(uint8_t slave_addr, uint16_t reg_addr, uint8_t* data,
  * @param len   Number of bytes to save to buffer
  */
 void i2c_read_transaction(uint8_t slave_addr, uint8_t* buf, uint8_t len) {
+    
+    // below here is set up for i2c2
     // // don't need to account for address in total bytes read (address sent with write params)
 
     // I2C2->CR2 &= ~(I2C_CR2_SADD |
@@ -505,8 +552,9 @@ void i2c_read_transaction(uint8_t slave_addr, uint8_t* buf, uint8_t len) {
     // I2C2->CR2 |= I2C_CR2_STOP;                 // stop
     // while ( !(I2C2->ISR & I2C_ISR_STOPF) ) {}  // wait for stop condition
     // I2C2->ICR |= I2C_ICR_STOPCF;               // clear flag
+    // above here is set up for i2c2
 
-
+    // below here is set up for i2c1
     // don't need to account for address in total bytes read (address sent with write params)
 
     I2C1->CR2 &= ~(I2C_CR2_SADD |
@@ -521,7 +569,8 @@ void i2c_read_transaction(uint8_t slave_addr, uint8_t* buf, uint8_t len) {
 
     I2C1->CR2 |= I2C_CR2_RD_WRN; // request read transfer
     I2C1->CR2 |= I2C_CR2_START;
-
+        
+    
     for (int i = 0; i < len; i++) {
         while ( !(I2C1->ISR & I2C_ISR_RXNE) && !(I2C1->ISR & I2C_ISR_NACKF) ) {} // wait for ready to read or error
 
@@ -538,4 +587,5 @@ void i2c_read_transaction(uint8_t slave_addr, uint8_t* buf, uint8_t len) {
     I2C1->CR2 |= I2C_CR2_STOP;                 // stop
     while ( !(I2C1->ISR & I2C_ISR_STOPF) ) {}  // wait for stop condition
     I2C1->ICR |= I2C_ICR_STOPCF;               // clear flag
+    // above here is set up for i2c1
 }

@@ -6,6 +6,6 @@
 
 //void control_from_radio(void);
 void control_init(float dt);
-void control_update(const IMU_t* imu, const Attitude_t* attitude);
+void control_update(const LSM6DS3_t* imu, const Attitude_t* attitude);
 
 #endif

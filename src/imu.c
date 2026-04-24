@@ -1,247 +1,533 @@
 /**
-IMU driver
+I2C protocol
+STM32F072 Discovery Board
 
-STM LSM6DS3
-LSM6DS3 can operate at 100 kHz or 400 kHz.
-
-Data provided:
-    - 3 axis acceleration
-    - 3 axis angular rate
-    - temperature
+Wiring:
+    STM PB13 (I2C2_SCL) → IMU SCL
+    STM PB13 (I2C2_SCL) → LiDAR SCL
+    STM PB11 (I2C2_SDA) → IMU SDA
+    STM PB11 (I2C2_SDA) → LiDAR SDA
 
 */
 
-#include "config.h"
 #include "i2c.h"
-#include "imu.h"
+//#include "stm32f0xx_hal.h"
 
 #include "stm32f072xb.h"
 #include "stm32f0xx_hal.h"
 #include "stm32f0xx_hal_gpio.h"
+#include "stm32f0xx_it.h"
 #include <stdint.h>
 #include <stdio.h>
 #include <sys/_intsup.h>
 #include <sys/types.h>
 
-#define IMU_ADDR        0x6B  // default I2C slave address
-//#define IMU_ADDR      0x6A  // another I2C slave address option
-#define WHO_AM_I_REG    0x0F  // 
-#define IMU_ID          0x69  // I2C device id, the value in WHO_AM_I_REG
 
-#define ACCEL_REG       0x28
-#define GYRO_REG        0x22
-#define TEMP_REG        0x20
+void i2c_init(uint16_t i2c_freq) {
+    GPIO_clocks_enable();
+    i2c_bus_reset();
 
-#define ACCEL_CFG       0x10
-#define GYRO_CFG        0x11
-#define INT1_CFG        0x0D
-#define INT2_CFG        0x0E
+    //led_init();
 
-#define CTRL3_C         0x12
-#define CTRL4_C         0x13
+    // // PB11 - I2C2_SDA
+    // GPIOB->MODER &= ~(0b11 << 22);    // clear alt function mode
+    // GPIOB->MODER |= (0b10 << 22);     // set alt function mode
+    // GPIOB->OTYPER &= ~(0b1 << 11);    // clear output type
+    // GPIOB->OTYPER |= (0b1 << 11);     // set output type to open-drain
+    // GPIOB->AFR[1] &= ~(0b1111 << 12); // clear alt function type
+    // GPIOB->AFR[1] |= (0b0001 << 12);  // set alt function type to i2c2_sda (AF1)
+ 
+    // // PB13 - I2C2_SCL
+    // GPIOB->MODER &= ~(0b11 << 26);
+    // GPIOB->MODER |= (0b10 << 26); // alt function mode
+    // GPIOB->OTYPER &= ~(0b1 << 13);
+    // GPIOB->OTYPER |= (0b1 << 13); // set output type to open-drain
+    // GPIOB->AFR[1] &= ~(0b1111 << 20);
+    // GPIOB->AFR[1] |= (0b0101 << 20); // set alt function type to i2c2_scl (AF5)
 
-#define ACCEL_ODR_104HZ  (0b0100 << 4)
-#define ACCEL_ODR_208HZ  (0b0101 << 4)
-#define ACCEL_ODR_416HZ  (0b0110 << 4)
+    // PB6 - I2C1_SCL
+    GPIOB->MODER &= ~(0b11 << 12);    // clear alt function mode
+    GPIOB->MODER |= (0b10 << 12);     // set alt function mode
+    GPIOB->OTYPER &= ~(0b1 << 6);     // clear output type
+    GPIOB->OTYPER |= (0b1 << 6);      // set output type to open-drain
+    GPIOB->AFR[0] &= ~(0b1111 << 24); // clear alt function type
+    GPIOB->AFR[0] |= (0b0001 << 24);  // set alt function type to i2c1_scl (AF1)
+ 
+    // PB7 - I2C1_SDA
+    GPIOB->MODER &= ~(0b11 << 14);
+    GPIOB->MODER |= (0b10 << 14);     // alt function mode
+    GPIOB->OTYPER &= ~(0b1 << 7);
+    GPIOB->OTYPER |= (0b1 << 7);      // set output type to open-drain
+    GPIOB->AFR[0] &= ~(0b1111 << 28);
+    GPIOB->AFR[0] |= (0b0001 << 28);  // set alt function type to i2c1_sda (AF1)
 
-#define ACCEL_FS_2G      (0b00 << 2)
-#define ACCEL_FS_4G      (0b10 << 2)
-#define ACCEL_FS_8G      (0b11 << 2)
-#define ACCEL_FS_16G     (0b01 << 2)
-
-#define ACCEL_BW_200HZ   (0b01 << 0)
-#define ACCEL_BW_400HZ   (0b00 << 0)
-
-#define GYRO_ODR_104HZ   (0b0100 << 4)
-#define GYRO_ODR_208HZ   (0b0101 << 4)
-#define GYRO_ODR_416HZ   (0b0110 << 4)
-
-#define GYRO_FS_500DPS   (0b10 << 2)
-#define GYRO_FS_2000DPS  (0b11 << 2)
-#define GYRO_FS_125DPS   (0b1  << 1)
-
-#define INT1_GYRO_EN     (0b1 << 1)
-#define INT1_ACCEL_EN    (0b1 << 0)
-
-#define INT2_TEMP_EN     (0b1 << 2)  // INT2_DRDY_TEMP
-#define INT2_GYRO_EN     (0b1 << 1)  // INT2_DRDY_G
-#define INT2_ACCEL_EN    (0b1 << 0)  // INT2_DRDY_XL
-
-
-/* ––––– scaling to account for lack of FPU on STM32F0 board ––––– */
-// accelerometer full-scale conversion mg/LSB --> ±32767 or 32768?
-#define A_FS_2      0.061 // 2 g  =  2000 mg
-#define A_FS_4      0.122
-#define A_FS_8      0.244
-#define A_FS_16     0.488
-
-// gyroscope full-scale conversion mdps/LSB --> ±28571
-#define G_FS_125    4.375 // 125 dps  =  125000 mdps
-#define G_FS_250    8.75
-#define G_FS_500    17.5
-#define G_FS_1000   35
-#define G_FS_2000   70
-
-
-static void imu_convert_units(LSM6DS3_t* imu);
-
-volatile uint8_t imu_ready = 0;
-
-
-#if USE_IMU // use REAL hardware
+    i2c_set_TIMINGR(i2c_freq);
+    i2c_enable();
+}
 
 /**
- * @brief LSM6DS3 configuration and initialization.
+ * @brief Writes data to a peripheral register
  * 
- * Hard-coded configs:
- *      - accelerometer: 416Hz data rate, ±8g full-scale, 400Hz anti-aliasing
- *      - gyroscope:     416Hz data rate, 2000 dps
- * 
- * @param imu       Pointer to IMU struct
- * @return          true if peripheral successfully initialized, false otherwise
+ * @param slave_addr  I2C slave address of peripheral
+ * @param reg_addr    Target peripheral register address
+ * @param data        Pointer to data buffer to write to target register
+ * @param len         Number of bytes to write
  */
-bool imu_init(LSM6DS3_t* imu) {
-    // verify device
-    uint8_t device_id;
-    i2c_read(IMU_ADDR, WHO_AM_I_REG, &device_id, 1);
+void i2c_write(uint8_t slave_addr, uint16_t reg_addr, uint8_t* data, uint8_t len) {
     
-    if (device_id != IMU_ID) {
-        // wrong device: throw an error
-        while (1) {
-            HAL_GPIO_TogglePin(GPIOC, GPIO_PIN_7);
-            HAL_GPIO_TogglePin(GPIOC, GPIO_PIN_8);
-            HAL_Delay(200);
-        }
+    i2c_write_transaction(slave_addr, reg_addr, data, len, 1);
 
-        return false;
+}
+
+/**
+ * @brief Reads data from a peripheral
+ * 
+ * @param slave_addr  I2C slave address of peripheral
+ * @param reg_addr    Target peripheral register address
+ * @param buf         Pointer to data buffer to write from target register
+ * @param len         Number of bytes to write
+ */
+void i2c_read(uint8_t slave_addr, uint16_t reg_addr, uint8_t* buf, uint8_t len) {
+
+    i2c_write_transaction(slave_addr, reg_addr, NULL, 0, 0);
+    i2c_read_transaction(slave_addr, buf, len);
+    
+}
+
+void GPIO_clocks_enable() {
+    
+    RCC->AHBENR |= (1 << 18); // GPIOB
+
+    // for PB11 and PB13 with I2C2
+    // RCC->APB1RSTR |= (1 << 22); // reset I2C2
+    // RCC->APB1RSTR &= ~(1 << 22); // release reset
+    
+    // RCC->APB1ENR |= (1 << 22); // enable I2C2
+
+
+    // for PB6 and PB7 with I2C1
+    RCC->APB1RSTR |= (1 << 21); // reset I2C1
+    RCC->APB1RSTR &= ~(1 << 21); // release reset
+    
+    RCC->APB1ENR |= (1 << 21); // enable I2C1
+}
+
+/**
+ * This is temporary and is just to use LEDs as signals for debugging
+ */
+void led_init() {
+  // set PC6, PC7, PC8, PC9 to output mode
+  GPIOC->MODER &= ~(0b11 << 12); // clear PC6 red
+  GPIOC->MODER |=  (0b01 << 12); // set PC6 output
+
+  GPIOC->MODER &= ~(0b11 << 14); // clear PC7 blue
+  GPIOC->MODER |=  (0b01 << 14); // set PC7 output
+
+  GPIOC->MODER &= ~(0b11 << 16); // clear PC8 orange
+  GPIOC->MODER |=  (0b01 << 16); // set PC8 output
+
+  GPIOC->MODER &= ~(0b11 << 18); // clear PC9 green
+  GPIOC->MODER |=  (0b01 << 18); // set PC9 output
+}
+
+/**
+ * @brief Sets I2C frequency.
+ * 
+ * This function is to blame for this I2C driver only
+ * supporting Standard-mode and Fast-mode.
+ * If an invalid frequency is provided, 100 kHz (Standard-mode) will
+ * be selected.
+ * 
+ * @param i2c_freq  I2C frequency in kHz
+*/
+void i2c_set_TIMINGR(uint16_t i2c_freq) {
+  
+//   switch(i2c_freq) { // 8MHz
+//     case 100: // Standard-mode - 100 kHz
+//         I2C2->TIMINGR =
+//             (0x1  << 28) |   // PRESC
+//             (0x4  << 20) |   // SCLDEL
+//             (0x2  << 16) |   // SDADEL
+//             (0x0F <<  8) |   // SCLH
+//             (0x13 <<  0);    // SCLL
+//             break;
+//     case 400: // Fast-mode - 400 kHz  !! doesn't work at 8MHz !!
+//         I2C2->TIMINGR =
+//             (0x0 << 28) |   // PRESC
+//             (0x3 << 20) |   // SCLDEL
+//             (0x1 << 16) |   // SDADEL
+//             (0x3 <<  8) |   // SCLH
+//             (0x9 <<  0);    // SCLL
+//             break;
+//     default: // Standard-mode - 100 kHz
+//         I2C2->TIMINGR =
+//             (0x1  << 28) |   // PRESC
+//             (0x4  << 20) |   // SCLDEL
+//             (0x2  << 16) |   // SDADEL
+//             (0x0F <<  8) |   // SCLH
+//             (0x13 <<  0);    // SCLL
+//             break;
+//   }
+
+    // switch(i2c_freq) { // 48MHz, I2C2
+
+    //     case 100: // 100 kHz at 48MHz
+    //         I2C2->TIMINGR =
+    //             (0xB << 28) |  // PRESC
+    //             (0x4 << 20) |  // SCLDEL
+    //             (0x2 << 16) |  // SDADEL
+    //             (0xF <<  8) |  // SCLH
+    //             (0x13 << 0);   // SCLL
+    //         break;
+    //     case 400: // 400 kHz at 48MHz
+    //         I2C2->TIMINGR =
+    //             (0x5 << 28) |  // PRESC
+    //             (0x3 << 20) |  // SCLDEL
+    //             (0x1 << 16) |  // SDADEL
+    //             (0x3 <<  8) |  // SCLH
+    //             (0x9 <<  0);   // SCLL
+    //         break;
+    //     default: // Standard-mode - 100 kHz at 48MHz
+    //         I2C2->TIMINGR =
+    //             (0xB << 28) |  // PRESC
+    //             (0x4 << 20) |  // SCLDEL
+    //             (0x2 << 16) |  // SDADEL
+    //             (0xF <<  8) |  // SCLH
+    //             (0x13 << 0);   // SCLL
+    //         break;
+    // }
+
+        switch(i2c_freq) { // 48MHz, I2C1
+
+        case 100: // 100 kHz at 48MHz
+            I2C1->TIMINGR =
+                (0xB << 28) |  // PRESC
+                (0x4 << 20) |  // SCLDEL
+                (0x2 << 16) |  // SDADEL
+                (0xF <<  8) |  // SCLH
+                (0x13 << 0);   // SCLL
+            break;
+        case 400: // 400 kHz at 48MHz
+            I2C1->TIMINGR =
+                (0x5 << 28) |  // PRESC
+                (0x3 << 20) |  // SCLDEL
+                (0x1 << 16) |  // SDADEL
+                (0x3 <<  8) |  // SCLH
+                (0x9 <<  0);   // SCLL
+            break;
+        default: // Standard-mode - 100 kHz at 48MHz
+            I2C1->TIMINGR =
+                (0xB << 28) |  // PRESC
+                (0x4 << 20) |  // SCLDEL
+                (0x2 << 16) |  // SDADEL
+                (0xF <<  8) |  // SCLH
+                (0x13 << 0);   // SCLL
+            break;
+    }
+}
+
+/**
+ * @brief I2C already configured, now enable.
+ */
+void i2c_enable() {
+    // // disable first
+    // I2C2->CR1 &= ~I2C_CR1_PE;
+
+    // // small delay (optional but safe)
+    // for (volatile int i = 0; i < 1000; i++);
+
+    // // reenable
+    // I2C2->CR1 |= I2C_CR1_PE;
+
+
+    // disable first
+    I2C1->CR1 &= ~I2C_CR1_PE;
+
+    // small delay (optional but safe)
+    for (volatile int i = 0; i < 1000; i++);
+
+    // reenable
+    I2C1->CR1 |= I2C_CR1_PE;
+}
+
+// reset whichever pins PB11 and PB13 or PB6 and PB7
+void i2c_bus_reset(void) {
+    // // temporarily take pins as GPIO outputs to bit-bang a reset
+    // GPIOB->MODER &= ~((0b11 << 22) | (0b11 << 26)); // clear PB11 and PB13
+    // GPIOB->MODER |=  ((0b01 << 22) | (0b01 << 26)); // set as outputs
+
+    // // clock 9 times on SCL with SDA high to unstick any slave
+    // for (int i = 0; i < 9; i++) {
+    //     GPIOB->BSRR = (1 << 11);  // SDA high
+    //     GPIOB->BSRR = (1 << 13);  // SCL high
+    //     //for (volatile int d = 0; d < 100; d++); // // for 8MHz clock, 100kHz I2C
+    //     for (volatile int d = 0; d < 600; d++); // for 48MHz clock, 400kHz I2C
+    //     GPIOB->BSRR = (1 << (13 + 16)); // SCL low
+    //     //for (volatile int d = 0; d < 100; d++); // for 8MHz clock, 100kHz I2C
+    //     for (volatile int d = 0; d < 600; d++); // for 48MHz clock, 400kHz I2C
+    // }
+
+    // // send STOP condition: SCL high, SDA low → high
+    // GPIOB->BSRR = (1 << (11 + 16));         // SDA low
+    // GPIOB->BSRR = (1 << 13);                // SCL high
+    // //for (volatile int d = 0; d < 100; d++);
+    // for (volatile int d = 0; d < 600; d++);
+    // GPIOB->BSRR = (1 << 11);                // SDA high
+
+    // // pins back to alt function mode
+    // GPIOB->MODER &= ~((0b11 << 22) | (0b11 << 26));
+    // GPIOB->MODER |=  ((0b10 << 22) | (0b10 << 26));
+
+
+    // temporarily take pins as GPIO outputs to bit-bang a reset
+    GPIOB->MODER &= ~((0b11 << 12) | (0b11 << 14)); // clear PB6 and PB7
+    GPIOB->MODER |=  ((0b01 << 12) | (0b01 << 14)); // set as outputs
+
+    // clock 9 times on SCL with SDA high to unstick any slave
+    for (int i = 0; i < 9; i++) {
+        GPIOB->BSRR = (1 << 7);  // sda high
+        GPIOB->BSRR = (1 << 6);  // scl high
+        //for (volatile int d = 0; d < 100; d++); // for 8MHz clock, 100kHz I2C
+        for (volatile int d = 0; d < 600; d++); // for 48MHz clock, 400kHz I2C
+        GPIOB->BSRR = (1 << (6 + 16)); // SCL low
+        //for (volatile int d = 0; d < 100; d++); // for 8MHz clock, 100kHz I2C
+        for (volatile int d = 0; d < 600; d++); // for 48MHz clock, 400kHz I2C
     }
 
-    // freeze registers for read on block data update
-    uint8_t ctrl3 = 0x44;  // BDU
-    i2c_write(IMU_ADDR, CTRL3_C, &ctrl3, 1);
+    // send STOP condition: SCL high, SDA low → high
+    GPIOB->BSRR = (1 << (7 + 16));         // SDA low
+    GPIOB->BSRR = (1 << 6);                // SCL high
+    //for (volatile int d = 0; d < 100; d++); // for 8MHz clock, 100kHz I2C
+    for (volatile int d = 0; d < 600; d++); // for 48MHz clock, 400kHz I2C
+    GPIOB->BSRR = (1 << 7);                // SDA high
 
-    // prevent interrupt fire at startup with data ready mask
-    uint8_t ctrl4 = 0x08;  // DRDY_MASK
-    i2c_write(IMU_ADDR, CTRL4_C, &ctrl4, 1);
-
-<<<<<<< Updated upstream
-    uint8_t int1_config = INT1_GYRO_EN | INT1_ACCEL_EN;
-    i2c_write(IMU_ADDR, INT1_CFG, &int1_config, 1);
-=======
-    // interrupts
-//   uint8_t int1_config = INT1_GYRO_EN | INT1_ACCEL_EN;
-//   i2c_write(IMU_ADDR, INT1_CFG, &int1_config, 1);
->>>>>>> Stashed changes
-
-    // uint8_t int2_config = INT2_GYRO_EN | INT2_ACCEL_EN;
-    // i2c_write(IMU_ADDR, INT2_CFG, &int2_config, 1);
-
-    // configure
-    uint8_t accel_config = ACCEL_ODR_416HZ | ACCEL_FS_8G | ACCEL_BW_400HZ;
-    i2c_write(IMU_ADDR, ACCEL_CFG, &accel_config, 1);
-
-    uint8_t gyro_config = GYRO_ODR_416HZ | GYRO_FS_2000DPS;
-    i2c_write(IMU_ADDR, GYRO_CFG, &gyro_config, 1);
-
-//    while (!imu_ready) { }  
-
-    return true;
+    // pins back to alt function mode
+    GPIOB->MODER &= ~((0b11 << 12) | (0b11 << 14));
+    GPIOB->MODER |=  ((0b10 << 12) | (0b10 << 14));
 }
 
 /**
- * @brief Reads all inertial data (this does not include temperature).
+ * @brief Writes data to slave.
  * 
- * This IMU has an auto-increment feature, allowing the access all in one
- * shot of the data in a register as well as the n bytes desired after it.
- * Hence the gyro data is accessed first because it is the lowest register.
+ * @brief Preps master for writing to slave.
+//  * 
+//  * Returns 0 if slave does not ACK.
+//  * 
+//  * This and the i2c_set_read_params function are to 
+//  * blame for this I2C driver only supporting 7-bit 
+//  * address mode. Fix the SADD shift if you actually 
+//  * care that much.
+
+ * 
+ * @param reg_addr  Peripheral register to be written to
+ * @param data      Pointer to data to write to register
+ * @param len       Number of bytes of data to write
  */
-void imu_read(LSM6DS3_t* imu) {
-    uint8_t buf[12];
+void i2c_write_transaction(uint8_t slave_addr, uint16_t reg_addr, uint8_t* data, uint8_t len, uint8_t send_stop) {
+    // // total bytes sent includes register as well
+    // uint8_t total_bytes = (reg_addr > 0xFF) ? len + 2 : len + 1;
 
-    i2c_read(IMU_ADDR, GYRO_REG, buf, 12);
-    imu->gx = (int16_t)(buf[0]  | buf[1]  << 8);
-    imu->gy = (int16_t)(buf[2]  | buf[3]  << 8);
-    imu->gz = (int16_t)(buf[4]  | buf[5]  << 8);
-    imu->ax = (int16_t)(buf[6]  | buf[7]  << 8);
-    imu->ay = (int16_t)(buf[8]  | buf[9]  << 8);
-    imu->az = (int16_t)(buf[10] | buf[11] << 8);
+    // I2C2->CR2 &= ~(I2C_CR2_SADD | I2C_CR2_NBYTES | I2C_CR2_RD_WRN | I2C_CR2_START | I2C_CR2_AUTOEND);
 
-    imu_convert_units(imu);
-}
+    // I2C2->CR2 |= slave_addr << 1;   // SADD shifted for 7-bit address mode
+    // I2C2->CR2 |= total_bytes << 16; // NBYTES
+    
 
-// Reads IMU acceleration data
-void imu_read_accel(LSM6DS3_t* imu) {
-    uint8_t buf[6]; // 6 bytes: X, Y, Z (2 bytes each)
+    // I2C2->CR2 &= ~(I2C_CR2_RD_WRN); // request write transfer
 
-    i2c_read(IMU_ADDR, ACCEL_REG, buf, 6);
-    imu->ax = (int16_t)(buf[0] | buf[1] << 8);
-    imu->ay = (int16_t)(buf[2] | buf[3] << 8);
-    imu->az = (int16_t)(buf[4] | buf[5] << 8);
+    // // I2C2->CR2 |= I2C_CR2_AUTOEND; // can't use when doing write then read together (repeated START in between)
+    // I2C2->CR2 |= I2C_CR2_START;   // 13
 
-    imu_convert_units(imu);
-}
 
-// Reads IMU gyroscope data
-void imu_read_gyro(LSM6DS3_t* imu) {
-    uint8_t buf[6]; // 6 bytes: X, Y, Z (2 bytes each)
+    // while (!(I2C2->ISR & I2C_ISR_TXIS) && !(I2C2->ISR & I2C_ISR_NACKF)) {} // wait for ready to transmit or error
+    // if (I2C2->ISR & I2C_ISR_NACKF) {
+    //     // NACKF: probably should throw an error
+    //     I2C2->ICR |= I2C_ICR_NACKCF; // clear flag
+    //     I2C2->CR2 |= I2C_CR2_STOP;   // stop
+    //     return;
+    // }
 
-    i2c_read(IMU_ADDR, GYRO_REG, buf, 6);
-    imu->gx = (int16_t)(buf[0] | buf[1] << 8);
-    imu->gy = (int16_t)(buf[2] | buf[3] << 8);
-    imu->gz = (int16_t)(buf[4] | buf[5] << 8);
+    // if (reg_addr > 0xFF) { // if 16-bit register
+    //     // send high byte 
+    //     I2C2->TXDR = (reg_addr >> 8) & 0xFF;
 
-    imu_convert_units(imu);
-}
+    //     while (!(I2C2->ISR & I2C_ISR_TXIS) && !(I2C2->ISR & I2C_ISR_NACKF)) {} // wait for ready to transmit or error
+    //     if (I2C2->ISR & I2C_ISR_NACKF) {
+    //         // NACKF: probably should throw an error
+    //         I2C2->ICR |= I2C_ICR_NACKCF; // clear flag
+    //         I2C2->CR2 |= I2C_CR2_STOP;   // stop
+    //         return;
+    //     }
 
-// Reads IMU temperature data
-// This output is raw. The conversion to celsius is:
-// celsius_temp = (raw_temp / 16) + 25  (± the offset error)
-void imu_read_temp(IMU_t* imu) {
-    uint8_t buf[2];
+    //     // send low byte
+    //     I2C2->TXDR = reg_addr & 0xFF;
+    // }
+    // else {
+    //     I2C2->TXDR = reg_addr;
+    // }
 
-    i2c_read(IMU_ADDR, TEMP_REG, buf, 2);
-    imu->temp = (int16_t)(buf[0] | buf[1]  << 8);
+    // // write bytes to transmit
+    // for (int i = 0; i < len; i++)
+    // {
+    //     while (!(I2C2->ISR & I2C_ISR_TXIS) && !(I2C2->ISR & I2C_ISR_NACKF)) {} // wait for ready to transmit or error
+    //     if (I2C2->ISR & I2C_ISR_NACKF) {
+    //         // NACKF: probably should throw an error
+    //         I2C2->ICR |= I2C_ICR_NACKCF; // clear flag
+    //         I2C2->CR2 |= I2C_CR2_STOP;   // stop
+    //         return;
+    //     }
+    //     I2C2->TXDR = data[i];
+    // }
 
-    imu_convert_units(imu);
-}
+    // while( !(I2C2->ISR & I2C_ISR_TC) ) {}  // wait for transmit complete
 
-// Reads all IMU data (including temperature)
-void imu_read_all(LSM6DS3_t* imu) {
-    uint8_t buf[14];
+    // if (send_stop) {
+    //     I2C2->CR2 |= I2C_CR2_STOP;
+    //     while ( !(I2C2->ISR & I2C_ISR_STOPF) ) {}
+    //     I2C2->ICR |= I2C_ICR_STOPCF;
+    // }
+    // // if not sending stop, leave TC set — the peripheral holds the bus and i2c_read_transaction will issue the repeated START
 
-    i2c_read(IMU_ADDR, TEMP_REG, buf, 14);
-    imu->temp = (int16_t)(buf[0]  | buf[1]  << 8);
-    imu->gx   = (int16_t)(buf[2]  | buf[3]  << 8);
-    imu->gy   = (int16_t)(buf[4]  | buf[5]  << 8);
-    imu->gz   = (int16_t)(buf[6]  | buf[7]  << 8);
-    imu->ax   = (int16_t)(buf[8]  | buf[9]  << 8);
-    imu->ay   = (int16_t)(buf[10] | buf[11] << 8);
-    imu->az   = (int16_t)(buf[12] | buf[13] << 8);
 
-    imu_convert_units(imu);
+
+
+    // total bytes sent includes register as well
+    uint8_t total_bytes = (reg_addr > 0xFF) ? len + 2 : len + 1;
+
+    I2C1->CR2 &= ~(I2C_CR2_SADD | I2C_CR2_NBYTES | I2C_CR2_RD_WRN | I2C_CR2_START | I2C_CR2_AUTOEND);
+
+    I2C1->CR2 |= slave_addr << 1;   // SADD shifted for 7-bit address mode
+    I2C1->CR2 |= total_bytes << 16; // NBYTES
+    
+    I2C1->CR2 &= ~(I2C_CR2_RD_WRN); // request write transfer
+    I2C1->CR2 |= I2C_CR2_START;   // 13
+
+    while (!(I2C1->ISR & I2C_ISR_TXIS) && !(I2C1->ISR & I2C_ISR_NACKF)) {} // wait for ready to transmit or error
+    if (I2C1->ISR & I2C_ISR_NACKF) {
+        // NACKF: probably should throw an error
+        I2C1->ICR |= I2C_ICR_NACKCF; // clear flag
+        I2C1->CR2 |= I2C_CR2_STOP;   // stop
+        return;
+    }
+
+    if (reg_addr > 0xFF) { // if 16-bit register
+        // send high byte 
+        I2C1->TXDR = (reg_addr >> 8) & 0xFF;
+
+        while (!(I2C1->ISR & I2C_ISR_TXIS) && !(I2C1->ISR & I2C_ISR_NACKF)) {} // wait for ready to transmit or error
+        if (I2C1->ISR & I2C_ISR_NACKF) {
+            // NACKF: probably should throw an error
+            I2C1->ICR |= I2C_ICR_NACKCF; // clear flag
+            I2C1->CR2 |= I2C_CR2_STOP;   // stop
+            return;
+        }
+
+        // send low byte
+        I2C1->TXDR = reg_addr & 0xFF;
+    }
+    else {
+        I2C1->TXDR = reg_addr;
+    }
+
+    // write bytes to transmit
+    for (int i = 0; i < len; i++)
+    {
+        while (!(I2C1->ISR & I2C_ISR_TXIS) && !(I2C1->ISR & I2C_ISR_NACKF)) {} // wait for ready to transmit or error
+        if (I2C1->ISR & I2C_ISR_NACKF) {
+            // NACKF: probably should throw an error
+            I2C1->ICR |= I2C_ICR_NACKCF; // clear flag
+            I2C1->CR2 |= I2C_CR2_STOP;   // stop
+            return;
+        }
+        I2C1->TXDR = data[i];
+    }
+
+    while( !(I2C1->ISR & I2C_ISR_TC) ) {}  // wait for transmit complete
+
+    if (send_stop) {
+        I2C1->CR2 |= I2C_CR2_STOP;
+        while ( !(I2C1->ISR & I2C_ISR_STOPF) ) {}
+        I2C1->ICR |= I2C_ICR_STOPCF;
+    }
+    // if not sending stop, leave TC set — the peripheral holds the bus and i2c_read_transaction will issue the repeated START
+
 }
 
 /**
- * This conversion is hard coded for the configs we selected. Accuracy can be
- * increased by using micro g and micro dps.
+ * @brief Reads data from slave.
+ * @brief Preps the master for reading from slave.
+ * 
+ * This and the i2c_set_write_params function are to 
+ * blame for this I2C driver only supporting 7-bit 
+ * address mode. Fix the SADD shift if you actually 
+ * care that much.
+ * 
+ * @param buf   Buffer to receive data from slave
+ * @param len   Number of bytes to save to buffer
  */
-static void imu_convert_units(LSM6DS3_t* imu) {
-    imu->ax_mg   = (int32_t)imu->ax * 244 / 1000; // 244 for ±8g full-scale
-    imu->ay_mg   = (int32_t)imu->ay * 244 / 1000;
-    imu->az_mg   = (int32_t)imu->az * 244 / 1000;
+void i2c_read_transaction(uint8_t slave_addr, uint8_t* buf, uint8_t len) {
+    // // don't need to account for address in total bytes read (address sent with write params)
 
-    imu->gx_mdps = (int32_t)imu->gx * 70 / 1000;  // 70 for ±2000dps full-scale
-    imu->gy_mdps = (int32_t)imu->gy * 70 / 1000;
-    imu->gz_mdps = (int32_t)imu->gz * 70 / 1000;
+    // I2C2->CR2 &= ~(I2C_CR2_SADD |
+    //             I2C_CR2_NBYTES |
+    //             I2C_CR2_RD_WRN |
+    //             I2C_CR2_START |
+    //             I2C_CR2_STOP  |
+    //             I2C_CR2_AUTOEND);
 
-    //imu->temp_c  = ((int32_t)imu->temp >> 4) + 25;
+    // I2C2->CR2 |= len << 16;        // NBYTES
+    // I2C2->CR2 |= slave_addr << 1;  // SADD shifted for 7-bit address mode
+
+    // I2C2->CR2 |= I2C_CR2_RD_WRN; // request read transfer
+    // I2C2->CR2 |= I2C_CR2_START;
+
+    // for (int i = 0; i < len; i++) {
+    //     while ( !(I2C2->ISR & I2C_ISR_RXNE) && !(I2C2->ISR & I2C_ISR_NACKF) ) {} // wait for ready to read or error
+
+    //     if (I2C2->ISR & I2C_ISR_NACKF) {
+    //         I2C2->ICR |= I2C_ICR_NACKCF; // clear flag
+    //         I2C2->CR2 |= I2C_CR2_STOP;   // stop
+    //         // NACKF: probably should throw an error
+    //         return;
+    //     }
+    //     buf[i] = I2C2->RXDR;
+    // }
+
+    // while ( !(I2C2->ISR & I2C_ISR_TC) ) {}     // wait for transfer complete
+    // I2C2->CR2 |= I2C_CR2_STOP;                 // stop
+    // while ( !(I2C2->ISR & I2C_ISR_STOPF) ) {}  // wait for stop condition
+    // I2C2->ICR |= I2C_ICR_STOPCF;               // clear flag
+
+
+    // don't need to account for address in total bytes read (address sent with write params)
+
+    I2C1->CR2 &= ~(I2C_CR2_SADD |
+                I2C_CR2_NBYTES |
+                I2C_CR2_RD_WRN |
+                I2C_CR2_START |
+                I2C_CR2_STOP  |
+                I2C_CR2_AUTOEND);
+
+    I2C1->CR2 |= len << 16;        // NBYTES
+    I2C1->CR2 |= slave_addr << 1;  // SADD shifted for 7-bit address mode
+
+    I2C1->CR2 |= I2C_CR2_RD_WRN; // request read transfer
+    I2C1->CR2 |= I2C_CR2_START;
+
+    for (int i = 0; i < len; i++) {
+        while ( !(I2C1->ISR & I2C_ISR_RXNE) && !(I2C1->ISR & I2C_ISR_NACKF) ) {} // wait for ready to read or error
+
+        if (I2C1->ISR & I2C_ISR_NACKF) {
+            I2C1->ICR |= I2C_ICR_NACKCF; // clear flag
+            I2C1->CR2 |= I2C_CR2_STOP;   // stop
+            // NACKF: probably should throw an error
+            return;
+        }
+        buf[i] = I2C1->RXDR;
+    }
+
+    while ( !(I2C1->ISR & I2C_ISR_TC) ) {}     // wait for transfer complete
+    I2C1->CR2 |= I2C_CR2_STOP;                 // stop
+    while ( !(I2C1->ISR & I2C_ISR_STOPF) ) {}  // wait for stop condition
+    I2C1->ICR |= I2C_ICR_STOPCF;               // clear flag
 }
-
-#else // use FAKE hardware
-bool imu_init(LSM6DS3_t* imu) { return true; }
-void imu_read(LSM6DS3_t* imu) { /* do nothing */ }
-void imu_read_accel(LSM6DS3_t* imu) { /* do nothing */ }
-void imu_read_gyro(LSM6DS3_t* imu) { /* do nothing */ }
-void imu_read_temp(LSM6DS3_t* imu) { /* do nothing */ }
-void imu_read_all(LSM6DS3_t* imu) { /* do nothing */ }
-#endif
