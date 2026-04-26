@@ -32,6 +32,8 @@ void i2c_write_transaction(uint8_t slave_addr, uint16_t reg_addr,
                             uint8_t *data, uint8_t len, uint8_t send_stop);
 void i2c_read_transaction(uint8_t slave_addr, uint8_t *buf, uint8_t len);
 
+static void i2c_recover(void);  /* forward declaration — used by I2C_WAIT */
+
 /* Timeout in milliseconds for every blocking ISR poll */
 #define I2C_TIMEOUT_MS  10U
 
@@ -46,23 +48,18 @@ void i2c_read_transaction(uint8_t slave_addr, uint8_t *buf, uint8_t len);
         uint32_t _t0 = HAL_GetTick();                              \
         while (!(condition)) {                                      \
             if ((HAL_GetTick() - _t0) >= I2C_TIMEOUT_MS) {        \
-                I2C1->CR2  |= I2C_CR2_STOP;                        \
-                I2C1->ICR   = I2C_ICR_NACKCF | I2C_ICR_ARLOCF |   \
-                               I2C_ICR_BERRCF | I2C_ICR_STOPCF;    \
+                i2c_recover();                                      \
                 return;                                             \
             }                                                       \
         }                                                           \
     } while (0)
 
-/* Same as above but the enclosing function returns a value */
 #define I2C_WAIT_RET(condition, retval)                             \
     do {                                                            \
         uint32_t _t0 = HAL_GetTick();                              \
         while (!(condition)) {                                      \
             if ((HAL_GetTick() - _t0) >= I2C_TIMEOUT_MS) {        \
-                I2C1->CR2  |= I2C_CR2_STOP;                        \
-                I2C1->ICR   = I2C_ICR_NACKCF | I2C_ICR_ARLOCF |   \
-                               I2C_ICR_BERRCF | I2C_ICR_STOPCF;    \
+                i2c_recover();                                      \
                 return (retval);                                    \
             }                                                       \
         }                                                           \
@@ -203,6 +200,19 @@ void i2c_enable(void)
     for (volatile int i = 0; i < 1000; i++);
     I2C1->CR1 |= I2C_CR1_PE;
 }
+
+
+
+/* Called internally when a transaction times out.
+   Re-runs the bus reset and re-enables the peripheral. */
+static void i2c_recover(void)
+{
+    I2C1->CR1 &= ~I2C_CR1_PE;          /* disable peripheral */
+    i2c_bus_reset();                    /* 9 clock pulses + STOP */
+    for (volatile int i = 0; i < 1000; i++);
+    I2C1->CR1 |= I2C_CR1_PE;           /* re-enable */
+}
+
 
 /* ------------------------------------------------------------------ */
 /* Write transaction                                                    */
