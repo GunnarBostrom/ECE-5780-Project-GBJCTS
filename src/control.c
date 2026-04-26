@@ -13,6 +13,7 @@
 
 static PIDController roll_pid;
 static PIDController pitch_pid;
+static MotorMixDebug_t last_mix = {1000U, 1000U, 1000U, 1000U};
 
 static uint16_t clamp_u16(int32_t value, uint16_t min_val, uint16_t max_val)
 {
@@ -58,9 +59,9 @@ void control_init(float dt)
 {   //Tune one axis at a time, start with roll then pitch. Proportional-> Derivative-> Integral
     // Roll PID controller
     PID_Init(&roll_pid,
-             3.5f,     // kp  proportional gain (main correction term)
-             1.0f,     // ki  integral gain (eliminates steady-state error)
-             0.06f,    // kd  derivative gain (damping / smoothing)
+             2.0f,     // kp  proportional gain (main correction term)
+             0.0f,     // ki  integral gain (eliminates steady-state error)
+             0.02f,    // kd  derivative gain (damping / smoothing)
              dt,
              -180.0f,  // output min (limits correction authority) not sure if these min/max values are applicable yet
              180.0f,   // output max
@@ -70,8 +71,8 @@ void control_init(float dt)
 
     // Pitch PID controller 
     PID_Init(&pitch_pid,
-             3.2f,
-             1.0f,
+             2.0f,
+             0.0f,
              0.02f,
              dt,
              -180.0f,
@@ -113,6 +114,10 @@ void control_update(const LSM6DS3_t* imu, const Attitude_t* attitude)
     {
         PID_Reset(&roll_pid);
         PID_Reset(&pitch_pid);
+        last_mix.m1 = THROTTLE_MIN_US;
+        last_mix.m2 = THROTTLE_MIN_US;
+        last_mix.m3 = THROTTLE_MIN_US;
+        last_mix.m4 = THROTTLE_MIN_US;
         motor_set_all(THROTTLE_MIN_US);
         return;
     }
@@ -129,6 +134,10 @@ void control_update(const LSM6DS3_t* imu, const Attitude_t* attitude)
     {
         PID_Reset(&roll_pid);
         PID_Reset(&pitch_pid);
+        last_mix.m1 = THROTTLE_MIN_US;
+        last_mix.m2 = THROTTLE_MIN_US;
+        last_mix.m3 = THROTTLE_MIN_US;
+        last_mix.m4 = THROTTLE_MIN_US;
         motor_set_all(THROTTLE_MIN_US);
         return;
     }
@@ -183,5 +192,14 @@ void control_update(const LSM6DS3_t* imu, const Attitude_t* attitude)
     m3 = clamp_u16((int32_t)(throttle_us - pitch_cmd + roll_cmd), THROTTLE_MIN_US, THROTTLE_MAX_US);
     m4 = clamp_u16((int32_t)(throttle_us - pitch_cmd - roll_cmd), THROTTLE_MIN_US, THROTTLE_MAX_US);
 
+    last_mix.m1 = m1;
+    last_mix.m2 = m2;
+    last_mix.m3 = m3;
+    last_mix.m4 = m4;
     motor_set_individual(m1, m2, m3, m4);
+}
+
+MotorMixDebug_t control_get_last_mix(void)
+{
+    return last_mix;
 }

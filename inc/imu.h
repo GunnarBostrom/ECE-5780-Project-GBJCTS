@@ -10,6 +10,10 @@ STM LSM6DS3
 #include <stdint.h>
 #include <stdbool.h>
 
+#define IMU_ERROR_NONE         0U
+#define IMU_ERROR_CAL_TIMEOUT  1U
+#define IMU_ERROR_CAL_MOTION   2U
+
 typedef struct {
     // raw sensor outputs
     int16_t ax, ay, az;
@@ -32,8 +36,10 @@ typedef struct {
 } LSM6DS3_t;
 
 extern volatile uint8_t imu_ready;
+extern volatile uint8_t imu_error_code;
 
 bool imu_init(LSM6DS3_t* imu);
+bool imu_data_ready(void);
 void imu_reset_gyro_bias(LSM6DS3_t* imu);
 bool imu_calibrate_gyro(LSM6DS3_t* imu, uint16_t sample_count);
 void imu_read(LSM6DS3_t* imu);

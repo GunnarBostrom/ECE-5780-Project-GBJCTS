@@ -6,6 +6,7 @@
 #include "main.h"
 #include "config.h"
 #include "control.h"
+#include "debugger.h"
 #include "filter.h"
 #include "i2c.h"
 #include "imu.h"
@@ -16,13 +17,16 @@
 #include "stm32f0xx_hal.h"
 #include "stm32f0xx_hal_gpio.h"
 #include "stm32f0xx_it.h"
+#include <stdio.h>
 #include <stdint.h>
 
 void Error_Handler(void);
 void SystemClock_Config(void);
 
 static void LED_init(void);
+static void debug_send_attitude(const Attitude_t* attitude);
 static void imu_interrupt_init(void);
+static void busy_delay(volatile uint32_t cycles);
 
 static LSM6DS3_t imu;
 static LIDAR_t vl53l1x;
@@ -36,6 +40,8 @@ int main(void)
     SystemClock_Config();
 
     LED_init();
+    debug_init();
+    accept_string("debug boot\r\n");
     i2c_init(400);
     imu_interrupt_init();
 
@@ -43,11 +49,13 @@ int main(void)
     {
         Error_Handler();
     }
+    accept_string("imu init ok\r\n");
 
     if (!imu_calibrate_gyro(&imu, 512U))
     {
         Error_Handler();
     }
+    accept_string("gyro cal ok\r\n");
 
     lidar_init(&vl53l1x, 0x52);
     radio_init();
@@ -61,7 +69,7 @@ int main(void)
     {
         radio_read();
 
-        if (imu_ready)
+        if (imu_data_ready())
         {
             imu_ready = 0;
 
@@ -76,6 +84,7 @@ int main(void)
                           imu.az_g,
                           dt);
 
+            debug_send_attitude(&attitude);
             control_update(&imu, &attitude);
         }
     }
@@ -95,6 +104,58 @@ static void LED_init(void)
     HAL_GPIO_Init(GPIOC, &initStr);
 
     HAL_GPIO_WritePin(GPIOC, GPIO_PIN_6 | GPIO_PIN_7 | GPIO_PIN_8 | GPIO_PIN_9, GPIO_PIN_RESET);
+}
+
+static void debug_send_attitude(const Attitude_t* attitude)
+{
+#if USE_DEBUGGER
+    static uint16_t debug_divider = 0U;
+    char msg[96];
+    MotorMixDebug_t mix;
+    int32_t roll_cdeg;
+    int32_t pitch_cdeg;
+    char roll_sign;
+    char pitch_sign;
+    uint32_t roll_abs_cdeg;
+    uint32_t pitch_abs_cdeg;
+
+    if (++debug_divider < 83U)
+    {
+        return;
+    }
+
+    debug_divider = 0U;
+
+    roll_cdeg = (attitude->roll_deg >= 0.0f) ?
+                (int32_t)(attitude->roll_deg * 100.0f + 0.5f) :
+                (int32_t)(attitude->roll_deg * 100.0f - 0.5f);
+    pitch_cdeg = (attitude->pitch_deg >= 0.0f) ?
+                 (int32_t)(attitude->pitch_deg * 100.0f + 0.5f) :
+                 (int32_t)(attitude->pitch_deg * 100.0f - 0.5f);
+
+    roll_sign = (roll_cdeg < 0) ? '-' : '+';
+    pitch_sign = (pitch_cdeg < 0) ? '-' : '+';
+    roll_abs_cdeg = (roll_cdeg < 0) ? (uint32_t)(-roll_cdeg) : (uint32_t)roll_cdeg;
+    pitch_abs_cdeg = (pitch_cdeg < 0) ? (uint32_t)(-pitch_cdeg) : (uint32_t)pitch_cdeg;
+    mix = control_get_last_mix();
+
+    snprintf(msg,
+             sizeof(msg),
+             "roll=%c%lu.%02lu pitch=%c%lu.%02lu m=[%u %u %u %u]\r\n",
+             roll_sign,
+             (unsigned long)(roll_abs_cdeg / 100U),
+             (unsigned long)(roll_abs_cdeg % 100U),
+             pitch_sign,
+             (unsigned long)(pitch_abs_cdeg / 100U),
+             (unsigned long)(pitch_abs_cdeg % 100U),
+             (unsigned int)mix.m1,
+             (unsigned int)mix.m2,
+             (unsigned int)mix.m3,
+             (unsigned int)mix.m4);
+    accept_string(msg);
+#else
+    (void)attitude;
+#endif
 }
 
 static void imu_interrupt_init(void)
@@ -153,10 +214,33 @@ void Error_Handler(void)
     __disable_irq();
     while (1)
     {
-        HAL_GPIO_TogglePin(GPIOC, GPIO_PIN_6);
-        for (volatile uint32_t delay = 0; delay < 200000U; ++delay)
+        uint8_t blink_count = 1U;
+
+        if (imu_error_code == IMU_ERROR_CAL_TIMEOUT)
         {
+            blink_count = 2U;
         }
+        else if (imu_error_code == IMU_ERROR_CAL_MOTION)
+        {
+            blink_count = 3U;
+        }
+
+        for (uint8_t blink_index = 0; blink_index < blink_count; ++blink_index)
+        {
+            HAL_GPIO_TogglePin(GPIOC, GPIO_PIN_6);
+            busy_delay(4000000U);
+            HAL_GPIO_TogglePin(GPIOC, GPIO_PIN_6);
+            busy_delay(4000000U);
+        }
+
+        busy_delay(12000000U);
+    }
+}
+
+static void busy_delay(volatile uint32_t cycles)
+{
+    while (cycles-- > 0U)
+    {
     }
 }
 

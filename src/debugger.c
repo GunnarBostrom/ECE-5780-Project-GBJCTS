@@ -6,6 +6,7 @@ PA9 - STM32 TX
 PA10 - STM32 RX
 */
 
+#include "config.h"
 #include "stm32f072xb.h"
 #include "stm32f0xx_hal.h"
 #include "debugger.h"
@@ -16,6 +17,8 @@ volatile short int new_data = 0;
 #if USE_DEBUGGER // use REAL hardware
 
 void debug_init(void) {
+  RCC->AHBENR |= RCC_AHBENR_GPIOAEN;
+  (void)RCC->AHBENR;
     
   GPIO_InitTypeDef initStr = {0};
   initStr.Pin = GPIO_PIN_9 | GPIO_PIN_10; // PA9 - stm tx, PA10 - stm rx

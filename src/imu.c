@@ -30,6 +30,7 @@ Data provided:
 #define ACCEL_CFG       0x10
 #define GYRO_CFG        0x11
 #define INT1_CFG        0x0D
+#define STATUS_REG      0x1E
 #define CTRL3_C         0x12
 #define CTRL4_C         0x13
 
@@ -42,30 +43,39 @@ Data provided:
 
 #define INT1_GYRO_EN     (0b1 << 1)
 #define INT1_ACCEL_EN    (0b1 << 0)
+#define STATUS_GYRO_READY (0b1 << 1)
+#define CTRL3_BDU        (0b1 << 6)
+#define CTRL3_IF_INC     (0b1 << 2)
 
-#define GYRO_CAL_WARMUP_SAMPLES        32U
+#define GYRO_CAL_WARMUP_SAMPLES        128U
 #define GYRO_CAL_READY_TIMEOUT_MS      100U
-#define GYRO_STATIONARY_THRESHOLD_RAW  70
+#define GYRO_CAL_STABILITY_THRESHOLD_RAW  200
 
 static void imu_convert_units(LSM6DS3_t* imu);
 static void imu_read_gyro_raw(int16_t* gx, int16_t* gy, int16_t* gz);
 static bool imu_wait_for_ready(uint32_t timeout_ms);
-static int32_t abs_i32(int32_t value);
+static bool imu_status_gyro_ready(void);
 
 volatile uint8_t imu_ready = 0;
+volatile uint8_t imu_error_code = IMU_ERROR_NONE;
 
 #if USE_IMU
 
 bool imu_init(LSM6DS3_t* imu)
 {
-    uint8_t device_id;
-    uint8_t ctrl3 = 0x40;
-    uint8_t ctrl4 = 0x08;
+    uint8_t device_id = 0;
+    uint8_t ctrl3 = CTRL3_BDU | CTRL3_IF_INC;
+    uint8_t ctrl4 = 0x00;
     uint8_t int1_config = INT1_GYRO_EN | INT1_ACCEL_EN;
     uint8_t accel_config = ACCEL_ODR_416HZ | ACCEL_FS_8G | ACCEL_BW_400HZ;
     uint8_t gyro_config = GYRO_ODR_416HZ | GYRO_FS_2000DPS;
+    const uint32_t start = HAL_GetTick();
 
-    i2c_read(IMU_ADDR, WHO_AM_I_REG, &device_id, 1);
+    do
+    {
+        HAL_Delay(5);
+        i2c_read(IMU_ADDR, WHO_AM_I_REG, &device_id, 1);
+    } while ((device_id != IMU_ID) && ((HAL_GetTick() - start) < 100U));
 
     if (device_id != IMU_ID)
     {
@@ -77,7 +87,14 @@ bool imu_init(LSM6DS3_t* imu)
         }
     }
 
+    imu_error_code = IMU_ERROR_NONE;
+
+    // Keep IF_INC enabled so the 6-byte and 12-byte burst reads used by this
+    // driver walk through the gyro/accel output registers correctly.
     i2c_write(IMU_ADDR, CTRL3_C, &ctrl3, 1);
+    // Keep the default CTRL4_C state here. Setting bit 3 disables I2C on the
+    // LSM6DS3, which prevents the later config writes and calibration reads
+    // from working.
     i2c_write(IMU_ADDR, CTRL4_C, &ctrl4, 1);
     i2c_write(IMU_ADDR, INT1_CFG, &int1_config, 1);
     i2c_write(IMU_ADDR, ACCEL_CFG, &accel_config, 1);
@@ -96,6 +113,11 @@ bool imu_init(LSM6DS3_t* imu)
     return true;
 }
 
+bool imu_data_ready(void)
+{
+    return (imu_ready != 0U) || imu_status_gyro_ready();
+}
+
 void imu_reset_gyro_bias(LSM6DS3_t* imu)
 {
     imu->gx_bias = 0;
@@ -110,13 +132,29 @@ bool imu_calibrate_gyro(LSM6DS3_t* imu, uint16_t sample_count)
     int32_t gx_sum = 0;
     int32_t gy_sum = 0;
     int32_t gz_sum = 0;
+    int16_t gx_min = INT16_MAX;
+    int16_t gy_min = INT16_MAX;
+    int16_t gz_min = INT16_MAX;
+    int16_t gx_max = INT16_MIN;
+    int16_t gy_max = INT16_MIN;
+    int16_t gz_max = INT16_MIN;
+    uint8_t cal_int1_config = INT1_GYRO_EN;
+    uint8_t runtime_int1_config = INT1_GYRO_EN | INT1_ACCEL_EN;
+    bool calibration_ok = false;
 
     if (sample_count == 0U)
     {
         return false;
     }
 
+    imu_error_code = IMU_ERROR_NONE;
     imu_reset_gyro_bias(imu);
+    imu_ready = 0;
+
+    // During calibration, only gate off the gyro data-ready signal. If accel
+    // DRDY is also enabled here, INT1 can remain latched high after the first
+    // sample because this routine only reads gyro registers.
+    i2c_write(IMU_ADDR, INT1_CFG, &cal_int1_config, 1);
 
     for (sample_index = 0; sample_index < GYRO_CAL_WARMUP_SAMPLES; ++sample_index)
     {
@@ -126,7 +164,8 @@ bool imu_calibrate_gyro(LSM6DS3_t* imu, uint16_t sample_count)
 
         if (!imu_wait_for_ready(GYRO_CAL_READY_TIMEOUT_MS))
         {
-            return false;
+            imu_error_code = IMU_ERROR_CAL_TIMEOUT;
+            goto restore_int1_config;
         }
 
         imu_read_gyro_raw(&gx_raw, &gy_raw, &gz_raw);
@@ -140,30 +179,48 @@ bool imu_calibrate_gyro(LSM6DS3_t* imu, uint16_t sample_count)
 
         if (!imu_wait_for_ready(GYRO_CAL_READY_TIMEOUT_MS))
         {
-            return false;
+            imu_error_code = IMU_ERROR_CAL_TIMEOUT;
+            goto restore_int1_config;
         }
 
         imu_read_gyro_raw(&gx_raw, &gy_raw, &gz_raw);
 
-        if ((abs_i32(gx_raw) > GYRO_STATIONARY_THRESHOLD_RAW) ||
-            (abs_i32(gy_raw) > GYRO_STATIONARY_THRESHOLD_RAW) ||
-            (abs_i32(gz_raw) > GYRO_STATIONARY_THRESHOLD_RAW))
-        {
-            imu_reset_gyro_bias(imu);
-            return false;
-        }
-
         gx_sum += gx_raw;
         gy_sum += gy_raw;
         gz_sum += gz_raw;
+
+        if (gx_raw < gx_min) gx_min = gx_raw;
+        if (gy_raw < gy_min) gy_min = gy_raw;
+        if (gz_raw < gz_min) gz_min = gz_raw;
+        if (gx_raw > gx_max) gx_max = gx_raw;
+        if (gy_raw > gy_max) gy_max = gy_raw;
+        if (gz_raw > gz_max) gz_max = gz_raw;
+    }
+
+    // Gyro bias can legitimately be non-zero, especially after soldering the
+    // IMU onto a frame. Reject only if the samples are changing too much over
+    // the capture window, which is a stronger sign of actual motion.
+    if (((int32_t)gx_max - (int32_t)gx_min) > GYRO_CAL_STABILITY_THRESHOLD_RAW ||
+        ((int32_t)gy_max - (int32_t)gy_min) > GYRO_CAL_STABILITY_THRESHOLD_RAW ||
+        ((int32_t)gz_max - (int32_t)gz_min) > GYRO_CAL_STABILITY_THRESHOLD_RAW)
+    {
+        imu_error_code = IMU_ERROR_CAL_MOTION;
+        imu_reset_gyro_bias(imu);
+        goto restore_int1_config;
     }
 
     imu->gx_bias = (int16_t)(gx_sum / (int32_t)sample_count);
     imu->gy_bias = (int16_t)(gy_sum / (int32_t)sample_count);
     imu->gz_bias = (int16_t)(gz_sum / (int32_t)sample_count);
     imu->gyro_bias_valid = true;
+    imu_error_code = IMU_ERROR_NONE;
+    calibration_ok = true;
 
-    return true;
+restore_int1_config:
+    imu_ready = 0;
+    i2c_write(IMU_ADDR, INT1_CFG, &runtime_int1_config, 1);
+
+    return calibration_ok;
 }
 
 void imu_read(LSM6DS3_t* imu)
@@ -261,7 +318,7 @@ static bool imu_wait_for_ready(uint32_t timeout_ms)
 {
     const uint32_t start_ms = HAL_GetTick();
 
-    while (!imu_ready)
+    while (!imu_data_ready())
     {
         if ((HAL_GetTick() - start_ms) > timeout_ms)
         {
@@ -273,14 +330,18 @@ static bool imu_wait_for_ready(uint32_t timeout_ms)
     return true;
 }
 
-static int32_t abs_i32(int32_t value)
+static bool imu_status_gyro_ready(void)
 {
-    return (value < 0) ? -value : value;
+    uint8_t status = 0;
+
+    i2c_read(IMU_ADDR, STATUS_REG, &status, 1);
+    return (status & STATUS_GYRO_READY) != 0U;
 }
 
 #else
 
 bool imu_init(LSM6DS3_t* imu) { return (imu != 0); }
+bool imu_data_ready(void) { return false; }
 void imu_reset_gyro_bias(LSM6DS3_t* imu) { (void)imu; }
 bool imu_calibrate_gyro(LSM6DS3_t* imu, uint16_t sample_count)
 {

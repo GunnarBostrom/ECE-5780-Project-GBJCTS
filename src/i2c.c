@@ -306,6 +306,18 @@ void i2c_bus_reset(void) {
     GPIOB->MODER |=  ((0b10 << 12) | (0b10 << 14));
 }
 
+/* Called internally when a transaction times out.
+   Re-runs the bus reset and re-enables the peripheral. */
+static void i2c_recover(void)
+{
+    I2C1->CR1 &= ~I2C_CR1_PE;
+    i2c_bus_reset();
+    for (volatile int i = 0; i < 1000; i++)
+    {
+    }
+    I2C1->CR1 |= I2C_CR1_PE;
+}
+
 /**
  * @brief Writes data to slave.
  * 
@@ -402,7 +414,13 @@ void i2c_write_transaction(uint8_t slave_addr, uint16_t reg_addr, uint8_t* data,
     I2C1->CR2 &= ~(I2C_CR2_RD_WRN); // request write transfer
     I2C1->CR2 |= I2C_CR2_START;   // 13
 
-    while (!(I2C1->ISR & I2C_ISR_TXIS) && !(I2C1->ISR & I2C_ISR_NACKF)) {} // wait for ready to transmit or error
+    {
+        uint32_t t = HAL_GetTick();
+        while (!(I2C1->ISR & I2C_ISR_TXIS) && !(I2C1->ISR & I2C_ISR_NACKF))
+        {
+            if ((HAL_GetTick() - t) > 10U) { i2c_recover(); return; }
+        }
+    }
     if (I2C1->ISR & I2C_ISR_NACKF) {
         // NACKF: probably should throw an error
         I2C1->ICR |= I2C_ICR_NACKCF; // clear flag
@@ -414,7 +432,13 @@ void i2c_write_transaction(uint8_t slave_addr, uint16_t reg_addr, uint8_t* data,
         // send high byte 
         I2C1->TXDR = (reg_addr >> 8) & 0xFF;
 
-        while (!(I2C1->ISR & I2C_ISR_TXIS) && !(I2C1->ISR & I2C_ISR_NACKF)) {} // wait for ready to transmit or error
+        {
+            uint32_t t = HAL_GetTick();
+            while (!(I2C1->ISR & I2C_ISR_TXIS) && !(I2C1->ISR & I2C_ISR_NACKF))
+            {
+                if ((HAL_GetTick() - t) > 10U) { i2c_recover(); return; }
+            }
+        }
         if (I2C1->ISR & I2C_ISR_NACKF) {
             // NACKF: probably should throw an error
             I2C1->ICR |= I2C_ICR_NACKCF; // clear flag
@@ -432,7 +456,13 @@ void i2c_write_transaction(uint8_t slave_addr, uint16_t reg_addr, uint8_t* data,
     // write bytes to transmit
     for (int i = 0; i < len; i++)
     {
-        while (!(I2C1->ISR & I2C_ISR_TXIS) && !(I2C1->ISR & I2C_ISR_NACKF)) {} // wait for ready to transmit or error
+        {
+            uint32_t t = HAL_GetTick();
+            while (!(I2C1->ISR & I2C_ISR_TXIS) && !(I2C1->ISR & I2C_ISR_NACKF))
+            {
+                if ((HAL_GetTick() - t) > 10U) { i2c_recover(); return; }
+            }
+        }
         if (I2C1->ISR & I2C_ISR_NACKF) {
             // NACKF: probably should throw an error
             I2C1->ICR |= I2C_ICR_NACKCF; // clear flag
@@ -442,11 +472,23 @@ void i2c_write_transaction(uint8_t slave_addr, uint16_t reg_addr, uint8_t* data,
         I2C1->TXDR = data[i];
     }
 
-    while( !(I2C1->ISR & I2C_ISR_TC) ) {}  // wait for transmit complete
+    {
+        uint32_t t = HAL_GetTick();
+        while (!(I2C1->ISR & I2C_ISR_TC))
+        {
+            if ((HAL_GetTick() - t) > 10U) { i2c_recover(); return; }
+        }
+    }
 
     if (send_stop) {
         I2C1->CR2 |= I2C_CR2_STOP;
-        while ( !(I2C1->ISR & I2C_ISR_STOPF) ) {}
+        {
+            uint32_t t = HAL_GetTick();
+            while (!(I2C1->ISR & I2C_ISR_STOPF))
+            {
+                if ((HAL_GetTick() - t) > 10U) { i2c_recover(); return; }
+            }
+        }
         I2C1->ICR |= I2C_ICR_STOPCF;
     }
     // if not sending stop, leave TC set — the peripheral holds the bus and i2c_read_transaction will issue the repeated START
@@ -515,7 +557,13 @@ void i2c_read_transaction(uint8_t slave_addr, uint8_t* buf, uint8_t len) {
     I2C1->CR2 |= I2C_CR2_START;
 
     for (int i = 0; i < len; i++) {
-        while ( !(I2C1->ISR & I2C_ISR_RXNE) && !(I2C1->ISR & I2C_ISR_NACKF) ) {} // wait for ready to read or error
+        {
+            uint32_t t = HAL_GetTick();
+            while (!(I2C1->ISR & I2C_ISR_RXNE) && !(I2C1->ISR & I2C_ISR_NACKF))
+            {
+                if ((HAL_GetTick() - t) > 10U) { i2c_recover(); return; }
+            }
+        }
 
         if (I2C1->ISR & I2C_ISR_NACKF) {
             I2C1->ICR |= I2C_ICR_NACKCF; // clear flag
@@ -526,8 +574,20 @@ void i2c_read_transaction(uint8_t slave_addr, uint8_t* buf, uint8_t len) {
         buf[i] = I2C1->RXDR;
     }
 
-    while ( !(I2C1->ISR & I2C_ISR_TC) ) {}     // wait for transfer complete
+    {
+        uint32_t t = HAL_GetTick();
+        while (!(I2C1->ISR & I2C_ISR_TC))
+        {
+            if ((HAL_GetTick() - t) > 10U) { i2c_recover(); return; }
+        }
+    }
     I2C1->CR2 |= I2C_CR2_STOP;                 // stop
-    while ( !(I2C1->ISR & I2C_ISR_STOPF) ) {}  // wait for stop condition
+    {
+        uint32_t t = HAL_GetTick();
+        while (!(I2C1->ISR & I2C_ISR_STOPF))
+        {
+            if ((HAL_GetTick() - t) > 10U) { i2c_recover(); return; }
+        }
+    }
     I2C1->ICR |= I2C_ICR_STOPCF;               // clear flag
 }

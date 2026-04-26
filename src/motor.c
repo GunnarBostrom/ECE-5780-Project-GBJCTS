@@ -24,10 +24,10 @@ void motor_init(void)
     // -------------------------------------------------------------------------
     // GPIO CONFIG
     //
-    // M1 -> PA0  = TIM2_CH1 (AF2)
-    // M2 -> PA1  = TIM2_CH2 (AF2)
-    // M3 -> PB10 = TIM2_CH3 (AF2)
-    // M4 -> PB11 = TIM2_CH4 (AF2)
+    // M1 clockwise-> PA0  = TIM2_CH1 (AF2)
+    // M2 counter -> PA1  = TIM2_CH2 (AF2)
+    // M3 counter -> PB10 = TIM2_CH3 (AF2)
+    // M4 clockwise-> PB11 = TIM2_CH4 (AF2)
     // -------------------------------------------------------------------------
 
     // Clear mode bits

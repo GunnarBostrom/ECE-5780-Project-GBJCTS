@@ -3,6 +3,15 @@
 
 #include "imu.h"
 #include "filter.h"
+#include <stdint.h>
+
+typedef struct
+{
+    uint16_t m1;
+    uint16_t m2;
+    uint16_t m3;
+    uint16_t m4;
+} MotorMixDebug_t;
 
 // Initializes the attitude controller with the fixed control-loop timestep.
 //
@@ -19,5 +28,6 @@ void control_init(float dt);
 // `imu` is accepted for interface consistency and future extensions, but the
 // current implementation closes the loop using `attitude`.
 void control_update(const LSM6DS3_t* imu, const Attitude_t* attitude);
+MotorMixDebug_t control_get_last_mix(void);
 
 #endif
