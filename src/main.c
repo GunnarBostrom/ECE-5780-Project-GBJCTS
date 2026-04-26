@@ -33,12 +33,12 @@ void Error_Handler(void);
 void SystemClock_Config(void);
 static void LED_init(void);
 void imu_interrupt_init(void);
-static void print_imu(const LSM6DS3_t *imu);
+static void print_imu(const IMU_t *imu);
 
 /* ------------------------------------------------------------------ */
 /* Globals                                                              */
 /* ------------------------------------------------------------------ */
-LSM6DS3_t  imu;
+IMU_t  imu;
 LIDAR_t    vl53l1x;
 Attitude_t attitude;
 
@@ -56,7 +56,7 @@ int main(void)
     i2c_init(400);
 
     /* IMU — verify WHO_AM_I, configure ODR/FS, enable INT1 */
-    if (!imu_init(&imu)) {
+    if (!imu_init(&imu, 0x6B)) {
         Error_Handler();
     }
     imu_interrupt_init();   /* arm EXTI *after* IMU is configured */
@@ -81,14 +81,14 @@ int main(void)
     control_init(dt);
 
     uint32_t last_print_ms = 0;
-
+    
     /* ---------------------------------------------------------------- */
     /* Main loop                                                         */
     /* ---------------------------------------------------------------- */
     while (1)
     {
         radio_read();
-
+        
         if (imu_ready)
         {
             imu_ready = 0;
@@ -99,12 +99,12 @@ int main(void)
              * imu_convert_units() stores integer mg and mdps.
              * Convert to float g and dps for the complementary filter.
              */
-            float ax_g   =  (float)imu.ax_mg   / 1000.0f;
-            float ay_g   =  (float)imu.ay_mg   / 1000.0f;
-            float az_g   =  (float)imu.az_mg   / 1000.0f;
-            float gx_dps =  (float)imu.gx_mdps / 1000.0f;
-            float gy_dps =  (float)imu.gy_mdps / 1000.0f;
-            float gz_dps =  (float)imu.gz_mdps / 1000.0f;
+            float ax_g   =  (float)imu.ax_g   / 1000.0f;
+            float ay_g   =  (float)imu.ay_g   / 1000.0f;
+            float az_g   =  (float)imu.az_g   / 1000.0f;
+            float gx_dps =  (float)imu.gx_dps / 1000.0f;
+            float gy_dps =  (float)imu.gy_dps / 1000.0f;
+            float gz_dps =  (float)imu.gz_dps / 1000.0f;
 
             filter_update(&attitude,
                           gx_dps, gy_dps, gz_dps,
@@ -126,18 +126,18 @@ int main(void)
 /* ------------------------------------------------------------------ */
 /* print_imu — formatted UART output for PuTTY                         */
 /* ------------------------------------------------------------------ */
-static void print_imu(const LSM6DS3_t *d)
+static void print_imu(const IMU_t *d)
 {
     char buf[128];
 
     accept_string("\r\n=== IMU Data ===\r\n");
 
     sprintf(buf, "Accel  (mg):   ax=%7ld  ay=%7ld  az=%7ld\r\n",
-            (long)d->ax_mg, (long)d->ay_mg, (long)d->az_mg);
+            (long)d->ax_g, (long)d->ay_g, (long)d->az_g);
     accept_string(buf);
 
     sprintf(buf, "Gyro  (mdps):  gx=%7ld  gy=%7ld  gz=%7ld\r\n",
-            (long)d->gx_mdps, (long)d->gy_mdps, (long)d->gz_mdps);
+            (long)d->gx_dps, (long)d->gy_dps, (long)d->gz_dps);
     accept_string(buf);
 
     sprintf(buf, "Raw accel:     ax=%7d  ay=%7d  az=%7d\r\n",
@@ -184,42 +184,41 @@ static void LED_init(void)
 /* ------------------------------------------------------------------ */
 void imu_interrupt_init(void)
 {
+    /* SYSCFG clock must be on before HAL_GPIO_Init touches EXTICR.
+       HAL_MspInit() enables it at boot, but be explicit here. */
+    __HAL_RCC_SYSCFG_CLK_ENABLE();
     __HAL_RCC_GPIOC_CLK_ENABLE();
 
+    /* HAL_GPIO_Init with IT_RISING handles SYSCFG EXTICR, EXTI IMR,
+       EXTI RTSR, and EXTI FTSR — no manual register writes needed. */
     GPIO_InitTypeDef gpio = {0};
     gpio.Pin  = GPIO_PIN_0;
     gpio.Mode = GPIO_MODE_IT_RISING;
     gpio.Pull = GPIO_NOPULL;
     HAL_GPIO_Init(GPIOC, &gpio);
 
-    __HAL_RCC_SYSCFG_CLK_ENABLE();
+    /* Clear any stale pending flag that accumulated while IMU was
+       already outputting DR pulses before the EXTI was armed. */
+    EXTI->PR = EXTI_PR_PR0;
 
-    SYSCFG->EXTICR[0] &= ~SYSCFG_EXTICR1_EXTI0;
-    SYSCFG->EXTICR[0] |=  SYSCFG_EXTICR1_EXTI0_PC;
-
-    EXTI->IMR  |=  EXTI_IMR_MR0;
-    EXTI->RTSR |=  EXTI_RTSR_TR0;
-    EXTI->FTSR &= ~EXTI_FTSR_TR0;
-
-    NVIC_SetPriority(EXTI0_1_IRQn, 1);
+    NVIC_SetPriority(EXTI0_1_IRQn, 3);
     NVIC_EnableIRQ(EXTI0_1_IRQn);
 }
+
 
 /* ------------------------------------------------------------------ */
 /* EXTI callback — sets imu_ready flag, blinks orange at ~2 Hz         */
 /* ------------------------------------------------------------------ */
-void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
+void EXTI0_1_IRQHandler(void)
 {
-    if (GPIO_Pin == GPIO_PIN_0)
-    {
-        imu_ready = 1;
+    GPIOC->ODR |= GPIO_PIN_6;
+    imu_ready = 1;
 
-        static uint16_t divider = 0;
-        if (++divider >= 208)   /* 416 Hz / 208 = 2 Hz toggle -> 1 Hz blink */
-        {
-            divider = 0;
-            GPIOC->ODR ^= GPIO_ODR_8;
-        }
+    static uint16_t divider = 0;
+    if (++divider >= 208)   /* 416 Hz / 208 = 2 Hz toggle -> 1 Hz blink */
+    {
+        divider = 0;
+        GPIOC->ODR ^= GPIO_ODR_8;
     }
 }
 

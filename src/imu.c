@@ -5,8 +5,8 @@
  * LSM6DS3 can operate at 100 kHz or 400 kHz.
  *
  * Data provided:
- *   - 3-axis acceleration  (ax_mg / ay_mg / az_mg  in mg)
- *   - 3-axis angular rate  (gx_mdps / gy_mdps / gz_mdps  in mdps)
+ *   - 3-axis acceleration  (ax_g / ay_g / az_g  in mg)
+ *   - 3-axis angular rate  (gx_dps / gy_dps / gz_dps  in mdps)
  *   - temperature (raw, conversion: celsius = raw/16 + 25)
  *
  * Hard-coded configuration:
@@ -72,7 +72,7 @@ volatile uint8_t imu_ready = 0;
 /* ------------------------------------------------------------------ */
 /* Static helpers                                                       */
 /* ------------------------------------------------------------------ */
-static void imu_convert_units(LSM6DS3_t *imu);
+static void imu_convert_units(IMU_t *imu);
 
 /* ================================================================== */
 #if USE_IMU   /* real hardware */
@@ -92,14 +92,16 @@ static void imu_convert_units(LSM6DS3_t *imu);
  * @param imu  Pointer to driver struct (only used to zero-initialize).
  * @return true on success, false if WHO_AM_I does not match.
  */
-bool imu_init(LSM6DS3_t *imu)
+bool imu_init(IMU_t *imu, uint8_t slave_addr)
 {
     /* Zero-initialise the struct */
+    imu->slave_addr = slave_addr;
     imu->ax = imu->ay = imu->az = 0;
     imu->gx = imu->gy = imu->gz = 0;
-    imu->temp = 0;
-    imu->ax_mg = imu->ay_mg = imu->az_mg = 0;
-    imu->gx_mdps = imu->gy_mdps = imu->gz_mdps = 0;
+    imu->temp_raw = 0;
+    imu->temp_c = 0.0f;
+    imu->ax_g = imu->ay_g = imu->az_g = 0;
+    imu->gx_dps = imu->gy_dps = imu->gz_dps = 0;
 
     /* ---- Verify device ---- */
     uint8_t device_id = 0;
@@ -154,7 +156,7 @@ bool imu_init(LSM6DS3_t *imu)
  * The LSM6DS3 auto-increments its register pointer, so reading 12 bytes
  * starting at GYRO_REG captures both gyro (0x22-0x27) and accel (0x28-0x2D).
  */
-void imu_read(LSM6DS3_t *imu)
+void imu_read(IMU_t *imu)
 {
     uint8_t buf[12];
 
@@ -171,7 +173,7 @@ void imu_read(LSM6DS3_t *imu)
 }
 
 /** @brief Read accelerometer only (6 bytes). */
-void imu_read_accel(LSM6DS3_t *imu)
+void imu_read_accel(IMU_t *imu)
 {
     uint8_t buf[6];
 
@@ -184,7 +186,7 @@ void imu_read_accel(LSM6DS3_t *imu)
 }
 
 /** @brief Read gyroscope only (6 bytes). */
-void imu_read_gyro(LSM6DS3_t *imu)
+void imu_read_gyro(IMU_t *imu)
 {
     uint8_t buf[6];
 
@@ -202,21 +204,21 @@ void imu_read_gyro(LSM6DS3_t *imu)
  * Celsius conversion (not applied here):
  *   temp_c = (raw / 16) + 25
  */
-void imu_read_temp(LSM6DS3_t *imu)
+void imu_read_temp(IMU_t *imu)
 {
     uint8_t buf[2];
 
     i2c_read(IMU_ADDR, TEMP_REG, buf, 2);
-    imu->temp = (int16_t)(buf[0] | (buf[1] << 8));
+    imu->temp_raw = (int16_t)(buf[0] | (buf[1] << 8));
 }
 
 /** @brief Read all sensor data including temperature (14-byte burst). */
-void imu_read_all(LSM6DS3_t *imu)
+void imu_read_all(IMU_t *imu)
 {
     uint8_t buf[14];
 
     i2c_read(IMU_ADDR, TEMP_REG, buf, 14);
-    imu->temp = (int16_t)(buf[0]  | (buf[1]  << 8));
+    imu->temp_raw = (int16_t)(buf[0]  | (buf[1]  << 8));
     imu->gx   = (int16_t)(buf[2]  | (buf[3]  << 8));
     imu->gy   = (int16_t)(buf[4]  | (buf[5]  << 8));
     imu->gz   = (int16_t)(buf[6]  | (buf[7]  << 8));
@@ -228,33 +230,32 @@ void imu_read_all(LSM6DS3_t *imu)
 }
 
 /**
- * @brief Convert raw LSBs to physical units using integer arithmetic.
+ * @brief Convert raw LSBs to integer mg and mdps (no float arithmetic).
  *
- * Avoids float on the STM32F0 (no FPU).
- * Results are in mg (milli-g) and mdps (milli-degrees-per-second).
- * To get g: divide ax_mg by 1000.
- * To get dps: divide gx_mdps by 1000.
+ * Results are in mg and mdps so the STM32F0 (no FPU) stays in integer.
+ * To get g:   ax_g / 1000.0f.
+ * To get dps: gx_dps / 1000.0f.
  */
-static void imu_convert_units(LSM6DS3_t *imu)
+static void imu_convert_units(IMU_t *imu)
 {
-    imu->ax_mg   = (int32_t)imu->ax * ACCEL_SENS_NUM / ACCEL_SENS_DEN;
-    imu->ay_mg   = (int32_t)imu->ay * ACCEL_SENS_NUM / ACCEL_SENS_DEN;
-    imu->az_mg   = (int32_t)imu->az * ACCEL_SENS_NUM / ACCEL_SENS_DEN;
+    imu->ax_g   = (int32_t)imu->ax * ACCEL_SENS_NUM / ACCEL_SENS_DEN;
+    imu->ay_g   = (int32_t)imu->ay * ACCEL_SENS_NUM / ACCEL_SENS_DEN;
+    imu->az_g   = (int32_t)imu->az * ACCEL_SENS_NUM / ACCEL_SENS_DEN;
 
-    imu->gx_mdps = (int32_t)imu->gx * GYRO_SENS_NUM / GYRO_SENS_DEN;
-    imu->gy_mdps = (int32_t)imu->gy * GYRO_SENS_NUM / GYRO_SENS_DEN;
-    imu->gz_mdps = (int32_t)imu->gz * GYRO_SENS_NUM / GYRO_SENS_DEN;
+    imu->gx_dps = (int32_t)imu->gx * GYRO_SENS_NUM / GYRO_SENS_DEN;
+    imu->gy_dps = (int32_t)imu->gy * GYRO_SENS_NUM / GYRO_SENS_DEN;
+    imu->gz_dps = (int32_t)imu->gz * GYRO_SENS_NUM / GYRO_SENS_DEN;
 }
 
 /* ================================================================== */
 #else   /* stub implementations for builds without real hardware */
 /* ================================================================== */
 
-bool imu_init(LSM6DS3_t *imu)      { (void)imu; return true; }
-void imu_read(LSM6DS3_t *imu)      { (void)imu; }
-void imu_read_accel(LSM6DS3_t *imu){ (void)imu; }
-void imu_read_gyro(LSM6DS3_t *imu) { (void)imu; }
-void imu_read_temp(LSM6DS3_t *imu) { (void)imu; }
-void imu_read_all(LSM6DS3_t *imu)  { (void)imu; }
+bool imu_init(IMU_t *imu, uint8_t slave_addr) { (void)imu; (void)slave_addr; return true; }
+void imu_read(IMU_t *imu)      { (void)imu; }
+void imu_read_accel(IMU_t *imu){ (void)imu; }
+void imu_read_gyro(IMU_t *imu) { (void)imu; }
+void imu_read_temp(IMU_t *imu) { (void)imu; }
+void imu_read_all(IMU_t *imu)  { (void)imu; }
 
 #endif /* USE_IMU */

@@ -51,6 +51,7 @@ void radio_read(void)
     if (new_data_flag)
     {
         new_data_flag = 0;
+        last_frame_ms = HAL_GetTick();
 
         const volatile uint8_t *p = (const volatile uint8_t *)&radio_buffer[3];
 

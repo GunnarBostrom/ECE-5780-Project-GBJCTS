@@ -2,6 +2,7 @@
 #define IMU_H
 
 #include <stdint.h>
+#include <stdbool.h>
 
 typedef struct {
     uint8_t slave_addr;
@@ -17,21 +18,21 @@ typedef struct {
 
     int16_t temp_raw;
 
-    // Scaled physical units for filtering/control
-    float ax_g;
-    float ay_g;
-    float az_g;
+    // Scaled physical units — mg and mdps (integer, no FPU needed)
+    int32_t ax_g;
+    int32_t ay_g;
+    int32_t az_g;
 
-    float gx_dps;
-    float gy_dps;
-    float gz_dps;
+    int32_t gx_dps;
+    int32_t gy_dps;
+    int32_t gz_dps;
 
     float temp_c;
 } IMU_t;
 
 extern volatile uint8_t imu_ready;
 
-void imu_init(IMU_t* imu, uint8_t slave_addr);
+bool imu_init(IMU_t* imu, uint8_t slave_addr);
 void imu_read(IMU_t* imu);
 void imu_read_accel(IMU_t* imu);
 void imu_read_gyro(IMU_t* imu);
