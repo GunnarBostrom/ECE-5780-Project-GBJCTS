@@ -1,109 +1,82 @@
 #include "filter.h"
-#include <math.h>
 
-// Conversion factor from radians to degrees
-#define RAD_TO_DEG 57.2957795f
+/* ------------------------------------------------------------------ */
+/* IMU mounting-tilt bias (measured statically on a level surface).
+ * These values are subtracted from the accelerometer angle reference so
+ * the filter converges to 0° when the drone is physically level.
+ *
+ * ROLL_BIAS_CDEG  = 100  : drone reads +1.00° roll  when level
+ * PITCH_BIAS_CDEG = -60  : drone reads -0.60° pitch when level
+ */
+#define ROLL_BIAS_CDEG   100
+#define PITCH_BIAS_CDEG  (-60)
 
-// Initialize attitude estimate structure
+/* ------------------------------------------------------------------ */
+/* Gyro integration constant.
+ * delta_cdeg = gx_mdps * (1/416 s) * (100 cdeg/deg) / (1000 mdps/dps)
+ *            = gx_mdps / 4160
+ * A Bresenham carry accumulates the sub-centidegree remainder so no
+ * angular-rate information is discarded at 416 Hz.                    */
+#define GYRO_INTEG_DENOM 4160
 
-// Starts roll and pitch at zero and clears the stored gyro/accelerometer values
+/* ------------------------------------------------------------------ */
+/* Accelerometer angle constant.
+ * Small-angle approximation: atan2(y, z) ≈ y/z [rad]
+ * 1 radian = 57.2958° = 5729.58 centidegrees ≈ 5730 cdeg
+ * Guard: skip accel correction when az_mg < AZ_MIN_MG (craft near 90°). */
+#define RAD_TO_CDEG 5730
+#define AZ_MIN_MG    200
 
-void filter_init(Attitude_t* att)
+/* ------------------------------------------------------------------ */
+/* Complementary filter blend: alpha = 49/50 ≈ 0.98
+ * roll_new = (49 * gyro_pred + 1 * accel_ref) / 50               */
+#define ALPHA_NUM 49
+#define ALPHA_DEN 50
+
+void filter_init(Attitude_t *att)
 {
-    // Estimated Euler angles
-    att->roll_deg = 0.0f;
-    att->pitch_deg = 0.0f;
-
-    // Latest gyro measurements
-    att->gyro_x_dps = 0.0f;
-    att->gyro_y_dps = 0.0f;
-    att->gyro_z_dps = 0.0f;
-
-    // Latest accelerometer measurements
-    att->accel_x_g = 0.0f;
-    att->accel_y_g = 0.0f;
-    att->accel_z_g = 0.0f;
+    att->roll_cdeg   = 0;
+    att->pitch_cdeg  = 0;
+    att->roll_carry  = 0;
+    att->pitch_carry = 0;
 }
 
-// Update roll and pitch estimate using a complementary filter
-//
-// Inputs:
-//   gx_dps, gy_dps, gz_dps -> gyro angular rates in deg/s
-//   ax_g, ay_g, az_g       -> accelerometer readings in g
-//   dt                     -> loop timestep in seconds
-//
-// Function:
-//   - Stores the latest raw IMU data in the attitude structure
-//   - Computes roll/pitch from the accelerometer
-//   - Integrates gyro rates to predict angle motion
-//   - Blends gyro + accel estimates into a stable attitude estimate
-
-void filter_update(Attitude_t* att,
-                   float gx_dps,
-                   float gy_dps,
-                   float gz_dps,
-                   float ax_g,
-                   float ay_g,
-                   float az_g,
-                   float dt)
+void filter_update(Attitude_t *att,
+                   int32_t gx_mdps, int32_t gy_mdps,
+                   int32_t ax_mg,   int32_t ay_mg, int32_t az_mg)
 {
-    // Complementary filter blending factor
-    //
-    // alpha close to 1.0:
-    //   trust gyro more (fast response, but drifts over time)
-    //
-    // (1 - alpha):
-    //   trust accelerometer correction more (stable long-term, but noisy)
-    const float alpha = 0.98f;
+    /* -- Gyro integration (Bresenham) -------------------------------- */
+    att->roll_carry  += gx_mdps;
+    att->pitch_carry += gy_mdps;
 
-    float roll_acc_deg;
-    float pitch_acc_deg;
+    int32_t delta_roll  = att->roll_carry  / GYRO_INTEG_DENOM;
+    int32_t delta_pitch = att->pitch_carry / GYRO_INTEG_DENOM;
 
-    // Save most recent gyro measurements
-    att->gyro_x_dps = gx_dps;
-    att->gyro_y_dps = gy_dps;
-    att->gyro_z_dps = gz_dps;
+    att->roll_carry  %= GYRO_INTEG_DENOM;
+    att->pitch_carry %= GYRO_INTEG_DENOM;
 
-    // Save most recent accelerometer measurements
-    att->accel_x_g = ax_g;
-    att->accel_y_g = ay_g;
-    att->accel_z_g = az_g;
+    int32_t roll_pred  = att->roll_cdeg  + delta_roll;
+    int32_t pitch_pred = att->pitch_cdeg + delta_pitch;
 
-    
-    // Compute roll from accelerometer
-    //
-    // Uses gravity direction projected onto Y and Z axes
-    // Result is an absolute roll estimate in degrees
-    
-    roll_acc_deg =
-        atan2f(ay_g, az_g) * RAD_TO_DEG;
+    /* -- Accelerometer angle reference (small-angle approx) ---------- */
+    int32_t roll_acc;
+    int32_t pitch_acc;
 
-    
-    // Compute pitch from accelerometer
-    //
-    // Uses X axis and the magnitude of the Y/Z gravity components
-    // Result is an absolute pitch estimate in degrees
-    
-    pitch_acc_deg =
-        atan2f(-ax_g, sqrtf((ay_g * ay_g) + (az_g * az_g))) * RAD_TO_DEG;
+    if (az_mg > AZ_MIN_MG)
+    {
+        /* roll  ≈  atan2(ay, az) in cdeg, corrected for mounting bias */
+        roll_acc  =  ay_mg * RAD_TO_CDEG / az_mg - ROLL_BIAS_CDEG;
+        /* pitch ≈  atan2(-ax, az) in cdeg, corrected for mounting bias */
+        pitch_acc = -ax_mg * RAD_TO_CDEG / az_mg - PITCH_BIAS_CDEG;
+    }
+    else
+    {
+        /* Near 90° bank — trust gyro only, no accel correction */
+        roll_acc  = roll_pred;
+        pitch_acc = pitch_pred;
+    }
 
-    
-    // Complementary filter for roll
-    //
-    // 1. Predict new roll using gyro integration
-    // 2. Correct slow drift using accelerometer-based roll angle
-    
-    att->roll_deg =
-        alpha * (att->roll_deg + gx_dps * dt) +
-        (1.0f - alpha) * roll_acc_deg;
-
-    
-    // Complementary filter for pitch
-    //
-    // 1. Predict new pitch using gyro integration
-    // 2. Correct slow drift using accelerometer-based pitch angle
-    
-    att->pitch_deg =
-        alpha * (att->pitch_deg + gy_dps * dt) +
-        (1.0f - alpha) * pitch_acc_deg;
+    /* -- Complementary filter ---------------------------------------- */
+    att->roll_cdeg  = (ALPHA_NUM * roll_pred  + roll_acc)  / ALPHA_DEN;
+    att->pitch_cdeg = (ALPHA_NUM * pitch_pred + pitch_acc) / ALPHA_DEN;
 }

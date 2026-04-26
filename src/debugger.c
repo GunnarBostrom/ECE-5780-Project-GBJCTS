@@ -16,7 +16,9 @@ volatile short int new_data = 0;
 #if USE_DEBUGGER // use REAL hardware
 
 void debug_init(void) {
-    
+  RCC->AHBENR |= RCC_AHBENR_GPIOAEN;
+  (void)RCC->AHBENR;
+
   GPIO_InitTypeDef initStr = {0};
   initStr.Pin = GPIO_PIN_9 | GPIO_PIN_10; // PA9 - stm tx, PA10 - stm rx
   initStr.Mode = GPIO_MODE_AF_PP;

@@ -43,10 +43,9 @@ target_link_libraries(project PRIVATE
     STM32_Drivers
     STM32_Discovery
     VL53L1X_ULD
-    m
+    # -lm removed: all math is now integer-only (no FPU on Cortex-M0)
     # uncomment line below to do semihosting
     #rdimon
-    # it would go here, but we should probably just remove SEGGER from the project files
 )
 
 # flashing
