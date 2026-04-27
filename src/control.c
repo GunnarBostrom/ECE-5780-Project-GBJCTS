@@ -6,7 +6,7 @@
 
 // ESC PWM bounds
 #define THROTTLE_MIN_US 1000
-#define THROTTLE_MAX_US 1900
+#define THROTTLE_MAX_US 2000
 #define THROTTLE_IDLE_DEADBAND_US 50
 #define THROTTLE_ATTITUDE_START_US (THROTTLE_MIN_US + THROTTLE_IDLE_DEADBAND_US)
 #define THROTTLE_FULL_AUTHORITY_US 1250
@@ -53,7 +53,7 @@ static uint16_t map_throttle_to_us(uint16_t raw)
 void control_init(float dt)
 {
     PID_Init(&roll_pid,
-             3.5f,
+             2.0f,
              0.0f,
              0.02f,
              dt,
@@ -64,9 +64,9 @@ void control_init(float dt)
              0.02f);
 
     PID_Init(&pitch_pid,
-             3.2f,
+             2.2f,
              0.0f,
-             0.04f,
+             0.02f,
              dt,
              -180.0f,
              180.0f,
