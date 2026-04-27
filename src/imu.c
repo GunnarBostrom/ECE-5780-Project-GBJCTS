@@ -186,11 +186,18 @@ void imu_init(LSM6DS3_t* imu)
     // -------------------------------------------------------------------------
     // INT1_CTRL
     //
-    // Route accel + gyro data-ready to INT1
+    // Route gyro data-ready to INT1 by default.
+    //
+    // Using both gyro + accel DRDY on the same interrupt pin can produce two
+    // pulses per sensor period, which breaks the controller's fixed dt
+    // assumption. `config_local.h` can opt back into accel DRDY if needed.
     //
     // This is the key step required for PC0 EXTI interrupts to occur.
     // -------------------------------------------------------------------------
-    uint8_t int1_config = INT1_GYRO_EN | INT1_ACCEL_EN;
+    uint8_t int1_config = INT1_GYRO_EN;
+#if IMU_INT_USE_ACCEL_DRDY
+    int1_config |= INT1_ACCEL_EN;
+#endif
     i2c_write(IMU_ADDR, INT1_CFG, &int1_config, 1);
 }
 

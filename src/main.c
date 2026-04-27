@@ -49,6 +49,9 @@ int main(void) {
     // Optional LED setup for heartbeat / debug indication
     LED_init();
 
+    // Dedicated debug UART on USART1 TX (PA9)
+    uart_init();
+
     // Peripheral initialization
 
     // Initialize I2C bus at 400 kHz for IMU and lidar communication

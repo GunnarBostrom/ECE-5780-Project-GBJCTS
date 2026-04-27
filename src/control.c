@@ -2,14 +2,16 @@
 #include "pid.h"
 #include "radio.h"
 #include "motor.h"
+#include "uart.h"
 #include <stdint.h>
 
 // ESC PWM bounds
+#define THROTTLE_DISARM_US 1000
 #define THROTTLE_MIN_US 1000
 #define THROTTLE_MAX_US 2000
 #define THROTTLE_IDLE_DEADBAND_US 50
-#define THROTTLE_ATTITUDE_START_US (THROTTLE_MIN_US + THROTTLE_IDLE_DEADBAND_US)
-#define THROTTLE_FULL_AUTHORITY_US 1250
+#define THROTTLE_ATTITUDE_START_US THROTTLE_MIN_US
+#define THROTTLE_FULL_AUTHORITY_US 1150
 
 static PIDController roll_pid;
 static PIDController pitch_pid;
@@ -77,6 +79,8 @@ void control_init(float dt)
 
 void control_update(const LSM6DS3_t* imu, const Attitude_t* attitude)
 {
+    static uint8_t debug_divider = 0;
+
     uint16_t throttle_us;
     float roll_sp_deg;
     float pitch_sp_deg;
@@ -96,7 +100,7 @@ void control_update(const LSM6DS3_t* imu, const Attitude_t* attitude)
     {
         PID_Reset(&roll_pid);
         PID_Reset(&pitch_pid);
-        motor_set_all(THROTTLE_MIN_US);
+        motor_set_all(THROTTLE_DISARM_US);
         return;
     }
 
@@ -153,4 +157,10 @@ void control_update(const LSM6DS3_t* imu, const Attitude_t* attitude)
     m4 = clamp_u16((int32_t)(throttle_us - pitch_cmd - roll_cmd), THROTTLE_MIN_US, THROTTLE_MAX_US);
 
     motor_set_individual(m1, m2, m3, m4);
+
+    if (++debug_divider >= 20U)
+    {
+        debug_divider = 0;
+        uart_write_control_commands(roll_cmd, pitch_cmd, m1, m2, m3, m4);
+    }
 }

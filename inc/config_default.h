@@ -15,3 +15,11 @@
 #ifndef USE_DEBUGGER
     #define USE_DEBUGGER 1
 #endif
+
+// Route only one data-ready source to the control-loop interrupt by default.
+//
+// Enabling both accel and gyro DRDY on the same pin can create two interrupt
+// pulses per sensor period, which breaks the fixed control-loop timestep.
+#ifndef IMU_INT_USE_ACCEL_DRDY
+    #define IMU_INT_USE_ACCEL_DRDY 0
+#endif

@@ -10,6 +10,8 @@ LSM6DS3 Driver
 #include <stdint.h>
 
 typedef struct {
+    int16_t temp_raw;
+
     // raw sensor output
     int16_t ax;
     int16_t ay;
