@@ -1,42 +1,48 @@
 /**
+ * main.c
  * Flight Controller
  * STM32F072x Discovery Board
  */
 
-#include "main.h"
+#include <stdint.h>
+#include <stdio.h>
+
 #include "config.h"
 #include "control.h"
+#include "debugger.h"
 #include "filter.h"
 #include "i2c.h"
 #include "imu.h"
 #include "lidar.h"
+#include "main.h"
 #include "motor.h"
 #include "pid.h"
 #include "radio.h"
 #include "uart.h"
+
 #include "stm32f072xb.h"
 #include "stm32f0xx_hal.h"
 #include "stm32f0xx_hal_gpio.h"
 #include "stm32f0xx_it.h"
-#include <stdint.h>
-#include <stdio.h>
 #include <sys/_intsup.h>
 #include <sys/types.h>
-#include "imu.h"
-#include "filter.h"
-#include "control.h"
-#include "radio.h"
-#include "motor.h"
+
+typedef enum {
+  SENSOR_IMU,
+  SENSOR_LIDAR,
+  SENSOR_RADIO,
+} SensorType_t;
 
 void Error_Handler(void);
 void SystemClock_Config(void);
 
-static void LED_init(void);
 void imu_interrupt_init(void);
 
+static void LED_init(void);
+static void SendSensorData(SensorType_t sensor);
 
-/* –––––––––– globals –––––––––– */
-LSM6DS3_t imu;
+    /* –––––––––– globals –––––––––– */
+    LSM6DS3_t imu;
 LIDAR_t vl53l1x;
 Attitude_t attitude;
 
@@ -49,22 +55,21 @@ int main(void) {
     // Optional LED setup for heartbeat / debug indication
     LED_init();
 
-    // Peripheral initialization
-
-    // Initialize I2C bus at 400 kHz for IMU and lidar communication
+    // I2C peripheral initialization
     i2c_init(400);
 
-    // Initialize IMU, then enable its interrupt so new samples can trigger updates
     imu_init(&imu);
     imu_interrupt_init();
 
-    // Initialize lidar sensor
     lidar_init(&vl53l1x, 0x52);    // VL53L1X I2C address = 0x52
 
-    // Initialize radio receiver interface
+    // UART peripheral initialization
     radio_init();
 
-    // Initialize ESC / motor PWM outputs
+    debug_init();
+    static uint32_t last_tick = 0;
+
+    // PWM peripheral initialization
     motor_init();
 
     // Estimation and control initialization
@@ -79,10 +84,8 @@ int main(void) {
     // outputs are refreshed independently by TIM2 at a higher ESC update rate.
     const float dt = 1.0f / 416.0f;
 
-    // Initialize attitude estimate state
     filter_init(&attitude);
 
-    // Initialize roll/pitch controllers using the same fixed timestep
     control_init(dt);
 
     // Start with motors at minimum command for safety
@@ -138,8 +141,12 @@ int main(void) {
         //   - telemetry output
         //   - lidar processing
         //   - safety / fault checks
-    }
 
+        if (HAL_GetTick() - last_tick >= 500) {
+          last_tick = HAL_GetTick();
+          SendSensorData(SENSOR_IMU);
+        }
+    }
     // Nothing should execute below the main control loop
 }
 
@@ -219,6 +226,29 @@ void imu_interrupt_init(void) {
     NVIC_EnableIRQ(EXTI0_1_IRQn);
 }
 
+static void SendSensorData(SensorType_t sensor) {
+
+  char buffer[150];
+
+  switch (sensor) {
+
+  case SENSOR_IMU:
+    accept_string("IMU data received\r\n");
+    // sprintf(buffer, "ax: % d ay: % d az: % d\r\ngx: % d gy: % d gz: % d\r\n\r\n",
+    //         imu.ax, imu.ay, imu.az, imu.gx, imu.gy, imu.gz);
+    sprintf(buffer, "ax: % 4.2f ay: % 4.2f az: % 4.2f\r\ngx: % 4.2f gy: % 4.2f gz: % 4.2f\r\n\r\n",
+            imu.ax_g, imu.ay_g, imu.az_g, imu.gx_dps, imu.gy_dps, imu.gz_dps);
+    accept_string(buffer);
+    break;
+
+  case SENSOR_LIDAR:
+    break;
+  case SENSOR_RADIO:
+    break;
+  default:
+    break;
+  }
+}
 
 /**
   * @brief System Clock Configuration
