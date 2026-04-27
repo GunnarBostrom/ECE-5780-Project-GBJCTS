@@ -36,12 +36,12 @@ void imu_interrupt_init(void);
 
 
 /* –––––––––– globals –––––––––– */
-IMU_t lsm6ds3;
+LSM6DS3_t imu;
 LIDAR_t vl53l1x;
 Attitude_t attitude;
 
-int main(void)
-{
+int main(void) {
+
     // Core HAL and clock setup
     HAL_Init();
     SystemClock_Config();
@@ -55,7 +55,7 @@ int main(void)
     i2c_init(400);
 
     // Initialize IMU, then enable its interrupt so new samples can trigger updates
-    imu_init(&lsm6ds3, 0x6B);      // LSM6DS3 I2C address = 0x6B
+    imu_init(&imu);
     imu_interrupt_init();
 
     // Initialize lidar sensor
@@ -115,20 +115,20 @@ int main(void)
             imu_ready = 0;
 
             // Read the newest IMU sample
-            imu_read(&lsm6ds3);
+            imu_read(&imu);
 
             // Update attitude estimate from gyro + accelerometer data
             filter_update(&attitude,
-                          lsm6ds3.gx_dps,
-                          lsm6ds3.gy_dps,
-                          lsm6ds3.gz_dps,
-                          lsm6ds3.ax_g,
-                          lsm6ds3.ay_g,
-                          lsm6ds3.az_g,
+                          imu.gx_dps,
+                          imu.gy_dps,
+                          imu.gz_dps,
+                          imu.ax_g,
+                          imu.ay_g,
+                          imu.az_g,
                           dt);
 
             // Run the controller using the estimated attitude
-            control_update(&lsm6ds3, &attitude);
+            control_update(&imu, &attitude);
           }
 
         // Background tasks can be added here later as long as they stay short

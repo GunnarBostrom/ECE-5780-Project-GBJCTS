@@ -1,12 +1,16 @@
+/**
+imu.h
+LSM6DS3 Driver
+
+*/
+
 #ifndef IMU_H
 #define IMU_H
 
 #include <stdint.h>
 
 typedef struct {
-    uint8_t slave_addr;
-
-    // Raw sensor outputs from the LSM6DS3 registers
+    // raw sensor output
     int16_t ax;
     int16_t ay;
     int16_t az;
@@ -15,27 +19,30 @@ typedef struct {
     int16_t gy;
     int16_t gz;
 
-    int16_t temp_raw;
+    // physical units
+    // int16_t ax_mg;
+    // int16_t ay_mg;
+    // int16_t az_mg;
+    // int16_t gx_mdps;
+    // int16_t gy_mdps;
+    // int16_t gz_mdps;
 
-    // Scaled physical units for filtering/control
     float ax_g;
     float ay_g;
     float az_g;
-
     float gx_dps;
     float gy_dps;
     float gz_dps;
 
-    float temp_c;
-} IMU_t;
+} LSM6DS3_t;
 
 extern volatile uint8_t imu_ready;
 
-void imu_init(IMU_t* imu, uint8_t slave_addr);
-void imu_read(IMU_t* imu);
-void imu_read_accel(IMU_t* imu);
-void imu_read_gyro(IMU_t* imu);
-void imu_read_temp(IMU_t* imu);
-void imu_read_all(IMU_t* imu);
+void imu_init(LSM6DS3_t* imu);
+void imu_read(LSM6DS3_t* imu);
+void imu_read_accel(LSM6DS3_t* imu);
+void imu_read_gyro(LSM6DS3_t* imu);
+void imu_read_temp(LSM6DS3_t* imu);
+void imu_read_all(LSM6DS3_t* imu);
 
 #endif // IMU_H
