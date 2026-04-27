@@ -100,6 +100,6 @@ Flash to board:
 **Status:** Sensing and actuating peripherals 
 **Language:** C  
 **License:** MIT License – see [LICENSE](./LICENSE)  
-**Authors:** [G. Bostram](https://github.com/GunnarBostrom), [J. Canada](https://github.com/JC919), [T. Stratton](https://github.com/POACH3)  
+**Authors:** [G. Bostrom](https://github.com/GunnarBostrom), [J. Canada](https://github.com/JC919), [T. Stratton](https://github.com/POACH3)  
 **Semester:** Spring 2026  
 **Start Date:** 17-MAR-2026
