@@ -18,6 +18,6 @@ void control_init(float dt);
 //
 // `imu` is accepted for interface consistency and future extensions, but the
 // current implementation closes the loop using `attitude`.
-void control_update(const IMU_t* imu, const Attitude_t* attitude);
+void control_update(const LSM6DS3_t* imu, const Attitude_t* attitude);
 
 #endif

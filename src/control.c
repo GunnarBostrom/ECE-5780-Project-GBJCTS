@@ -55,13 +55,13 @@ void control_init(float dt)
     PID_Init(&roll_pid,
              2.0f,
              0.0f,
-             0.03f,
+             0.02f,
              dt,
              -180.0f,
              180.0f,
              -50.0f,
              50.0f,
-             0.03f);
+             0.02f);
 
     PID_Init(&pitch_pid,
              2.2f,
@@ -75,7 +75,7 @@ void control_init(float dt)
              0.02f);
 }
 
-void control_update(const IMU_t* imu, const Attitude_t* attitude)
+void control_update(const LSM6DS3_t* imu, const Attitude_t* attitude)
 {
     uint16_t throttle_us;
     float roll_sp_deg;
