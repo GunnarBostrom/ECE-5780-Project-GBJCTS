@@ -71,7 +71,7 @@ void control_init(float dt)
 
     // Pitch PID controller 
     PID_Init(&pitch_pid,
-             2.0f,
+             2.2f,
              0.0f,
              0.02f,
              dt,
