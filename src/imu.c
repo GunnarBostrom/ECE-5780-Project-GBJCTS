@@ -102,8 +102,12 @@ static const float accel_scale_g_per_lsb = 0.000244f; // ±8 g
 #define G_FS_2000        70
 static const float gyro_scale_dps_per_lsb = 0.070f; // 2000 dps
 
+#define CAL_SAMPLES      416
 
-static void imu_convert_units(LSM6DS3_t *imu);
+static void convert_units(LSM6DS3_t* imu);
+
+static float gx_offset = 0, gy_offset = 0, gz_offset = 0;
+static float ax_offset = 0, ay_offset = 0, az_offset = 0;
 
 volatile uint8_t imu_ready = 0;
 
@@ -115,83 +119,77 @@ volatile uint8_t imu_ready = 0;
  * 
  * Hard-coded configs:
  *      - accelerometer: 416Hz data rate, ±8g full-scale, 400Hz anti-aliasing
- *      - gyroscope:     416Hz data rate, 2000 dps
+ *      - gyroscope:     416Hz data rate, 2000 dps full-scale
  * 
  * @param imu           Pointer to IMU struct
  */
-void imu_init(LSM6DS3_t* imu)
-{
+void imu_init(LSM6DS3_t* imu) {
+
     uint8_t device_id;
-    // Verify that the device on the bus is actually the LSM6DS3
     i2c_read(IMU_ADDR, WHO_AM_I_REG, &device_id, 1);
 
-    if (device_id != DEVICE_ID)
-    {
-        // Wrong device detected
-        //
-        // Blink blue + orange LEDs forever so startup failure is obvious
-        while (1)
-        {
+    if (device_id != DEVICE_ID) {
+        // wrong device detected
+        // blink blue + orange LEDs
+        while (1) {
             HAL_GPIO_TogglePin(GPIOC, GPIO_PIN_7);
             HAL_GPIO_TogglePin(GPIOC, GPIO_PIN_8);
             HAL_Delay(200);
         }
     }
 
-    // -------------------------------------------------------------------------
-    // CTRL3_C
-    //
     // BDU    = 1  -> block data update
     // IF_INC = 1  -> auto-increment register addresses for burst reads
     //
     // 0x44 = 0100 0100b
-    // -------------------------------------------------------------------------
     uint8_t ctrl3 = 0x44;
     i2c_write(IMU_ADDR, CTRL3_C, &ctrl3, 1);
 
-    // -------------------------------------------------------------------------
-    // CTRL4_C
-    //
-    // DRDY_MASK = 1
-    //
-    // Masks data-ready until output data has settled
-    // -------------------------------------------------------------------------
+    // mask data-ready until output data has settled
     uint8_t ctrl4 = 0x08;
     i2c_write(IMU_ADDR, CTRL4_C, &ctrl4, 1);
 
-    // -------------------------------------------------------------------------
-    // CTRL1_XL
-    //
-    // Accelerometer:
-    //   ODR = 416 Hz
-    //   FS  = ±8 g
-    //   BW  = 400 Hz
-    // -------------------------------------------------------------------------
+    // data configs
     uint8_t accel_config = ACCEL_ODR_416HZ | ACCEL_FS_8G | ACCEL_BW_400HZ;
     i2c_write(IMU_ADDR, ACCEL_CFG, &accel_config, 1);
 
-    // -------------------------------------------------------------------------
-    // CTRL2_G
-    //
-    // Gyroscope:
-    //   ODR = 416 Hz
-    //   FS  = 2000 dps
-    // -------------------------------------------------------------------------
     uint8_t gyro_config = GYRO_ODR_416HZ | GYRO_FS_2000DPS;
     i2c_write(IMU_ADDR, GYRO_CFG, &gyro_config, 1);
 
-    // Allow startup / filter settling time
+    // startup filter settling time
     HAL_Delay(100);
 
-    // -------------------------------------------------------------------------
-    // INT1_CTRL
-    //
-    // Route accel + gyro data-ready to INT1
-    //
-    // This is the key step required for PC0 EXTI interrupts to occur.
-    // -------------------------------------------------------------------------
+    // interrupts
     uint8_t int1_config = INT1_GYRO_EN | INT1_ACCEL_EN;
     i2c_write(IMU_ADDR, INT1_CFG, &int1_config, 1);
+}
+
+// record average offset
+void imu_calibrate(LSM6DS3_t *imu) {
+
+  for (int i = 0; i < CAL_SAMPLES; i++) {
+    while (!imu_ready) {} // wait
+    imu_ready = 0;
+
+    imu_read(imu);
+
+    gx_offset += imu->gx;
+    gy_offset += imu->gy;
+    gz_offset += imu->gz;
+    ax_offset += imu->ax;
+    ay_offset += imu->ay;
+    az_offset += imu->az;
+  }
+
+  gx_offset /= CAL_SAMPLES;
+  gy_offset /= CAL_SAMPLES;
+  gz_offset /= CAL_SAMPLES;
+  ax_offset /= CAL_SAMPLES;
+  ay_offset /= CAL_SAMPLES;
+  az_offset /= CAL_SAMPLES;
+  az_offset -= 1.0f / accel_scale_g_per_lsb; // subtract 1g in raw counts
+  // az should read 1g at rest, so subtract gravity
+
 }
 
 /**
@@ -211,7 +209,18 @@ void imu_read(LSM6DS3_t* imu) {
   imu->ax = (int16_t)(buf[6] | buf[7] << 8);
   imu->ay = (int16_t)(buf[8] | buf[9] << 8);
   imu->az = (int16_t)(buf[10] | buf[11] << 8);
-  imu_convert_units(imu);
+  convert_units(imu);
+}
+
+// Reads IMU gyroscope data
+void imu_read_gyro(LSM6DS3_t *imu) {
+  uint8_t buf[6]; // 6 bytes: X, Y, Z (2 bytes each)
+
+  i2c_read(IMU_ADDR, GYRO_REG, buf, 6);
+  imu->gx = (int16_t)(buf[0] | buf[1] << 8);
+  imu->gy = (int16_t)(buf[2] | buf[3] << 8);
+  imu->gz = (int16_t)(buf[4] | buf[5] << 8);
+  convert_units(imu);
 }
 
 //Reads IMU acceleration data
@@ -222,29 +231,16 @@ void imu_read_accel(LSM6DS3_t* imu) {
   imu->ax = (int16_t)(buf[0] | buf[1] << 8);
   imu->ay = (int16_t)(buf[2] | buf[3] << 8);
   imu->az = (int16_t)(buf[4] | buf[5] << 8);
-  imu_convert_units(imu);
-}
-
-// Reads IMU gyroscope data
-void imu_read_gyro(LSM6DS3_t* imu) {
-  uint8_t buf[6]; // 6 bytes: X, Y, Z (2 bytes each)
-
-  i2c_read(IMU_ADDR, GYRO_REG, buf, 6);
-  imu->gx = (int16_t)(buf[0] | buf[1] << 8);
-  imu->gy = (int16_t)(buf[2] | buf[3] << 8);
-  imu->gz = (int16_t)(buf[4] | buf[5] << 8);
-  imu_convert_units(imu);
+  convert_units(imu);
 }
 
 // Reads IMU temperature data
-// This output is raw. The conversion to celsius is:
-// celsius_temp = (raw_temp / 16) + 25  (± the offset error)
 void imu_read_temp(LSM6DS3_t* imu) {
   uint8_t buf[2];
 
   i2c_read(IMU_ADDR, TEMP_REG, buf, 2);
-  imu->temp_raw = (int16_t)(buf[0] | (buf[1] << 8));
-  //imu_convert_units(imu);
+  //imu->temp = (int16_t)(buf[0] | (buf[1] << 8));
+  //convert_units(imu);
 }
 
 // Reads all IMU data (including temperature)
@@ -252,31 +248,34 @@ void imu_read_all(LSM6DS3_t* imu) {
     uint8_t buf[14];
 
     i2c_read(IMU_ADDR, TEMP_REG, buf, 14);
-    imu->temp_raw = (int16_t)(buf[0] | (buf[1] << 8));
-    imu->gx   = (int16_t)(buf[2]  | buf[3]  << 8);
-    imu->gy   = (int16_t)(buf[4]  | buf[5]  << 8);
-    imu->gz   = (int16_t)(buf[6]  | buf[7]  << 8);
-    imu->ax   = (int16_t)(buf[8]  | buf[9]  << 8);
-    imu->ay   = (int16_t)(buf[10] | buf[11] << 8);
-    imu->az   = (int16_t)(buf[12] | buf[13] << 8);
-    imu_convert_units(imu);
+    //imu->temp = (int16_t)(buf[0] | (buf[1] << 8));
+    imu->gx = (int16_t)(buf[2]  | buf[3]  << 8);
+    imu->gy = (int16_t)(buf[4]  | buf[5]  << 8);
+    imu->gz = (int16_t)(buf[6]  | buf[7]  << 8);
+    imu->ax = (int16_t)(buf[8]  | buf[9]  << 8);
+    imu->ay = (int16_t)(buf[10] | buf[11] << 8);
+    imu->az = (int16_t)(buf[12] | buf[13] << 8);
+    convert_units(imu);
 }
 
-// convert raw to millis
-static void imu_convert_units(LSM6DS3_t* imu) {
-//   imu->ax_mg = imu->ax * A_FS_8;
-//   imu->ay_mg = imu->ay * A_FS_8;
-//   imu->az_mg = imu->az * A_FS_8;
-//   imu->gx_mdps = imu->gx * G_FS_2000;
-//   imu->gy_mdps = imu->gy * G_FS_2000;
-//   imu->gz_mdps = imu->gz * G_FS_2000;
+// corrects raw values and converts to physical units
+static void convert_units(LSM6DS3_t* imu) {
+    // imu->gx_mdps = imu->gx * G_FS_2000;
+    // imu->gy_mdps = imu->gy * G_FS_2000;
+    // imu->gz_mdps = imu->gz * G_FS_2000;
+    // imu->ax_mg = imu->ax * A_FS_8;
+    // imu->ay_mg = imu->ay * A_FS_8;
+    // imu->az_mg = imu->az * A_FS_8;
 
-  imu->ax_g = (float)imu->ax * accel_scale_g_per_lsb;
-  imu->ay_g = (float)imu->ay * accel_scale_g_per_lsb;
-  imu->az_g = (float)imu->az * accel_scale_g_per_lsb;
-  imu->gx_dps = (float)imu->gx * gyro_scale_dps_per_lsb;
-  imu->gy_dps = (float)imu->gy * gyro_scale_dps_per_lsb;
-  imu->gz_dps = (float)imu->gz * gyro_scale_dps_per_lsb;
+    imu->gx_dps = (float)(imu->gx - gx_offset) * gyro_scale_dps_per_lsb;
+    imu->gy_dps = (float)(imu->gy - gy_offset) * gyro_scale_dps_per_lsb;
+    imu->gz_dps = (float)(imu->gz - gz_offset) * gyro_scale_dps_per_lsb;
+    imu->ax_g = (float)(imu->ax - ax_offset) * accel_scale_g_per_lsb;
+    imu->ay_g = (float)(imu->ay - ay_offset) * accel_scale_g_per_lsb;
+    imu->az_g = (float)(imu->az - az_offset) * accel_scale_g_per_lsb;
+
+    // conversion to celsius is:
+    // celsius_temp = (raw_temp / 16) + 25  (± the offset error)
 }
 
 #else // use FAKE hardware
@@ -286,5 +285,6 @@ void imu_read_accel(LSM6DS3_t* imu) { /* do nothing */ }
 void imu_read_gyro(LSM6DS3_t* imu) { /* do nothing */ }
 void imu_read_temp(LSM6DS3_t* imu) { /* do nothing */ }
 void imu_read_all(LSM6DS3_t* imu) { /* do nothing */ }
-static void imu_convert_units(LSM6DS3_t* imu) { /* do nothing */ }
+static void calibrate(LSM6DS3_t *imu) { /* do nothing */ }
+static void convert_units(LSM6DS3_t* imu) { /* do nothing */ }
 #endif

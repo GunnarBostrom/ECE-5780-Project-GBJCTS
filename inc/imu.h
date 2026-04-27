@@ -10,35 +10,23 @@ LSM6DS3 Driver
 #include <stdint.h>
 
 typedef struct {
-    // raw sensor output
-    int16_t ax;
-    int16_t ay;
-    int16_t az;
 
-    int16_t gx;
-    int16_t gy;
-    int16_t gz;
+    // raw sensor output (not corrected)
+    int16_t gx, gy, gz;
+    int16_t ax, ay, az;
 
     // physical units
-    // int16_t ax_mg;
-    // int16_t ay_mg;
-    // int16_t az_mg;
-    // int16_t gx_mdps;
-    // int16_t gy_mdps;
-    // int16_t gz_mdps;
-
-    float ax_g;
-    float ay_g;
-    float az_g;
-    float gx_dps;
-    float gy_dps;
-    float gz_dps;
+    // int16_t gx_mdps, gy_mdps, gz_mdps;
+    // int16_t ax_mg, ay_mg, az_mg;
+    float gx_dps, gy_dps, gz_dps;
+    float ax_g, ay_g, az_g;
 
 } LSM6DS3_t;
 
 extern volatile uint8_t imu_ready;
 
 void imu_init(LSM6DS3_t* imu);
+void imu_calibrate(LSM6DS3_t* imu);
 void imu_read(LSM6DS3_t* imu);
 void imu_read_accel(LSM6DS3_t* imu);
 void imu_read_gyro(LSM6DS3_t* imu);

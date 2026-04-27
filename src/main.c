@@ -39,38 +39,55 @@ void SystemClock_Config(void);
 void imu_interrupt_init(void);
 
 static void LED_init(void);
-static void SendSensorData(SensorType_t sensor);
+static void led_status(uint8_t);
+static void send_sensor_data(SensorType_t sensor);
 
-    /* –––––––––– globals –––––––––– */
-    LSM6DS3_t imu;
+/* –––––––––– globals –––––––––– */
+LSM6DS3_t imu;
 LIDAR_t vl53l1x;
 Attitude_t attitude;
 
 int main(void) {
 
-    // Core HAL and clock setup
+    // core HAL and clock setup
     HAL_Init();
     SystemClock_Config();
 
-    // Optional LED setup for heartbeat / debug indication
     LED_init();
+    led_status(1);
 
     // I2C peripheral initialization
     i2c_init(400);
+    led_status(2);
 
     imu_init(&imu);
     imu_interrupt_init();
+    led_status(3);
+    // finish setting up later
 
     lidar_init(&vl53l1x, 0x52);    // VL53L1X I2C address = 0x52
+    led_status(4);
 
     // UART peripheral initialization
     radio_init();
+    led_status(5);
 
     debug_init();
     static uint32_t last_tick = 0;
 
     // PWM peripheral initialization
     motor_init();
+    led_status(6);
+
+
+    imu_calibrate(&imu); // do calibration now that IMU has warmed up
+    // while (1) {
+    //   HAL_GPIO_TogglePin(GPIOC, GPIO_PIN_7); // blue off
+    //   HAL_Delay(500);
+    // }
+    led_status(7);
+    led_status(8);
+    led_status(9);
 
     // Estimation and control initialization
 
@@ -144,7 +161,7 @@ int main(void) {
 
         if (HAL_GetTick() - last_tick >= 500) {
           last_tick = HAL_GetTick();
-          SendSensorData(SENSOR_IMU);
+          send_sensor_data(SENSOR_IMU);
         }
     }
     // Nothing should execute below the main control loop
@@ -175,26 +192,62 @@ static void LED_init(void) {
                               GPIO_NOPULL};
 
   HAL_GPIO_Init(GPIOC, &initStr);
-  
-  // a real cute power on sequence
-  HAL_GPIO_WritePin(GPIOC, GPIO_PIN_6 | GPIO_PIN_7 | GPIO_PIN_8 | GPIO_PIN_9, GPIO_PIN_SET); // leds on
-  HAL_Delay(1000);
-  HAL_GPIO_TogglePin(GPIOC, GPIO_PIN_6 | GPIO_PIN_7 | GPIO_PIN_8 | GPIO_PIN_9); // leds off
-  HAL_Delay(500);
-  HAL_GPIO_WritePin(GPIOC, GPIO_PIN_6 | GPIO_PIN_7 | GPIO_PIN_8 | GPIO_PIN_9, GPIO_PIN_SET); // leds on
-  HAL_Delay(500);
-  HAL_GPIO_TogglePin(GPIOC, GPIO_PIN_6); // red off
-  HAL_Delay(500);
-  HAL_GPIO_TogglePin(GPIOC, GPIO_PIN_9); // green off
-  HAL_Delay(500);
-  HAL_GPIO_TogglePin(GPIOC, GPIO_PIN_7); // blue off
-  HAL_Delay(500);
-  HAL_GPIO_TogglePin(GPIOC, GPIO_PIN_8); // orange off
-  HAL_Delay(500);
-  HAL_GPIO_WritePin(GPIOC, GPIO_PIN_6 | GPIO_PIN_7 | GPIO_PIN_8 | GPIO_PIN_9, GPIO_PIN_SET); // leds on
-  HAL_Delay(1000);
-  HAL_GPIO_TogglePin(GPIOC, GPIO_PIN_6 | GPIO_PIN_7 | GPIO_PIN_8 | GPIO_PIN_9); // leds off
-  HAL_Delay(500);
+}
+
+// a real cute power on sequence
+static void led_status(uint8_t powerup) {
+
+  switch (powerup) {
+
+    case 1:
+      HAL_GPIO_WritePin(GPIOC,
+                        GPIO_PIN_6 | GPIO_PIN_7 | GPIO_PIN_8 | GPIO_PIN_9,
+                        GPIO_PIN_SET); // leds on
+      HAL_Delay(1000);
+      break;
+    case 2:
+      HAL_GPIO_TogglePin(GPIOC, GPIO_PIN_6 | GPIO_PIN_7 | GPIO_PIN_8 |
+                                    GPIO_PIN_9); // leds off
+      HAL_Delay(500);
+      break;
+    case 3:
+      HAL_GPIO_WritePin(GPIOC,
+                        GPIO_PIN_6 | GPIO_PIN_7 | GPIO_PIN_8 | GPIO_PIN_9,
+                        GPIO_PIN_SET); // leds on
+      HAL_Delay(500);
+      break;
+    case 4:
+      HAL_GPIO_TogglePin(GPIOC, GPIO_PIN_6); // red off
+      HAL_Delay(500);
+      break;
+    case 5:
+      HAL_GPIO_TogglePin(GPIOC, GPIO_PIN_9); // green off
+      HAL_Delay(500);
+      break;
+    case 6:
+      HAL_GPIO_TogglePin(GPIOC, GPIO_PIN_7); // blue off
+      HAL_Delay(500);
+      break;
+    case 7:
+      HAL_GPIO_TogglePin(GPIOC, GPIO_PIN_8); // orange off
+      HAL_Delay(500);
+      break;
+    case 8:
+      HAL_GPIO_WritePin(GPIOC,
+                        GPIO_PIN_6 | GPIO_PIN_7 | GPIO_PIN_8 | GPIO_PIN_9,
+                        GPIO_PIN_SET); // leds on
+      HAL_Delay(1000);
+      break;
+    case 9:
+      HAL_GPIO_TogglePin(GPIOC, GPIO_PIN_6 | GPIO_PIN_7 | GPIO_PIN_8 |
+                                    GPIO_PIN_9); // leds off
+      HAL_Delay(500);
+      break;
+    default:
+      break;
+  }
+
+ 
 
 }
 
@@ -222,11 +275,11 @@ void imu_interrupt_init(void) {
     EXTI->FTSR &= ~EXTI_FTSR_TR0;  // not falling edge
     
     // Configure and enable NVIC
-    NVIC_SetPriority(EXTI0_1_IRQn, 1);
+    NVIC_SetPriority(EXTI0_1_IRQn, 3);
     NVIC_EnableIRQ(EXTI0_1_IRQn);
 }
 
-static void SendSensorData(SensorType_t sensor) {
+static void send_sensor_data(SensorType_t sensor) {
 
   char buffer[150];
 
