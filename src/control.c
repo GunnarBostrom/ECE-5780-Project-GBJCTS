@@ -55,13 +55,13 @@ void control_init(float dt)
     PID_Init(&roll_pid,
              2.0f,
              0.0f,
-             0.02f,
+             0.03f,
              dt,
              -180.0f,
              180.0f,
              -50.0f,
              50.0f,
-             0.02f);
+             0.03f);
 
     PID_Init(&pitch_pid,
              2.2f,
