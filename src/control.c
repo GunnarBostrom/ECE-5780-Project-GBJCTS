@@ -75,82 +75,83 @@ void control_init(float dt)
              0.02f);
 }
 
-void control_update(const LSM6DS3_t* imu, const Attitude_t* attitude)
-{
-    uint16_t throttle_us;
-    float roll_sp_deg;
-    float pitch_sp_deg;
-    float roll_cmd;
-    float pitch_cmd;
-    uint16_t m1;
-    uint16_t m2;
-    uint16_t m3;
-    uint16_t m4;
-    float authority;
-    float correction_sum;
-    float correction_headroom;
+void control_update(const LSM6DS3_t *imu, const Attitude_t *attitude, MOTOR_t* motors) {
+  uint16_t throttle_us;
+  float roll_sp_deg;
+  float pitch_sp_deg;
+  float roll_cmd;
+  float pitch_cmd;
+  uint16_t m1;
+  uint16_t m2;
+  uint16_t m3;
+  uint16_t m4;
+  float authority;
+  float correction_sum;
+  float correction_headroom;
 
-    (void)imu;
+  (void)imu;
 
-    if (!radio_data.armed)
-    {
-        PID_Reset(&roll_pid);
-        PID_Reset(&pitch_pid);
-        motor_set_all(THROTTLE_MIN_US);
-        return;
-    }
+  if (!radio_data.armed) {
+    PID_Reset(&roll_pid);
+    PID_Reset(&pitch_pid);
+    motor_set_all(THROTTLE_MIN_US);
+    return;
+  }
 
-    throttle_us = map_throttle_to_us(radio_data.throttle);
+  throttle_us = map_throttle_to_us(radio_data.throttle);
 
-    if (throttle_us <= (THROTTLE_MIN_US + THROTTLE_IDLE_DEADBAND_US))
-    {
-        PID_Reset(&roll_pid);
-        PID_Reset(&pitch_pid);
-        motor_set_all(THROTTLE_MIN_US);
-        return;
-    }
+  if (throttle_us <= (THROTTLE_MIN_US + THROTTLE_IDLE_DEADBAND_US)) {
+    PID_Reset(&roll_pid);
+    PID_Reset(&pitch_pid);
+    motor_set_all(THROTTLE_MIN_US);
+    return;
+  }
 
-    roll_sp_deg = 0.0f;
-    pitch_sp_deg = 0.0f;
+  roll_sp_deg = 0.0f;
+  pitch_sp_deg = 0.0f;
 
-    roll_cmd = PID_Update(&roll_pid, roll_sp_deg, attitude->roll_deg);
-    pitch_cmd = -PID_Update(&pitch_pid, pitch_sp_deg, attitude->pitch_deg);
+  roll_cmd = PID_Update(&roll_pid, roll_sp_deg, attitude->roll_deg);
+  pitch_cmd = -PID_Update(&pitch_pid, pitch_sp_deg, attitude->pitch_deg);
 
-    authority = (float)(throttle_us - THROTTLE_ATTITUDE_START_US) /
-                (float)(THROTTLE_FULL_AUTHORITY_US - THROTTLE_ATTITUDE_START_US);
-    if (authority < 0.0f)
-    {
-        authority = 0.0f;
-    }
-    if (authority > 1.0f)
-    {
-        authority = 1.0f;
-    }
+  authority = (float)(throttle_us - THROTTLE_ATTITUDE_START_US) /
+              (float)(THROTTLE_FULL_AUTHORITY_US - THROTTLE_ATTITUDE_START_US);
+  if (authority < 0.0f) {
+    authority = 0.0f;
+  }
+  if (authority > 1.0f) {
+    authority = 1.0f;
+  }
 
-    roll_cmd *= authority;
-    pitch_cmd *= authority;
+  roll_cmd *= authority;
+  pitch_cmd *= authority;
 
-    correction_sum = abs_f(roll_cmd) + abs_f(pitch_cmd);
-    correction_headroom = (float)(throttle_us - THROTTLE_MIN_US);
-    if ((float)(THROTTLE_MAX_US - throttle_us) < correction_headroom)
-    {
-        correction_headroom = (float)(THROTTLE_MAX_US - throttle_us);
-    }
-    if (correction_headroom > 10.0f)
-    {
-        correction_headroom -= 10.0f;
-    }
-    if ((correction_sum > correction_headroom) && (correction_sum > 1.0f))
-    {
-        float scale = correction_headroom / correction_sum;
-        roll_cmd *= scale;
-        pitch_cmd *= scale;
-    }
+  correction_sum = abs_f(roll_cmd) + abs_f(pitch_cmd);
+  correction_headroom = (float)(throttle_us - THROTTLE_MIN_US);
+  if ((float)(THROTTLE_MAX_US - throttle_us) < correction_headroom) {
+    correction_headroom = (float)(THROTTLE_MAX_US - throttle_us);
+  }
+  if (correction_headroom > 10.0f) {
+    correction_headroom -= 10.0f;
+  }
+  if ((correction_sum > correction_headroom) && (correction_sum > 1.0f)) {
+    float scale = correction_headroom / correction_sum;
+    roll_cmd *= scale;
+    pitch_cmd *= scale;
+  }
 
-    m1 = clamp_u16((int32_t)(throttle_us + pitch_cmd + roll_cmd), THROTTLE_MIN_US, THROTTLE_MAX_US);
-    m2 = clamp_u16((int32_t)(throttle_us + pitch_cmd - roll_cmd), THROTTLE_MIN_US, THROTTLE_MAX_US);
-    m3 = clamp_u16((int32_t)(throttle_us - pitch_cmd + roll_cmd), THROTTLE_MIN_US, THROTTLE_MAX_US);
-    m4 = clamp_u16((int32_t)(throttle_us - pitch_cmd - roll_cmd), THROTTLE_MIN_US, THROTTLE_MAX_US);
+  m1 = clamp_u16((int32_t)(throttle_us + pitch_cmd + roll_cmd), THROTTLE_MIN_US,
+                 THROTTLE_MAX_US);
+  m2 = clamp_u16((int32_t)(throttle_us + pitch_cmd - roll_cmd), THROTTLE_MIN_US,
+                 THROTTLE_MAX_US);
+  m3 = clamp_u16((int32_t)(throttle_us - pitch_cmd + roll_cmd), THROTTLE_MIN_US,
+                 THROTTLE_MAX_US);
+  m4 = clamp_u16((int32_t)(throttle_us - pitch_cmd - roll_cmd), THROTTLE_MIN_US,
+                 THROTTLE_MAX_US);
 
-    motor_set_individual(m1, m2, m3, m4);
+  motors->motor_1 = m1;
+  motors->motor_2 = m2;
+  motors->motor_3 = m3;
+  motors->motor_4 = m4;
+
+  motor_set_individual(m1, m2, m3, m4);
 }

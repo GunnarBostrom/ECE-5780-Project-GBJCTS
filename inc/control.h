@@ -4,6 +4,14 @@
 #include "imu.h"
 #include "filter.h"
 
+typedef struct {
+    uint16_t motor_1;
+    uint16_t motor_2;
+    uint16_t motor_3;
+    uint16_t motor_4;
+
+} MOTOR_t;
+
 // Initializes the attitude controller with the fixed control-loop timestep.
 //
 // The timestep should match the rate at which `control_update()` is called so
@@ -18,6 +26,6 @@ void control_init(float dt);
 //
 // `imu` is accepted for interface consistency and future extensions, but the
 // current implementation closes the loop using `attitude`.
-void control_update(const LSM6DS3_t* imu, const Attitude_t* attitude);
+void control_update(const LSM6DS3_t* imu, const Attitude_t* attitude, MOTOR_t* motors);
 
 #endif

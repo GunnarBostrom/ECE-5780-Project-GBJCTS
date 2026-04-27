@@ -31,6 +31,7 @@ typedef enum {
   SENSOR_IMU,
   SENSOR_LIDAR,
   SENSOR_RADIO,
+  MOTOR,
 } SensorType_t;
 
 void Error_Handler(void);
@@ -46,6 +47,7 @@ static void send_sensor_data(SensorType_t sensor);
 LSM6DS3_t imu;
 LIDAR_t vl53l1x;
 Attitude_t attitude;
+MOTOR_t motors;
 
 int main(void) {
 
@@ -148,7 +150,7 @@ int main(void) {
                           dt);
 
             // Run the controller using the estimated attitude
-            control_update(&imu, &attitude);
+            control_update(&imu, &attitude, &motors);
           }
 
         // Background tasks can be added here later as long as they stay short
@@ -161,7 +163,7 @@ int main(void) {
 
         if (HAL_GetTick() - last_tick >= 500) {
           last_tick = HAL_GetTick();
-          send_sensor_data(SENSOR_IMU);
+          send_sensor_data(MOTOR);
         }
     }
     // Nothing should execute below the main control loop
@@ -298,6 +300,11 @@ static void send_sensor_data(SensorType_t sensor) {
     break;
   case SENSOR_RADIO:
     break;
+  case MOTOR:
+    //sprintf(buffer, "1: % u  2: % u  3: % u  4: % u\r\n", motors.motor_1, motors.motor_2, motors.motor_3, motors.motor_4);
+    sprintf(buffer, "motor1: % d motor2: % d motor3: % d motor4: % d", motors.motor_1, motors.motor_2, motors.motor_3, motors.motor_4);
+    accept_string(buffer);
+    break;
   default:
     break;
   }
@@ -341,10 +348,11 @@ void SystemClock_Config(void) {
   * @retval None
   */
 void Error_Handler(void) {
-  /* User can add their own implementation to report the HAL error return state */
   __disable_irq();
   while (1)
   {
+    HAL_GPIO_TogglePin(GPIOC, GPIO_PIN_6); // toggle red
+    HAL_Delay(250);
   }
 }
 
