@@ -250,7 +250,7 @@ void imu_read_temp(LSM6DS3_t* imu) {
   uint8_t buf[2];
 
   i2c_read(IMU_ADDR, TEMP_REG, buf, 2);
-  imu->temp_raw = (int16_t)(buf[0] | (buf[1] << 8));
+  //imu->temp = (int16_t)(buf[0] | (buf[1] << 8));
   //imu_convert_units(imu);
 }
 
@@ -259,7 +259,7 @@ void imu_read_all(LSM6DS3_t* imu) {
     uint8_t buf[14];
 
     i2c_read(IMU_ADDR, TEMP_REG, buf, 14);
-    imu->temp_raw = (int16_t)(buf[0] | (buf[1] << 8));
+    //imu->temp = (int16_t)(buf[0] | (buf[1] << 8));
     imu->gx   = (int16_t)(buf[2]  | buf[3]  << 8);
     imu->gy   = (int16_t)(buf[4]  | buf[5]  << 8);
     imu->gz   = (int16_t)(buf[6]  | buf[7]  << 8);
