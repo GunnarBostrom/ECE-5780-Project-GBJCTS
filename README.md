@@ -1,11 +1,3 @@
-Generate build files:  
-`cmake -B build -S ./`  
-Compile:  
-`cmake --build build`  
-Flash to board:  
-`cmake --build build --target flash_project`  
-
-
 # ECE-5780-Project-GBJCTS: Simple Quadcopter
 This is the final project for an embedded systems design course.
 
@@ -50,6 +42,8 @@ Weekly Milestones:
 - Motor control via PWM
 - RF radio link integrated via UART
 - IMU data read via I2C
+- Hardware integrated
+- Rough PID tune
 
 
 ## Toolchain
@@ -86,6 +80,31 @@ sudo apt install stlink-tools
 #### Windows
 Recommended to use Windows Subsystem for Linux. [Install WSL](https://learn.microsoft.com/en-us/windows/wsl/install) and use the Linux instructions above.  
 
+### Setup
+Create a file called config_local.h in the /inc/ directory and copy the code below into it.
+This is local config file that allows for the independent testing of different peripherals by multiple devs. Adjust the 1s and 0s according to what peripheral is to be included in the build.
+
+```c
+/*
+THIS FILE IS GITIGNORED.
+This config file is per dev settings and overrides the default.
+*/
+
+#pragma once
+
+
+/*
+Override for what peripherals you have.
+1 = HAVE
+0 = DON'T HAVE
+*/
+#define USE_RADIO 1
+#define USE_IMU 1
+#define USE_LIDAR 0
+#define USE_MOTOR 1
+#define USE_DEBUGGER 1
+```
+
 ### Build & Flash
 Generate build files:  
 `cmake -B build -S ./` (regular build)  
@@ -95,9 +114,18 @@ Compile:
 Flash to board:  
 `cmake --build build --target flash_project`
 
+### Debug and Testing
+Run OpenOCD:  
+`openocd -f interface/stlink.cfg -f target/stm32f0x.cfg &`  
+Run GDB:  
+`arm-none-eabi-gdb build/project.elf`  
+`target remote :3333`  
+`load`  
+Then set breakpoints and step through or continue as needed.
+
 
 ## Project Info
-**Status:** Sensing and actuating peripherals 
+**Status:** Flight tests and PID tuning  
 **Language:** C  
 **License:** MIT License – see [LICENSE](./LICENSE)  
 **Authors:** [G. Bostrom](https://github.com/GunnarBostrom), [J. Canada](https://github.com/JC919), [T. Stratton](https://github.com/POACH3)  
